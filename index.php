@@ -1,17 +1,27 @@
 <?PHP
+session_start();
 header('Content-type: text/html; charset=utf-8');
 require_once 'config.php';
 require_once 'function.php';
 
-/* ########################
- * # CHECK LOCAL DATABASE #
- */########################
-$conn_local = @mysql_connect($mysql_local[0] . ':' . $mysql_local[1], $mysql_local[2], $mysql_local[3]);
-if (!$conn_local) {
+/* ##################
+ * # CHECK PASSWORD #
+ */##################
+if (!isset($protect_site) or $protect_site !== false) {
+    if ($_SESSION['logged'] !== true) {
+        header('Location:login.php');
+    }
+}
+
+/* ##################
+ * # CHECK DATABASE #
+ */##################
+$conn_database = @mysql_connect($mysql_database[0] . ':' . $mysql_database[1], $mysql_database[2], $mysql_database[3]);
+if (!$conn_database) {
     die('Could not connect: ' . mysql_error());
 }
-$sel_local = @mysql_select_db($mysql_local[4]);
-if (!$sel_local) {
+$sel_xbmc = @mysql_select_db($mysql_database[4]);
+if (!$sel_xbmc) {
     die('Could not connect: ' . mysql_error());
 }
 
@@ -22,27 +32,29 @@ mysql_query('SET NAMES utf8');
 // Check table in database
 $sql_table = 'SHOW TABLES LIKE "movie"';
 $result_table = mysql_query($sql_table);
-if (!mysql_num_rows($result_table)) {
+if (!mysql_num_rows($result_table) & $mode === 2) {
     $output = create_table($col, $lang);
+} elseif (mysql_num_rows($result_table) > 2 & $mode === 2) {
+    $output = 'To nie jest baza danych MovieLib. Posiada za dużo tabel.';
 }
 
-/* #########################
- * # CHECK REMOTE DATABASE #
- */#########################
-if (!$_COOKIE['synch']) {
-    setcookie('synch', 'true', time()+3600);
-    $fp = @fsockopen($mysql_remote[0], $mysql_remote[1], $errno, $errstr, 3);
+/* #######################
+ * # CHECK XBMC DATABASE #
+ */#######################
+if (!isset($_COOKIE['sync']) & $mode === 1) {
+    $fp = @fsockopen($mysql_xbmc[0], $mysql_xbmc[1], $errno, $errstr, 3);
     if ($fp) {
         fclose($fp);
-        $conn_remote = @mysql_connect($mysql_remote[0] . ':' . $mysql_remote[1], $mysql_remote[2], $mysql_remote[3]);
-        if ($conn_remote) {
-            $output = synch_database($col, $mysql_local, $mysql_remote, $conn_local, $conn_remote, $lang);
+        $conn_xbmc = mysql_connect($mysql_xbmc[0] . ':' . $mysql_xbmc[1], $mysql_xbmc[2], $mysql_xbmc[3]);
+        if ($conn_xbmc) {
+            $output = sync_database($col, $mysql_database, $mysql_xbmc, $conn_database, $conn_xbmc, $lang);
+            setcookie('sync', true, time()+3600);
         }
     }
 }
 
-mysql_connect($mysql_local[0] . ':' . $mysql_local[1], $mysql_local[2], $mysql_local[3]);
-mysql_select_db($mysql_local[4]);
+mysql_connect($mysql_database[0] . ':' . $mysql_database[1], $mysql_database[2], $mysql_database[3]);
+mysql_select_db($mysql_database[4]);
 mysql_query('SET CHARACTER SET utf8');
 mysql_query('SET NAMES utf8');
 
@@ -141,8 +153,6 @@ while ($list = mysql_fetch_array($list_result)) {
     if (!file_exists($poster)) {
         $poster = 'img/d_poster.jpg';
     }
-
-
     $movie_stream_v_sql = 'SELECT strVideoCodec, fVideoAspect, iVideoWidth, iVideoHeight FROM streamdetails WHERE idFile = ' . $list[$col['id_file']] . ' AND iStreamType = 0';
     $movie_stream_v_result = mysql_query($movie_stream_v_sql);
     $movie_stream_v = mysql_fetch_array($movie_stream_v_result);
@@ -222,7 +232,7 @@ if (!isset($output) or $output == '') {
 <!DOCTYPE HTML>
 <html>
     <head>
-        <title>Movie Lib</title>
+        <title><?PHP echo $site_name ?></title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <link type="text/css" href="css/style.css" rel="stylesheet" media="all" />
         <script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>

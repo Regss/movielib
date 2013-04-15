@@ -11,13 +11,13 @@
 /* ##############################################################
  * # Script can work in two mode:                               #
  * #                                                            #
- * # 1. Local mode work on database created and used by XBMC.   #
+ * # 1. XBMC mode work on database created and used by XBMC.    #
  * #    The content is read and displayed on the fly.           #
  * #    However, access is only possible when a XBMC machine    #
  * #    is running.                                             #
  * #                                                            #
- * # 2. Remote mode work on separate MySql database and         #
- * #    can by run on other serwer. It connects to the XBMC     #
+ * # 2. Local mode work on separate MySql database and          #
+ * #    can by run on other server. It connects to the XBMC     #
  * #    database and synchronize with it.                       #
    #                                                            #
  */##############################################################
@@ -25,30 +25,29 @@
 // Set mode 1 or 2
 $mode = 1;
 
-// Database
-$mysql_host = 'localhost'; // Database host
-$mysql_port = '3306'; // Database port, default is 3306
-$mysql_login = 'root'; // Database login
-$mysql_pass = 'vertrigo'; // Database password
-$mysql_database = 'movielib'; // Database name
-$mysql_local = array($mysql_host, $mysql_port, $mysql_login, $mysql_pass, $mysql_database);
+// XBMC database
+$mysql_host_xbmc = 'localhost'; // Database host
+$mysql_port_xbmc = '3306'; // Database port, default is 3306
+$mysql_login_xbmc = 'root'; // Database login
+$mysql_pass_xbmc = 'vertrigo'; // Database password
+$mysql_database_xbmc = 'movielib'; // Database name
 
-// Remote database
-$mysql_host_remote = 'localhost'; // Database host
-$mysql_port_remote = '3306'; // Database port, default is 3306
-$mysql_login_remote = 'root'; // Database login
-$mysql_pass_remote = 'vertrigo'; // Database password
-$mysql_database_remote = 'xbmc58'; // Database name
-$mysql_remote = array($mysql_host_remote, $mysql_port_remote, $mysql_login_remote, $mysql_pass_remote, $mysql_database_remote);
+// Second separate database if set mode 2
+$mysql_host_sep = 'localhost'; // Database host
+$mysql_port_sep = '3306'; // Database port, default is 3306
+$mysql_login_sep = 'root'; // Database login
+$mysql_pass_sep = 'vertrigo'; // Database password
+$mysql_database_sep = 'xbmc58'; // Database name
 
 // Config
+$site_name = 'MovieLib'; // Site title
 $language = 'lang_pl.php'; // The file that contains the language, file must be in the lang/ folder
 $per_page = 50; // Movies per page, If you do not want to have pagination, type 0
 $recently_limit = 10; // Movies in recently added panel, to turn off panel type 0
 
 // Password
-$protect_site = true; // Set true to protect acess to site
-$pass = ''; // Type password in md5.
+$protect_site = false; // Set true to protect acess to site
+$pass = 'b27bfe5ba5bec17f80de30b9f23ff658'; // Type password in md5.
 
 
 /* ########################################
@@ -57,6 +56,18 @@ $pass = ''; // Type password in md5.
 
 // Language 
 require 'lang/' . $language;
+
+// Database config to array
+$mysql_xbmc = array($mysql_host_xbmc, $mysql_port_xbmc, $mysql_login_xbmc, $mysql_pass_xbmc, $mysql_database_xbmc);
+$mysql_sep = array($mysql_host_sep, $mysql_port_sep, $mysql_login_sep, $mysql_pass_sep, $mysql_database_sep);
+
+if ($mode === 1) {
+$mysql_database = $mysql_xbmc;
+}
+if ($mode === 2) {
+$mysql_database = $mysql_sep;
+
+}
 
 // Video resolution
 $vres_array = array('sd', 480, 576, 540, 720, 1080);

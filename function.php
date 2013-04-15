@@ -7,7 +7,6 @@
 /* ######################
  * # Create empty table #
  */######################
-
 function create_table($col, $lang) {
     $create_movie_sql = 'CREATE TABLE IF NOT EXISTS `movie` (
                 `' . $col['id_movie'] . '` int(11) NOT NULL AUTO_INCREMENT,
@@ -53,17 +52,16 @@ function create_table($col, $lang) {
 }
 
 /* ##################################
- * # Synch remote database to local #
+ * # Sync remote database to local #
  */##################################
-
-function synch_database($col, $mysql_local, $mysql_remote, $conn_local, $conn_remote, $lang) {
+function sync_database($col, $mysql_database, $mysql_xbmc, $conn_database, $conn_xbmc, $lang) {
     
     $output = '';
 
     // Check id movie from remote
     $remote_sql = 'SELECT ' . $col['id_movie'] . ', ' . $col['id_file'] . ' FROM movie ORDER BY ' . $col['id_movie'];
-    mysql_select_db($mysql_remote[4], $conn_remote);
-    $remote_result = mysql_query($remote_sql, $conn_remote);
+    mysql_select_db($mysql_xbmc[4], $conn_xbmc);
+    $remote_result = mysql_query($remote_sql, $conn_xbmc);
     $id_remote_assoc = array();
     while ($remote = mysql_fetch_assoc($remote_result)) {
         array_push($id_remote_assoc, $remote[$col['id_movie']]);
@@ -71,8 +69,8 @@ function synch_database($col, $mysql_local, $mysql_remote, $conn_local, $conn_re
 
     // Check id movie from local
     $local_sql = 'SELECT ' . $col['id_movie'] . ', ' . $col['id_file'] . ' FROM movie ORDER BY ' . $col['id_movie'];
-    mysql_select_db($mysql_local[4], $conn_local);
-    $local_result = mysql_query($local_sql, $conn_local);
+    mysql_select_db($mysql_database[4], $conn_database);
+    $local_result = mysql_query($local_sql, $conn_database);
     $id_local_assoc = array();
     $file_local_assoc = array();
     while ($local = mysql_fetch_assoc($local_result)) {
@@ -102,9 +100,9 @@ function synch_database($col, $mysql_local, $mysql_remote, $conn_local, $conn_re
     foreach ($id_to_remove as $key => $val) {
         $delete_movie_sql = 'DELETE FROM movie WHERE ' . $col['id_movie'] . ' = "' . $val . '"';
         $delete_stream_sql = 'DELETE FROM streamdetails WHERE ' . $col['id_file'] . ' = "' . $file_to_remove[$key] . '"';
-        mysql_select_db($mysql_local[4], $conn_local);
-        mysql_query($delete_movie_sql, $conn_local);
-        mysql_query($delete_stream_sql, $conn_local);
+        mysql_select_db($mysql_database[4], $conn_database);
+        mysql_query($delete_movie_sql, $conn_database);
+        mysql_query($delete_stream_sql, $conn_database);
         if (file_exists('cache/' . $val . '.jpg')) {
             unlink('cache/' . $val . '.jpg');
         }
@@ -126,13 +124,13 @@ function synch_database($col, $mysql_local, $mysql_remote, $conn_local, $conn_re
       ' . $col['director'] . ',
       ' . $col['originaltitle'] . ',
       ' . $col['country'] . ' FROM movie WHERE ' . $col['id_movie'] . ' = "' . $val . '"';
-        mysql_select_db($mysql_remote[4], $conn_remote);
-        mysql_query('SET CHARACTER SET utf8', $conn_remote);
-        mysql_query('SET NAMES utf8', $conn_remote);
-        $select_result = mysql_query($select_sql, $conn_remote);
+        mysql_select_db($mysql_xbmc[4], $conn_xbmc);
+        mysql_query('SET CHARACTER SET utf8', $conn_xbmc);
+        mysql_query('SET NAMES utf8', $conn_xbmc);
+        $select_result = mysql_query($select_sql, $conn_xbmc);
         $movie = mysql_fetch_assoc($select_result);
         $select_stream_sql = 'SELECT * FROM streamdetails WHERE ' . $col['id_file'] . ' = "' . $movie['idFile'] . '" ORDER BY iStreamType';
-        $select_stream_result = mysql_query($select_stream_sql, $conn_remote);
+        $select_stream_result = mysql_query($select_stream_sql, $conn_xbmc);
         $stream_assoc = array();
         while ($stream = mysql_fetch_assoc($select_stream_result)) {
             array_push($stream_assoc, $stream);
@@ -194,16 +192,16 @@ function synch_database($col, $mysql_local, $mysql_remote, $conn_local, $conn_re
         "' . $stream_assoc[1]['strAudioCodec'] . '",
         "' . $stream_assoc[1]['iAudioChannels'] . '"
         )';
-        mysql_select_db($mysql_local[4], $conn_local);
-        mysql_query('SET CHARACTER SET utf8', $conn_local);
-        mysql_query('SET NAMES utf8', $conn_local);
-        $insert = mysql_query($insert_sql, $conn_local);
+        mysql_select_db($mysql_database[4], $conn_database);
+        mysql_query('SET CHARACTER SET utf8', $conn_database);
+        mysql_query('SET NAMES utf8', $conn_database);
+        $insert = mysql_query($insert_sql, $conn_database);
         if (!$insert) {
-            echo '<br />' . $lang['f_synch_error'] . ': ' . mysql_error($conn_local);
+            echo '<br />' . $lang['f_synch_error'] . ': ' . mysql_error($conn_database);
             exit;
         } else {
-            mysql_query($insert_streamdetails_0_sql, $conn_local);
-            mysql_query($insert_streamdetails_1_sql, $conn_local);
+            mysql_query($insert_streamdetails_0_sql, $conn_database);
+            mysql_query($insert_streamdetails_1_sql, $conn_database);
         }
         $output = 'Zsynchronizowano';
     } 
@@ -213,7 +211,6 @@ function synch_database($col, $mysql_local, $mysql_remote, $conn_local, $conn_re
 /* ######################################
  * # GD conversion, create poster cache #
  */######################################
-
 function gd_convert($id, $poster) {
     $cache_poster = 'cache/' . $id . '.jpg';
     if (!file_exists($cache_poster) and !empty($poster)) {
