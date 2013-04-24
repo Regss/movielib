@@ -23,21 +23,22 @@
  */##############################################################
 
 // Set mode 1 or 2
-$mode = 1;
+$mode = 2;
 
 // XBMC database
-$mysql_host_xbmc = 'localhost'; // Database host
+$mysql_host_xbmc = '192.168.1.201'; // Database host
 $mysql_port_xbmc = '3306'; // Database port, default is 3306
 $mysql_login_xbmc = 'root'; // Database login
 $mysql_pass_xbmc = 'vertrigo'; // Database password
-$mysql_database_xbmc = 'movielib'; // Database name
+$mysql_database_xbmc = 'xbmc_video75'; // Database name
 
-// Second separate database if set mode 2
-$mysql_host_sep = 'localhost'; // Database host
-$mysql_port_sep = '3306'; // Database port, default is 3306
-$mysql_login_sep = 'root'; // Database login
-$mysql_pass_sep = 'vertrigo'; // Database password
-$mysql_database_sep = 'xbmc58'; // Database name
+// MovieLib database
+$mysql_host_ml = '192.168.1.201'; // Database host
+$mysql_port_ml = '3306'; // Database port, default is 3306
+$mysql_login_ml = 'root'; // Database login
+$mysql_pass_ml = 'vertrigo'; // Database password
+$mysql_database_ml = 'movielib'; // Database name
+$mysql_table_ml = 'movies'; // Table name to create
 
 // Config
 $site_name = 'MovieLib'; // Site title
@@ -59,15 +60,7 @@ require 'lang/' . $language;
 
 // Database config to array
 $mysql_xbmc = array($mysql_host_xbmc, $mysql_port_xbmc, $mysql_login_xbmc, $mysql_pass_xbmc, $mysql_database_xbmc);
-$mysql_sep = array($mysql_host_sep, $mysql_port_sep, $mysql_login_sep, $mysql_pass_sep, $mysql_database_sep);
-
-if ($mode === 1) {
-$mysql_database = $mysql_xbmc;
-}
-if ($mode === 2) {
-$mysql_database = $mysql_sep;
-
-}
+$mysql_ml = array($mysql_host_ml, $mysql_port_ml, $mysql_login_ml, $mysql_pass_ml, $mysql_database_ml);
 
 // Video resolution
 $vres_array = array('sd', 480, 576, 540, 720, 1080);
@@ -172,7 +165,7 @@ foreach ($var as $key => $val) {
     }
 }
 
-// Database column
+// XBMC database column
 $col['id_movie']        =   'idMovie';
 $col['id_file']         =   'idFile';
 $col['title']           =   'c00';

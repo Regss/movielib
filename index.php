@@ -16,12 +16,12 @@ if (!isset($protect_site) or $protect_site !== false) {
 /* ##################
  * # CHECK DATABASE #
  */##################
-$conn_database = @mysql_connect($mysql_database[0] . ':' . $mysql_database[1], $mysql_database[2], $mysql_database[3]);
-if (!$conn_database) {
+$conn_ml = @mysql_connect($mysql_ml[0] . ':' . $mysql_ml[1], $mysql_ml[2], $mysql_ml[3]);
+if (!$conn_ml) {
     die('Could not connect: ' . mysql_error());
 }
-$sel_xbmc = @mysql_select_db($mysql_database[4]);
-if (!$sel_xbmc) {
+$sel_ml = @mysql_select_db($mysql_ml[4]);
+if (!$sel_ml) {
     die('Could not connect: ' . mysql_error());
 }
 
@@ -30,31 +30,31 @@ mysql_query('SET CHARACTER SET utf8');
 mysql_query('SET NAMES utf8');
 
 // Check table in database
-$sql_table = 'SHOW TABLES LIKE "movie"';
+$sql_table = 'SHOW TABLES LIKE "' . $mysql_table_ml . '"';
 $result_table = mysql_query($sql_table);
-if (!mysql_num_rows($result_table) & $mode === 2) {
+if (!mysql_num_rows($result_table)) {
     $output = create_table($col, $lang);
-} elseif (mysql_num_rows($result_table) > 2 & $mode === 2) {
+} elseif (mysql_num_rows($result_table) > 1) {
     $output = 'To nie jest baza danych MovieLib. Posiada za dużo tabel.';
 }
 
 /* #######################
  * # CHECK XBMC DATABASE #
  */#######################
-if (!isset($_COOKIE['sync']) & $mode === 1) {
+if (!isset($_COOKIE['sync'])) {
     $fp = @fsockopen($mysql_xbmc[0], $mysql_xbmc[1], $errno, $errstr, 3);
     if ($fp) {
         fclose($fp);
         $conn_xbmc = mysql_connect($mysql_xbmc[0] . ':' . $mysql_xbmc[1], $mysql_xbmc[2], $mysql_xbmc[3]);
         if ($conn_xbmc) {
-            $output = sync_database($col, $mysql_database, $mysql_xbmc, $conn_database, $conn_xbmc, $lang);
-            setcookie('sync', true, time()+3600);
+            $output = sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $lang);
+            // setcookie('sync', true, time()+3600);
         }
     }
 }
 
-mysql_connect($mysql_database[0] . ':' . $mysql_database[1], $mysql_database[2], $mysql_database[3]);
-mysql_select_db($mysql_database[4]);
+mysql_connect($mysql_ml[0] . ':' . $mysql_ml[1], $mysql_ml[2], $mysql_ml[3]);
+mysql_select_db($mysql_ml[4]);
 mysql_query('SET CHARACTER SET utf8');
 mysql_query('SET NAMES utf8');
 
@@ -86,16 +86,16 @@ $sort_menu = '<span class="bold">Sortuj:</span>';
 foreach ($sort_array as $key => $val) {
     $sort_menu.= ($sort == $key ? ' ' . $val . ' ' : ' <a href="index.php?sort=' . $key . '&amp;genre=' . $genre . '">' . $val . '</a> ');
 }
-$sort_mysql = array(1 => $col['title'] . ' ASC', $col['year'] . ' DESC', $col['rating'] . ' DESC', $col['id_movie'] . ' DESC', ' CAST( ' . $col['runtime'] . ' AS DECIMAL( 10, 2 ) ) DESC');
+$sort_mysql = array(1 => 'title ASC', 'year DESC', 'rating DESC', 'id DESC', ' CAST( runtime AS DECIMAL( 10, 2 ) ) DESC');
 
 /* ##########
  * # GENRES #
  */##########
-$genre_sql = 'SELECT ' . $col['genre'] . ' FROM movie ORDER by ' . $col['genre'];
+$genre_sql = 'SELECT genre FROM ' . $mysql_table_ml . ' ORDER BY genre';
 $genre_result = mysql_query($genre_sql);
 $genre_array = array();
 while ($genre_mysql_array = mysql_fetch_array($genre_result)) {
-    foreach (explode(' / ', $genre_mysql_array[$col['genre']]) as $val) {
+    foreach (explode(' / ', $genre_mysql_array['genre']) as $val) {
         if (!in_array($val, $genre_array) && strlen($val) > 2) {
             $genre_array[] = $val;
         }
@@ -116,7 +116,7 @@ foreach ($genre_array as $key => $val) {
 /* #############
  * # PANEL NAV #
  */#############
-$nav_sql = 'SELECT ' . $col['id_movie'] . ', ' . $col['title'] . ', ' . $col['rating'] . ', ' . $col['year'] . ', ' . $col['genre'] . ', ' . $col['country'] . ' FROM movie WHERE ' . $col['genre'] . ' LIKE "%' . $genre_mysql . '%" AND ' . $col['title'] . ' LIKE "%' . $search_mysql . '%" AND ' . $col['id_movie'] . ' LIKE "' . $id_mysql . '" ORDER by ' . $sort_mysql[$sort];
+$nav_sql = 'SELECT id, title, rating, year, genre, country FROM ' . $mysql_table_ml . ' WHERE genre LIKE "%' . $genre_mysql . '%" AND title LIKE "%' . $search_mysql . '%" AND id LIKE "' . $id_mysql . '" ORDER by ' . $sort_mysql[$sort];
 $nav_result = mysql_query($nav_sql);
 $row = mysql_num_rows($nav_result);
 if ($per_page == 0) {
@@ -139,30 +139,23 @@ if ($per_page == 0) {
     $limit_sql = ' LIMIT ' . $start . ', ' . $per_page;
 }
 
-$list_sql = 'SELECT ' . $col['id_movie'] . ', ' . $col['id_file'] . ', ' . $col['title'] . ', ' . $col['rating'] . ', ' . $col['year'] . ', ' . $col['poster'] . ', ' . $col['plot'] . ', ' . $col['runtime'] . ', ' . $col['genre'] . ', ' . $col['country'] . ', ' . $col['director'] . ', ' . $col['originaltitle'] . ' FROM movie WHERE ' . $col['genre'] . ' LIKE "%' . $genre_mysql . '%" AND ' . $col['title'] . ' LIKE "%' . $search_mysql . '%" AND ' . $col['id_movie'] . ' LIKE "' . $id_mysql . '" ORDER by ' . $sort_mysql[$sort] . $limit_sql;
+$list_sql = 'SELECT * FROM ' . $mysql_table_ml . ' WHERE genre LIKE "%' . $genre_mysql . '%" AND title LIKE "%' . $search_mysql . '%" AND id LIKE "' . $id_mysql . '" ORDER by ' . $sort_mysql[$sort] . $limit_sql;
 $list_result = mysql_query($list_sql);
 $panel_list = '';
 while ($list = mysql_fetch_array($list_result)) {
     
-    $poster = 'cache/' . $list[$col['id_movie']] . '.jpg';
+    $poster = 'cache/' . $list['id'] . '.jpg';
     if (!file_exists($poster)) {
-        preg_match_all('/<thumb.*?>(.*?)<\/thumb>/', $list[$col['poster']], $poster_path);
+        preg_match_all('/<thumb.*?>(.*?)<\/thumb>/', $list['poster'], $poster_path);
         $poster_path = (isset($poster_path[1]) ? $poster_path[1] : '');
-        gd_convert($list[$col['id_movie']], $poster_path);
+        gd_convert($list['id'], $poster_path);
     }
     if (!file_exists($poster)) {
         $poster = 'img/d_poster.jpg';
     }
-    $movie_stream_v_sql = 'SELECT strVideoCodec, fVideoAspect, iVideoWidth, iVideoHeight FROM streamdetails WHERE idFile = ' . $list[$col['id_file']] . ' AND iStreamType = 0';
-    $movie_stream_v_result = mysql_query($movie_stream_v_sql);
-    $movie_stream_v = mysql_fetch_array($movie_stream_v_result);
-
-    $movie_stream_a_sql = 'SELECT strAudioCodec, iAudioChannels FROM streamdetails WHERE idFile = ' . $list[$col['id_file']] . ' AND iStreamType = 1';
-    $movie_stream_a_result = mysql_query($movie_stream_a_sql);
-    $movie_stream_a = mysql_fetch_array($movie_stream_a_result);
 
 // hd flag
-    if ($movie_stream_v['iVideoWidth'] > 1279) {
+    if ($list['v_width'] > 1279) {
         $flag_hd = '<img class="img_flag_hd" src="img/hd.png" alt="">';
     } else {
         $flag_hd = '';
@@ -171,51 +164,51 @@ while ($list = mysql_fetch_array($list_result)) {
 // video resolution
     $i = 0;
     foreach ($width_height as $key => $val) {
-        if ($movie_stream_v['iVideoWidth'] >= $key or $movie_stream_v['iVideoHeight'] >= $val) {
+        if ($list['v_width'] >= $key or $list['v_height'] >= $val) {
             $img_flag_vres = '<img id="vres" src="img/flags/vres_' . $vres_array[$i] . '.png" alt="">';
         }
         $i++;
     }
 
 // video codec
-    if (isset($vtype[$movie_stream_v['strVideoCodec']])) {
-        $img_flag_vtype = '<img id="vtype" src="img/flags/vcodec_' . $vtype[$movie_stream_v['strVideoCodec']] . '.png" alt="">';
+    if (isset($vtype[$list['v_codec']])) {
+        $img_flag_vtype = '<img id="vtype" src="img/flags/vcodec_' . $vtype[$list['v_codec']] . '.png" alt="">';
     } else {
         $img_flag_vtype = '<img id="vtype" src="img/flags/vcodec_defaultscreen.png" alt="">';
     }
 
 // audio codec 
-    if (isset($atype[$movie_stream_a['strAudioCodec']])) {
-        $img_flag_atype = '<img id="atype" src="img/flags/acodec_' . $atype[$movie_stream_a['strAudioCodec']] . '.png" alt="">';
+    if (isset($atype[$list['a_codec']])) {
+        $img_flag_atype = '<img id="atype" src="img/flags/acodec_' . $atype[$list['a_codec']] . '.png" alt="">';
     } else {
         $img_flag_atype = '<img id="atype" src="img/flags/acodec_defaultsound.png" alt="">';
     }
 
 // audio channel
-    if (isset($achan[$movie_stream_a['iAudioChannels']])) {
-        $img_flag_achan = '<img id="achan" src="img/flags/achan_' . $achan[$movie_stream_a['iAudioChannels']] . '.png" alt="">';
+    if (isset($achan[$list['a_channels']])) {
+        $img_flag_achan = '<img id="achan" src="img/flags/achan_' . $achan[$list['a_channels']] . '.png" alt="">';
     } else {
         $img_flag_achan = '<img id="achan" src="img/flags/achan_defaultsound.png" alt="">';
     }
     $img_flag = $img_flag_vres . $img_flag_vtype . $img_flag_atype . $img_flag_achan;
 
-    $panel_list.= '<div class="movie"><div class="title">' . $list[$col['title']] . $flag_hd . '</div><div class="title_org">' . $list[$col['originaltitle']] . '</div><img class="poster" src="' . $poster . '"><div class="flags"><table id="movie_info"><tr><td class="movie_left">Rok:</td><td class="movie_right">' . $list[$col['year']] . '</td></tr><tr><td class="movie_left">Gatunek</td><td class="movie_right">' . $list[$col['genre']] . '</td></tr><tr><td class="movie_left">Rating:</td><td class="movie_right">' . round($list[$col['rating']], 1) . '</td></tr><tr><td class="movie_left">Kraj:</td><td class="movie_right">' . $list[$col['country']] . '</td></tr><tr><td class="movie_left">Runtime:</td><td class="movie_right">' . $list[$col['runtime']] . ' min.</td></tr><tr><td class="movie_left">Reżyser:</td><td class="movie_right">' . $list[$col['director']] . '</td></tr><tr><td class="movie_left">Opis:</td><td class="movie_right">' . $list[$col['plot']] . '</td></tr></table><img id="img_space" src="img/space.png">' . $img_flag . '</div></div>';
+    $panel_list.= '<div class="movie"><div class="title">' . $list['title'] . $flag_hd . '</div><div class="title_org">' . $list['originaltitle'] . '</div><img class="poster" src="' . $poster . '"><div class="flags"><table id="movie_info"><tr><td class="movie_left">Rok:</td><td class="movie_right">' . $list['year'] . '</td></tr><tr><td class="movie_left">Gatunek:</td><td class="movie_right">' . $list['genre'] . '</td></tr><tr><td class="movie_left">Rating:</td><td class="movie_right">' . round($list['rating'], 1) . '</td></tr><tr><td class="movie_left">Kraj:</td><td class="movie_right">' . $list['country'] . '</td></tr><tr><td class="movie_left">Runtime:</td><td class="movie_right">' . $list['runtime'] . ' min.</td></tr><tr><td class="movie_left">Reżyser:</td><td class="movie_right">' . $list['director'] . '</td></tr><tr><td class="movie_left">Opis:</td><td class="movie_right">' . $list['plot'] . '</td></tr></table><img id="img_space" src="img/space.png">' . $img_flag . '</div></div>';
 }
 
 // recently added panel
 if ($recently_limit == 0) {
     $recently_output = '';
 } else {
-    $recently_sql = 'SELECT ' . $col['id_movie'] . ', ' . $col['id_file'] . ', ' . $col['title'] . ', ' . $col['poster'] . ' FROM movie ORDER BY ' . $col['id_movie'] . ' DESC LIMIT ' . $recently_limit;
+    $recently_sql = 'SELECT id, file, title, poster FROM ' . $mysql_table_ml . ' ORDER BY id DESC LIMIT ' . $recently_limit;
     $recently_result = mysql_query($recently_sql);
     $recently_output = '';
     while ($recently = mysql_fetch_array($recently_result)) {
-        if (!file_exists('cache/' . $recently[$col['id_movie']] . '.jpg')) {
-            preg_match_all('/<thumb.*?>(.*?)<\/thumb>/', $recently[$col['poster']], $poster_path);
+        if (!file_exists('cache/' . $recently['id'] . '.jpg')) {
+            preg_match_all('/<thumb.*?>(.*?)<\/thumb>/', $recently['poster'], $poster_path);
             $poster_path = (isset($poster_path[1]) ? $poster_path[1] : '');
-            gd_convert($recently[$col['id_movie']], $poster_path, '');
+            gd_convert($recently['id'], $poster_path, '');
         }
-        $recently_output.= '<a href="index.php?id=' . $recently[$col['id_movie']] . '"><img class="recently_img" src="cache/' . $recently[$col['id_movie']] . '.jpg" title="' . $recently[$col['title']] . '" alt=""></a>';
+        $recently_output.= '<a href="index.php?id=' . $recently['id'] . '"><img class="recently_img" src="cache/' . $recently['id'] . '.jpg" title="' . $recently['title'] . '" alt=""></a>';
     }
 }
 
