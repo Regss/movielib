@@ -33,7 +33,7 @@ mysql_query('SET NAMES utf8');
 $sql_table = 'SHOW TABLES LIKE "' . $mysql_table_ml . '"';
 $result_table = mysql_query($sql_table);
 if (!mysql_num_rows($result_table)) {
-    $output = create_table($col, $lang);
+    $output = create_table($col, $mysql_table_ml, $lang);
 } elseif (mysql_num_rows($result_table) > 1) {
     $output = 'To nie jest baza danych MovieLib. Posiada za dużo tabel.';
 }
@@ -47,16 +47,22 @@ if (!isset($_COOKIE['sync'])) {
         fclose($fp);
         $conn_xbmc = mysql_connect($mysql_xbmc[0] . ':' . $mysql_xbmc[1], $mysql_xbmc[2], $mysql_xbmc[3]);
         if ($conn_xbmc) {
-            $output = sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $lang);
+            $output = sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysql_table_ml, $lang);
             // setcookie('sync', true, time()+3600);
         }
     }
 }
-
 mysql_connect($mysql_ml[0] . ':' . $mysql_ml[1], $mysql_ml[2], $mysql_ml[3]);
 mysql_select_db($mysql_ml[4]);
 mysql_query('SET CHARACTER SET utf8');
 mysql_query('SET NAMES utf8');
+
+/* ##########################
+ * # CHECK FILE videodb.xml #
+ */##########################
+if (file_exists('import/videodb.xml')) {
+    $output = import_xml($col, $mysql_ml, $conn_ml, $mysql_table_ml, $lang);
+}
 
 // Set id
 if (!isset($_GET['id'])) {
