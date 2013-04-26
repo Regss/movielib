@@ -10,6 +10,7 @@ require_once 'function.php';
 if (!isset($protect_site) or $protect_site !== false) {
     if ($_SESSION['logged'] !== true) {
         header('Location:login.php');
+        die();
     }
 }
 
@@ -61,7 +62,7 @@ mysql_query('SET NAMES utf8');
  * # CHECK FILE videodb.xml #
  */##########################
 if (file_exists('import/videodb.xml')) {
-    $output = import_xml($col, $mysql_ml, $conn_ml, $mysql_table_ml, $lang);
+    // $output = import_xml($col, $mysql_ml, $conn_ml, $mysql_table_ml, $lang);
 }
 
 // Set id

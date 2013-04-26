@@ -26,14 +26,14 @@
 $mode = 2;
 
 // XBMC database
-$mysql_host_xbmc = '192.168.1.20'; // Database host
+$mysql_host_xbmc = '127.0.0.1'; // Database host
 $mysql_port_xbmc = '3306'; // Database port, default is 3306
 $mysql_login_xbmc = 'root'; // Database login
 $mysql_pass_xbmc = 'vertrigo'; // Database password
-$mysql_database_xbmc = 'xbmc_video75'; // Database name
+$mysql_database_xbmc = 'myvideos75'; // Database name
 
 // MovieLib database
-$mysql_host_ml = '192.168.1.201'; // Database host
+$mysql_host_ml = '127.0.0.1'; // Database host
 $mysql_port_ml = '3306'; // Database port, default is 3306
 $mysql_login_ml = 'root'; // Database login
 $mysql_pass_ml = 'vertrigo'; // Database password
