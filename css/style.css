@@ -35,8 +35,25 @@ a:active {
     color:#FFF;
     text-decoration:none;
 }
+a.block, .block {
+    font-weight: bold;
+    display: inline-block;
+    border: 1px solid #222;
+    background-color: #000;
+    padding: 3px;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-left: 10px;
+}
 .bold {
     font-weight: bold;
+}
+.orange {
+    font-weight: bold;
+    color: #ff7300;
+}
+.hidden {
+    display: none;
 }
 #container {
     background-color: #000;
@@ -46,8 +63,17 @@ a:active {
     margin: auto;
     margin-bottom: 10px;
 }
+#panel_left {
+    float: left;
+    width: 140px;
+}
+#panel_right {
+    float: right;
+    width: 660px;
+}
 #panel_info {
     position: absolute;
+    display: none;
     top: 5px;
     right: 5px;
     width: 200px;
@@ -58,26 +84,26 @@ a:active {
     color: #000;
     padding: 5px;
 }
-#panel_menu {
-    border: 1px solid;
-    border-color: #222222;
-    background-color: #111111;
-    width: 140px;
-    margin-left: 5px;
-    margin-top: 5px;
-    float: left;
-}
-#panel_menu_title {
+.panel_box_title {
+    border: 1px  solid #222;
+    border-bottom: 0px;
     font-weight: bold;
     text-align: center;
-    background-color: #000000;
+    background-color: #000;
+    margin-left: 5px;
+    margin-top: 5px;
     padding: 2px;
+}
+.panel_box {
+    padding: 5px;
+    border: 1px solid #222;
+    background-color: #111;
+    margin-left: 5px;
+    margin-bottom: 5px;
 }
 .genre {
     margin-top: 2px;
     margin-bottom: 2px;
-    margin-left: 5px;
-    margin-right: 5px;
 }
 #panel_options {
     float: right;
@@ -144,9 +170,16 @@ a:active {
     color: #aaa;
 }
 .img_flag_hd {
-    width: 31px;
-    height: 18px;
-    float: right;
+    position: absolute;
+    margin-left: 88px;
+    margin-top: 1px;
+    display: block;
+}
+.watched {
+    position: absolute;
+    padding-left: 104px;
+    padding-top: 162px;
+    display: block;
 }
 #vres, #vtype, #atype, #achan {
     width: 48px;

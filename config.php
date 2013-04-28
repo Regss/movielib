@@ -1,53 +1,52 @@
 <?PHP
 /* #############################################################
  * # This is the configuration file.                           #
-   #                                                           #
  */#############################################################
 
 /* #################
  * # OPTIONS START #
  */#################
 
-/* ##############################################################
- * # Script can work in two mode:                               #
- * #                                                            #
- * # 1. XBMC mode work on database created and used by XBMC.    #
- * #    The content is read and displayed on the fly.           #
- * #    However, access is only possible when a XBMC machine    #
- * #    is running.                                             #
- * #                                                            #
- * # 2. Local mode work on separate MySql database and          #
- * #    can by run on other server. It connects to the XBMC     #
- * #    database and synchronize with it.                       #
-   #                                                            #
- */##############################################################
+/* ######################################
+ * # Script can work in two mode:       #
+ * #                                    #
+ * # To connect to XBMC database and    #
+ * # synchronize it set mode to 1.      #
+ * #                                    #
+ * # To import movies from videodb.xml  #
+ * # exported from XBMC set mode to 2   #
+ * #                                    #
+ */######################################
 
 // Set mode 1 or 2
-$mode = 2;
-
-// XBMC database
-$mysql_host_xbmc = '127.0.0.1'; // Database host
-$mysql_port_xbmc = '3306'; // Database port, default is 3306
-$mysql_login_xbmc = 'root'; // Database login
-$mysql_pass_xbmc = 'vertrigo'; // Database password
-$mysql_database_xbmc = 'myvideos75'; // Database name
+$mode = 1;
 
 // MovieLib database
-$mysql_host_ml = '127.0.0.1'; // Database host
+$mysql_host_ml = '192.168.1.201'; // Database host
 $mysql_port_ml = '3306'; // Database port, default is 3306
 $mysql_login_ml = 'root'; // Database login
 $mysql_pass_ml = 'vertrigo'; // Database password
 $mysql_database_ml = 'movielib'; // Database name
 $mysql_table_ml = 'movies'; // Table name to create
 
+// XBMC database configure only when set to mode 1
+$mysql_host_xbmc = '192.168.1.201'; // Database host
+$mysql_port_xbmc = '3306'; // Database port, default is 3306
+$mysql_login_xbmc = 'root'; // Database login
+$mysql_pass_xbmc = 'vertrigo'; // Database password
+$mysql_database_xbmc = 'xbmc_video75'; // Database name
+
 // Config
 $site_name = 'MovieLib'; // Site title
 $language = 'lang_pl.php'; // The file that contains the language, file must be in the lang/ folder
-$per_page = 50; // Movies per page, If you do not want to have pagination, type 0
-$recently_limit = 10; // Movies in recently added panel, to turn off panel type 0
+$per_page = 50; // Movies per page, If you do not want to have pagination, set 0
+$recently_limit = 10; // Movies in recently added panel, to turn off panel set 0
+$sync_time = 10; // Time in minutes after which the script will attempt to synchronize databases
+$watched_status = true; // Show watched status
+$set_overall_panel = true; // Show overall panel
 
 // Password
-$protect_site = false; // Set true to protect acess to site
+$protect_site = false; // Protect acess to site
 $pass = 'b27bfe5ba5bec17f80de30b9f23ff658'; // Type password in md5.
 
 
@@ -156,13 +155,27 @@ $achan = array(
 );
 
 // Set var
-$var = array('sort' => 1, 'genre' => 'all', 'search' => '', 'page' => 1);
+$var = array(
+    'sort' => 1,
+    'genre' => 'all',
+    'search' => '',
+    'page' => 1
+    );
 foreach ($var as $key => $val) {
     if (isset($_GET[$key])) {
         $$key = $_GET[$key];
     } else {
         $$key = $val;
     }
+}
+
+// Set id
+if (!isset($_GET['id'])) {
+    $id = 0;
+    $id_mysql = '%';
+} else {
+    $id = $_GET['id'];
+    $id_mysql = $_GET['id'];
 }
 
 // XBMC database column

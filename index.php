@@ -19,11 +19,11 @@ if (!isset($protect_site) or $protect_site !== false) {
  */##################
 $conn_ml = @mysql_connect($mysql_ml[0] . ':' . $mysql_ml[1], $mysql_ml[2], $mysql_ml[3]);
 if (!$conn_ml) {
-    die('Could not connect: ' . mysql_error());
+    die($lang['i_could_not_connect'] . ': ' . mysql_error());
 }
 $sel_ml = @mysql_select_db($mysql_ml[4]);
 if (!$sel_ml) {
-    die('Could not connect: ' . mysql_error());
+    die($lang['i_could_not_connect'] . ': ' . mysql_error());
 }
 
 // Sets utf8 connections
@@ -31,47 +31,65 @@ mysql_query('SET CHARACTER SET utf8');
 mysql_query('SET NAMES utf8');
 
 // Check table in database
-$sql_table = 'SHOW TABLES LIKE "' . $mysql_table_ml . '"';
+$sql_table = 'SHOW TABLES';
 $result_table = mysql_query($sql_table);
-if (!mysql_num_rows($result_table)) {
+$table_count = mysql_num_rows($result_table);
+if ($table_count > 1) {
+    die($lang['i_not_movielib_db']);
+} elseif ($table_count == 0) {
     $output = create_table($col, $mysql_table_ml, $lang);
-} elseif (mysql_num_rows($result_table) > 1) {
-    $output = 'To nie jest baza danych MovieLib. Posiada za dużo tabel.';
 }
 
 /* #######################
  * # CHECK XBMC DATABASE #
  */#######################
-if (!isset($_COOKIE['sync'])) {
+if (!isset($_COOKIE['sync']) && $mode == 1) {
     $fp = @fsockopen($mysql_xbmc[0], $mysql_xbmc[1], $errno, $errstr, 3);
     if ($fp) {
         fclose($fp);
         $conn_xbmc = mysql_connect($mysql_xbmc[0] . ':' . $mysql_xbmc[1], $mysql_xbmc[2], $mysql_xbmc[3]);
         if ($conn_xbmc) {
-            $output = sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysql_table_ml, $lang);
-            // setcookie('sync', true, time()+3600);
+            $sel_xbmc = @mysql_select_db($mysql_xbmc[4]);
+            if ($sel_xbmc) {
+                $output = sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysql_table_ml, $lang);
+                setcookie('sync', true, time()+$sync_time/60);
+            }
         }
     }
 }
+
+/* ##########################
+ * # CHECK FILE videodb.xml #
+ */##########################
+if (file_exists('import/videodb.xml') && $mode == 2) {
+    $output = import_xml($col, $mysql_ml, $conn_ml, $mysql_table_ml, $lang);
+}
+
+/* ################################
+ * # CONNECT TO MOVIELIB DATABASE #
+ */################################
 mysql_connect($mysql_ml[0] . ':' . $mysql_ml[1], $mysql_ml[2], $mysql_ml[3]);
 mysql_select_db($mysql_ml[4]);
 mysql_query('SET CHARACTER SET utf8');
 mysql_query('SET NAMES utf8');
 
-/* ##########################
- * # CHECK FILE videodb.xml #
- */##########################
-if (file_exists('import/videodb.xml')) {
-    // $output = import_xml($col, $mysql_ml, $conn_ml, $mysql_table_ml, $lang);
-}
-
-// Set id
-if (!isset($_GET['id'])) {
-    $id = 0;
-    $id_mysql = '%';
+/* #################
+ * # OVERALL PANEL #
+ */#################
+if ($set_overall_panel == true) {
+    $overall_sql = 'SELECT play_count FROM ' . $mysql_table_ml;
+    $overall_result = mysql_query($overall_sql);
+    $overall_all = mysql_num_rows($overall_result);
+    $overall_nw = 0;
+    while($a = mysql_fetch_array($overall_result)) {
+        if ($a[0] == NULL) {
+            $overall_nw++;
+        }
+    }
+    $overall_w = $overall_all - $overall_nw;
+    $overall_panel = '<div class="panel_box_title">' . $lang['i_overall_title'] . ':</div><div class="panel_box"><span class="orange">' . $lang['i_overall_all'] . ':</span> ' . $overall_all . '<br /><span class="orange">' . $lang['i_overall_watched'] . ':</span> ' . $overall_w . '<br /><span class="orange">' . $lang['i_overall_notwatched'] . ':</span> ' . $overall_nw . '</div>';
 } else {
-    $id = $_GET['id'];
-    $id_mysql = $_GET['id'];
+    $overall_panel = '';
 }
 
 /* ##########
@@ -81,7 +99,7 @@ if ($search == '') {
     $search_text = '<input type="text" name="search" class="search"><input type="image" class="search_img" src="img/search.png" title="' . $lang['i_search'] . '" alt="Search" />';
     $search_mysql = '%';
 } else {
-    $search_text = $lang['i_result'] . ': ' . $search . ' <a href="index.php"><img src="img/delete.png" title="' . $lang['i_search_del'] . '" alt=""></a>';
+    $search_text = $lang['i_result'] . ': ' . $search . ' <a href="index.php"><img src="img/delete.png" title="' . $lang['i_search_del'] . '" alt=""></a> <input type="text" name="search" class="search"><input type="image" class="search_img" src="img/search.png" title="' . $lang['i_search'] . '" alt="Search" />';
     $search_mysql = $search;
 }
 
@@ -89,11 +107,11 @@ if ($search == '') {
  * # SORT #
  */########
 $sort_array = array(1 => $lang['i_title'], $lang['i_year'], $lang['i_rating'], $lang['i_added'], $lang['i_runtime']);
-$sort_menu = '<span class="bold">Sortuj:</span>';
+$sort_menu = '<span class="bold">' . $lang['i_sort'] . ':</span>';
 foreach ($sort_array as $key => $val) {
-    $sort_menu.= ($sort == $key ? ' ' . $val . ' ' : ' <a href="index.php?sort=' . $key . '&amp;genre=' . $genre . '">' . $val . '</a> ');
+    $sort_menu.= ($sort == $key ? ' <span class="block">' . $val . '</span> ' : ' <a class="block" href="index.php?sort=' . $key . '&amp;genre=' . $genre . '">' . $val . '</a> ');
 }
-$sort_mysql = array(1 => 'title ASC', 'year DESC', 'rating DESC', 'id DESC', ' CAST( runtime AS DECIMAL( 10, 2 ) ) DESC');
+$sort_mysql = array(1 => 'title ASC', 'year DESC', 'rating DESC', 'date_added DESC', ' CAST( runtime AS DECIMAL( 10, 2 ) ) DESC');
 
 /* ##########
  * # GENRES #
@@ -134,6 +152,9 @@ if ($per_page == 0) {
     $nav = ($page == 1 ? $lang['i_previous'] : '<a href="index.php?sort=' . $sort . '&amp;genre=' . $genre . '&amp;page=' . ($page - 1) . '&amp;search=' . $search . '">' . $lang['i_previous'] . '</a>') . ' ' .
             $lang['i_page'] . ' ' . $page . ' / ' . $i_pages . ' ' .
             ($page == $i_pages ? $lang['i_next'] : '<a href="index.php?sort=' . $sort . '&amp;genre=' . $genre . '&amp;page=' . ($page + 1) . '&amp;search=' . $search . '">' . $lang['i_next'] . '</a>');
+    if ($row == 0) {
+        $nav ='';
+    }
 }
 
 /* ##############
@@ -151,24 +172,23 @@ $list_result = mysql_query($list_sql);
 $panel_list = '';
 while ($list = mysql_fetch_array($list_result)) {
     
+    // poster
     $poster = 'cache/' . $list['id'] . '.jpg';
     if (!file_exists($poster)) {
-        preg_match_all('/<thumb.*?>(.*?)<\/thumb>/', $list['poster'], $poster_path);
-        $poster_path = (isset($poster_path[1]) ? $poster_path[1] : '');
-        gd_convert($list['id'], $poster_path);
+        gd_convert($list['id'], $list['poster']);
     }
     if (!file_exists($poster)) {
         $poster = 'img/d_poster.jpg';
     }
 
-// hd flag
+    // hd flag
     if ($list['v_width'] > 1279) {
         $flag_hd = '<img class="img_flag_hd" src="img/hd.png" alt="">';
     } else {
         $flag_hd = '';
     }
 
-// video resolution
+    // video resolution
     $i = 0;
     foreach ($width_height as $key => $val) {
         if ($list['v_width'] >= $key or $list['v_height'] >= $val) {
@@ -177,21 +197,21 @@ while ($list = mysql_fetch_array($list_result)) {
         $i++;
     }
 
-// video codec
+    // video codec
     if (isset($vtype[$list['v_codec']])) {
         $img_flag_vtype = '<img id="vtype" src="img/flags/vcodec_' . $vtype[$list['v_codec']] . '.png" alt="">';
     } else {
         $img_flag_vtype = '<img id="vtype" src="img/flags/vcodec_defaultscreen.png" alt="">';
     }
 
-// audio codec 
+    // audio codec 
     if (isset($atype[$list['a_codec']])) {
         $img_flag_atype = '<img id="atype" src="img/flags/acodec_' . $atype[$list['a_codec']] . '.png" alt="">';
     } else {
         $img_flag_atype = '<img id="atype" src="img/flags/acodec_defaultsound.png" alt="">';
     }
 
-// audio channel
+    // audio channel
     if (isset($achan[$list['a_channels']])) {
         $img_flag_achan = '<img id="achan" src="img/flags/achan_' . $achan[$list['a_channels']] . '.png" alt="">';
     } else {
@@ -199,23 +219,73 @@ while ($list = mysql_fetch_array($list_result)) {
     }
     $img_flag = $img_flag_vres . $img_flag_vtype . $img_flag_atype . $img_flag_achan;
 
-    $panel_list.= '<div class="movie"><div class="title">' . $list['title'] . $flag_hd . '</div><div class="title_org">' . $list['originaltitle'] . '</div><img class="poster" src="' . $poster . '"><div class="flags"><table id="movie_info"><tr><td class="movie_left">Rok:</td><td class="movie_right">' . $list['year'] . '</td></tr><tr><td class="movie_left">Gatunek:</td><td class="movie_right">' . $list['genre'] . '</td></tr><tr><td class="movie_left">Rating:</td><td class="movie_right">' . round($list['rating'], 1) . '</td></tr><tr><td class="movie_left">Kraj:</td><td class="movie_right">' . $list['country'] . '</td></tr><tr><td class="movie_left">Runtime:</td><td class="movie_right">' . $list['runtime'] . ' min.</td></tr><tr><td class="movie_left">Reżyser:</td><td class="movie_right">' . $list['director'] . '</td></tr><tr><td class="movie_left">Opis:</td><td class="movie_right">' . $list['plot'] . '</td></tr></table><img id="img_space" src="img/space.png">' . $img_flag . '</div></div>';
+    // wached status
+    if ($watched_status == true && $list['play_count'] > 0) {
+        $watched = '<img class="watched" src="img/watched.png" alt="" title="' . $lang['i_last_played'] . ': ' . $list['last_played'] . '">';
+    } else {
+        $watched = '';
+    }
+    
+    $panel_list.= '
+<div class="movie">
+    <div class="title">' . $list['title'] . '</div>
+    <div class="title_org">' . $list['originaltitle'] . '</div>'
+    . $watched 
+    . $flag_hd . '
+    <img class="poster" src="' . $poster . '">
+    <div class="flags">
+        <table id="movie_info">
+            <tr>
+                <td class="movie_left">' . $lang['i_year'] . ':</td>
+                <td class="movie_right">' . $list['year'] . '</td>
+            </tr>
+            <tr>
+                <td class="movie_left">' . $lang['i_genre'] . ':</td>
+                <td class="movie_right">' . $list['genre'] . '</td>
+            </tr>
+            <tr>
+                <td class="movie_left">' . $lang['i_rating'] . ':</td>
+                <td class="movie_right">' . round($list['rating'], 1) . '</td>
+            </tr>
+            <tr>
+                <td class="movie_left">' . $lang['i_country'] . ':</td>
+                <td class="movie_right">' . $list['country'] . '</td>
+            </tr>
+            <tr>
+                <td class="movie_left">' . $lang['i_runtime'] . ':</td>
+                <td class="movie_right">' . $list['runtime'] . ' ' . $lang['i_minute'] . '</td>
+            </tr>
+            <tr>
+                <td class="movie_left">' . $lang['i_director'] . ':</td>
+                <td class="movie_right">' . $list['director'] . '</td>
+            </tr>
+            <tr>
+                <td class="movie_left">' . $lang['i_plot'] . ':</td>
+                <td class="movie_right">' . $list['plot'] . '</td>
+            </tr>
+        </table>
+        <img id="img_space" src="img/space.png">
+        ' . $img_flag . '
+    </div>
+</div>';
 }
 
 // recently added panel
 if ($recently_limit == 0) {
     $recently_output = '';
 } else {
-    $recently_sql = 'SELECT id, file, title, poster FROM ' . $mysql_table_ml . ' ORDER BY id DESC LIMIT ' . $recently_limit;
+    $recently_sql = 'SELECT id, title, poster, date_added FROM ' . $mysql_table_ml . ' ORDER BY date_added DESC LIMIT ' . $recently_limit;
     $recently_result = mysql_query($recently_sql);
     $recently_output = '';
+    $recently_random = '';
+    $r = 0;
     while ($recently = mysql_fetch_array($recently_result)) {
         if (!file_exists('cache/' . $recently['id'] . '.jpg')) {
-            preg_match_all('/<thumb.*?>(.*?)<\/thumb>/', $recently['poster'], $poster_path);
-            $poster_path = (isset($poster_path[1]) ? $poster_path[1] : '');
-            gd_convert($recently['id'], $poster_path, '');
+            gd_convert($recently['id'], $recently['poster'], '');
         }
         $recently_output.= '<a href="index.php?id=' . $recently['id'] . '"><img class="recently_img" src="cache/' . $recently['id'] . '.jpg" title="' . $recently['title'] . '" alt=""></a>';
+        $r++;
+        $recently_random.= '<div id="rec_' . $r . '" class="hidden"><a href="index.php?id=' . $recently['id'] . '"><img class="recently_img" src="cache/' . $recently['id'] . '.jpg" title="' . $recently['title'] . '" alt=""></a></div>';
     }
 }
 
@@ -234,24 +304,29 @@ if (!isset($output) or $output == '') {
     <head>
         <title><?PHP echo $site_name ?></title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
         <link type="text/css" href="css/style.css" rel="stylesheet" media="all" />
         <script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
         <script type="text/javascript" src="js/jquery.index.js"></script>
     </head>
     <body>
         <?PHP echo $panel_info ?>
+        <div id="recently_random"><?PHP echo $recently_random ?></div>
         <div id="panel_recently"><?PHP echo $recently_output ?></div>
         <div id="container">
-            <div id="panel_menu">
-                <div id="panel_menu_title">Gatunek:</div>
-                    <?PHP echo $genre_menu ?>
+            <div id="panel_left">
+                <?PHP echo $overall_panel ?>
+                <div class="panel_box_title"><?PHP echo $lang['i_genre'] ?>:</div>
+                <div class="panel_box"><?PHP echo $genre_menu ?></div>
             </div>
-            <div id="panel_options"><?PHP echo $sort_menu ?></div>
-            <div id="panel_search"><form method="get" action="index.php"><?PHP echo $search_text ?></form></div>
-            <div id="panel_movie">
-                <div class="panel_nav"><?PHP echo $nav ?></div>
+            <div id="panel_right">
+                <div id="panel_options"><?PHP echo $sort_menu ?></div>
+                <div id="panel_search"><form method="get" action="index.php"><?PHP echo $search_text ?></form></div>
+                <div id="panel_movie">
+                    <div class="panel_nav"><?PHP echo $nav ?></div>
                     <?PHP echo $panel_list ?>
-                <div class="panel_nav"><?PHP echo $nav ?></div>
+                    <div class="panel_nav"><?PHP echo $nav ?></div>
+                </div>
             </div>
         </div>
     </body>

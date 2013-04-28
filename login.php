@@ -12,7 +12,7 @@ if (isset($_POST['pass']) && md5($_POST['pass']) === $pass) {
 <!DOCTYPE HTML>
 <html>
     <head>
-        <title><?PHP echo $site_name ?> - Login</title>
+        <title><?PHP echo $site_name ?> - <?PHP echo $lang['l_html_login'] ?></title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <link href="css/style.css" rel="stylesheet" type="text/css">
     </head>

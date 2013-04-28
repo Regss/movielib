@@ -36,7 +36,7 @@ function create_table($col, $mysql_table_ml, $lang) {
     if (!mysql_query($create_movie_sql)) {
         $output = $lang['f_tab_cant_create'] . ': ' . mysql_error() . '<br/>';
     } else {
-        $output = $lang['f_tab_created'] . ': movie<br/>';
+        $output = $lang['f_tab_created'] . ': ' . $mysql_table_ml . '<br/>';
     }
     return $output;
 }
@@ -46,15 +46,13 @@ function create_table($col, $mysql_table_ml, $lang) {
  */##################################
 function sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysql_table_ml, $lang) {
     
-    $output = '';
-
     // Check movie from XBMC
     $xbmc_sql = 'SELECT ' . $col['title'] . ' FROM movie';
     mysql_select_db($mysql_xbmc[4], $conn_xbmc);
     $xbmc_result = mysql_query($xbmc_sql, $conn_xbmc);
     $xbmc_assoc = array();
     while ($xbmc = mysql_fetch_assoc($xbmc_result)) {
-        array_push($xbmc_assoc, $xbmc[$col['title']]);
+        $xbmc_assoc[] = $xbmc[$col['title']];
     }
 
     // Check movie from MovieLib
@@ -82,7 +80,6 @@ function sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysq
         if (file_exists('cache/' . $key . '.jpg')) {
             unlink('cache/' . $key . '.jpg');
         }
-        $output = 'Zsynchronizowano';
     }
 
     // Set movie to add
@@ -129,7 +126,7 @@ function sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysq
         $select_stream_result = mysql_query($select_stream_sql, $conn_xbmc);
         $stream_assoc = array();
         while ($stream = mysql_fetch_assoc($select_stream_result)) {
-            array_push($stream_assoc, $stream);
+            $stream_assoc[] = $stream;
         }
         
         // Select from files table
@@ -170,10 +167,10 @@ function sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysq
       ) VALUES (
             "' . addslashes($movie[$col['title']]) . '",
             "' . addslashes($movie[$col['plot']]) . '",
-            "' . addslashes($movie[$col['rating']]) . '",
-            "' . addslashes($movie[$col['year']]) . '",
-            "' . addslashes($poster_url) . '",
-            "' . addslashes($movie[$col['runtime']]) . '",
+            "' . $movie[$col['rating']] . '",
+            "' . $movie[$col['year']] . '",
+            "' . addslashes($poster_url) . '", '
+            . ($movie[$col['runtime']] == 0 ? '"' . round($stream_assoc[0]['iVideoDuration'] / 60, 0) . '", ' : '"' . $movie[$col['runtime']] . '", ') . '
             "' . addslashes($movie[$col['genre']]) . '",
             "' . addslashes($movie[$col['director']]) . '",
             "' . addslashes($movie[$col['originaltitle']]) . '",
@@ -184,9 +181,9 @@ function sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysq
             . (isset($stream_assoc[0]['iVideoHeight']) ? '"' . $stream_assoc[0]['iVideoHeight'] . '", ' : 'NULL, ')
             . (isset($stream_assoc[0]['iVideoDuration']) ? '"' . $stream_assoc[0]['iVideoDuration'] . '", ' : 'NULL, ')
             . (isset($stream_assoc[1]['strAudioCodec']) ? '"' . $stream_assoc[1]['strAudioCodec'] . '", ' : 'NULL, ')
-            . (isset($stream_assoc[1]['iAudioChannels']) ? '"' . $stream_assoc[1]['iAudioChannels'] . '", ' : 'NULL, ') . '
-            "' . $files['playCount'] . '",
-            "' . $files['lastPlayed'] . '",
+            . (isset($stream_assoc[1]['iAudioChannels']) ? '"' . $stream_assoc[1]['iAudioChannels'] . '", ' : 'NULL, ')
+            . ($files['playCount'] == null ? 'NULL, ' : '"' . $files['playCount'] . '", ')
+            . ($files['lastPlayed'] == null ? 'NULL, ' : '"' . $files['lastPlayed'] . '", ') . '
             "' . $files['dateAdded'] . '"
       )';
 
@@ -198,8 +195,14 @@ function sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysq
             echo '<br />' . $lang['f_synch_error'] . ': ' . mysql_error($conn_ml);
             exit;
         }
-        $output = 'Zsynchronizowano';
-    } 
+    }
+    $added = count($to_add);
+    $removed = count($to_remove);
+    if ($added == 0 && $removed == 0) {
+        $output = '';
+    } else {
+        $output = $lang['f_synchronized'] . '<br />' . $lang['f_added'] . ': ' . $added . ' ' . $lang['f_movies'] . '<br />' . $lang['f_removed'] . ': ' . $removed . ' ' . $lang['f_movies'];
+    }
     return $output;
 }
 
@@ -207,7 +210,7 @@ function sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysq
  * # Import videodb.xml #
  */######################
 function import_xml($col, $mysql_ml, $conn_ml, $mysql_table_ml, $lang) {
-    
+        
     // Load XML file
     $xml = simplexml_load_file('import/videodb.xml');
     $xml_movie = $xml->movie;
@@ -245,7 +248,6 @@ function import_xml($col, $mysql_ml, $conn_ml, $mysql_table_ml, $lang) {
         if (file_exists('cache/' . $key . '.jpg')) {
             unlink('cache/' . $key . '.jpg');
         }
-        $output = 'Zsynchronizowano';
     }
 
     // Set movie to add
@@ -258,15 +260,10 @@ function import_xml($col, $mysql_ml, $conn_ml, $mysql_table_ml, $lang) {
     
     // Add new movies
     // Select from movie table
-
     foreach ($to_add as $key => $val) {
         
         $movie = $xml_movie[$key];
-        
-        echo '<pre>';
-        print_r($movie);
-        echo '</pre>';
-    
+
         // Insert to MovieLib table
         $genre = array();
         foreach ($movie->genre as $genre_val) {
@@ -316,9 +313,9 @@ function import_xml($col, $mysql_ml, $conn_ml, $mysql_table_ml, $lang) {
             NULL,
             NULL,
             NULL,
-            NULL,
-            "' . $movie->playcount . '",
-            "' . $movie->lastplayed . '",
+            NULL, '
+            . ($movie->playcount == 0 ? 'NULL,' : '"' . $movie->playcount . '",')
+            . ($movie->lastplayed == '1601-01-01' ? 'NULL,' : '"' . $movie->lastplayed . '", ') . '
             "' . $movie->dateadded . '"
       )';
         mysql_select_db($mysql_ml[4], $conn_ml);
@@ -329,8 +326,14 @@ function import_xml($col, $mysql_ml, $conn_ml, $mysql_table_ml, $lang) {
             echo '<br />' . $lang['f_synch_error'] . ': ' . mysql_error($conn_ml);
             exit;
         }
-        $output = 'Zaimportowano';
-    } 
+    }
+    $added = count($to_add);
+    $removed = count($to_remove);
+    if ($added == 0 && $removed == 0) {
+        $output = '';
+    } else {
+        $output = $lang['f_synchronized'] . '<br />' . $lang['f_added'] . ': ' . $added . ' ' . $lang['f_movies'] . '<br />' . $lang['f_removed'] . ': ' . $removed . ' ' . $lang['f_movies'];
+    }
     return $output;
 }
 
@@ -340,18 +343,15 @@ function import_xml($col, $mysql_ml, $conn_ml, $mysql_table_ml, $lang) {
 function gd_convert($id, $poster) {
     $cache_poster = 'cache/' . $id . '.jpg';
     if (!file_exists($cache_poster) and !empty($poster)) {
-        foreach ($poster as $val) {
-            $img = @imagecreatefromjpeg($val);
-            if ($img) {
-                $width = imagesx($img);
-                $height = imagesy($img);
-                $new_width = 140;
-                $new_height = 198;
-                $img_temp = imagecreatetruecolor($new_width, $new_height);
-                imagecopyresampled($img_temp, $img, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
-                imagejpeg($img_temp, $cache_poster, 80);
-                break;
-            }
+        $img = @imagecreatefromjpeg($poster);
+        if ($img) {
+            $width = imagesx($img);
+            $height = imagesy($img);
+            $new_width = 140;
+            $new_height = 198;
+            $img_temp = imagecreatetruecolor($new_width, $new_height);
+            imagecopyresampled($img_temp, $img, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+            imagejpeg($img_temp, $cache_poster, 80);
         }
     }
 }
