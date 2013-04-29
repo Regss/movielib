@@ -14,6 +14,15 @@ if (!isset($protect_site) or $protect_site !== false) {
     }
 }
 
+/* #############
+ * # CHECK DIR #
+ */#############
+foreach ($folders_assoc as $folder) {
+    if (!file_exists($folder)) {
+        mkdir($folder);
+    }
+}
+
 /* ##################
  * # CHECK DATABASE #
  */##################
@@ -35,7 +44,7 @@ $sql_table = 'SHOW TABLES';
 $result_table = mysql_query($sql_table);
 $table_count = mysql_num_rows($result_table);
 if ($table_count > 1) {
-    die($lang['i_not_movielib_db']);
+    // die($lang['i_not_movielib_db']);
 } elseif ($table_count == 0) {
     $output = create_table($col, $mysql_table_ml, $lang);
 }

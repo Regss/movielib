@@ -20,11 +20,25 @@ $(function() {
     });
     $('#panel_info').fadeIn(5000).delay(3000).fadeOut(5000);
     
-    var i = 1;
-    var e = 3000;
-    for (var i = 1; i < 4; i++) {
-    $('#rec_'+i).fadeIn(1000+e).delay(1000).fadeOut(1000);
-    e+3000;
-    }
+    
+    $('#rec_1').fadeIn().delay(500).fadeOut();
+    
+    $(document).ready(function() {
 
+     var j = 0;
+     var delay = 2000; //millisecond delay between cycles
+     function cycleThru(){
+             var jmax = $("#rec_5").length -1;
+             $("#rec_:eq(" + j + ")")
+                     .animate({"opacity" : "1"} ,400)
+                     .animate({"opacity" : "1"}, delay)
+                     .animate({"opacity" : "0"}, 400, function(){
+                             (j == jmax) ? j=0 : j++;
+                             cycleThru();
+                     });
+             };
+
+     cycleThru();
+
+});
 });

@@ -22,7 +22,7 @@
 $mode = 1;
 
 // MovieLib database
-$mysql_host_ml = '192.168.1.201'; // Database host
+$mysql_host_ml = '127.0.0.1'; // Database host
 $mysql_port_ml = '3306'; // Database port, default is 3306
 $mysql_login_ml = 'root'; // Database login
 $mysql_pass_ml = 'vertrigo'; // Database password
@@ -60,6 +60,9 @@ require 'lang/' . $language;
 // Database config to array
 $mysql_xbmc = array($mysql_host_xbmc, $mysql_port_xbmc, $mysql_login_xbmc, $mysql_pass_xbmc, $mysql_database_xbmc);
 $mysql_ml = array($mysql_host_ml, $mysql_port_ml, $mysql_login_ml, $mysql_pass_ml, $mysql_database_ml);
+
+// Folders
+$folders_assoc = array('import', 'cache');
 
 // Video resolution
 $vres_array = array('sd', 480, 576, 540, 720, 1080);
