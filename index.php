@@ -44,7 +44,7 @@ $sql_table = 'SHOW TABLES';
 $result_table = mysql_query($sql_table);
 $table_count = mysql_num_rows($result_table);
 if ($table_count > 1) {
-    // die($lang['i_not_movielib_db']);
+    die($lang['i_not_movielib_db']);
 } elseif ($table_count == 0) {
     $output = create_table($col, $mysql_table_ml, $lang);
 }
@@ -61,7 +61,7 @@ if (!isset($_COOKIE['sync']) && $mode == 1) {
             $sel_xbmc = @mysql_select_db($mysql_xbmc[4]);
             if ($sel_xbmc) {
                 $output = sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysql_table_ml, $lang);
-                setcookie('sync', true, time()+$sync_time/60);
+                setcookie('sync', true, time()+$sync_time*60);
             }
         }
     }
@@ -286,16 +286,39 @@ if ($recently_limit == 0) {
     $recently_sql = 'SELECT id, title, poster, date_added FROM ' . $mysql_table_ml . ' ORDER BY date_added DESC LIMIT ' . $recently_limit;
     $recently_result = mysql_query($recently_sql);
     $recently_output = '';
-    $recently_random = '';
-    $r = 0;
     while ($recently = mysql_fetch_array($recently_result)) {
         if (!file_exists('cache/' . $recently['id'] . '.jpg')) {
             gd_convert($recently['id'], $recently['poster'], '');
         }
-        $recently_output.= '<a href="index.php?id=' . $recently['id'] . '"><img class="recently_img" src="cache/' . $recently['id'] . '.jpg" title="' . $recently['title'] . '" alt=""></a>';
-        $r++;
-        $recently_random.= '<div id="rec_' . $r . '" class="hidden"><a href="index.php?id=' . $recently['id'] . '"><img class="recently_img" src="cache/' . $recently['id'] . '.jpg" title="' . $recently['title'] . '" alt=""></a></div>';
+        $recently_output.= '<a href="index.php?id=' . $recently['id'] . '"><img src="cache/' . $recently['id'] . '.jpg" title="' . $recently['title'] . '" alt=""></a>';
     }
+}
+
+// random panel
+if ($random_limit == 0) {
+    $random_output = '';
+} else {
+    $random_sql = 'SELECT id, title, poster FROM ' . $mysql_table_ml . ' ORDER BY RAND() LIMIT ' . $random_limit;
+    $random_result = mysql_query($random_sql);
+    $random_output = '';
+    while ($random = mysql_fetch_array($random_result)) {
+        if (!file_exists('cache/' . $random['id'] . '.jpg')) {
+            gd_convert($random['id'], $random['poster'], '');
+        }
+        $random_output.= '<a href="index.php?id=' . $random['id'] . '"><img src="cache/' . $random['id'] . '.jpg" title="' . $random['title'] . '" alt=""></a>';
+    }
+}
+
+// premiere panel
+$year = date('Y');
+$premiere_sql = 'SELECT id, title, poster, year FROM ' . $mysql_table_ml . ' WHERE year=' . $year;
+$premiere_result = mysql_query($premiere_sql);
+$premiere_output = '';
+while ($premiere = mysql_fetch_array($premiere_result)) {
+    if (!file_exists('cache/' . $premiere['id'] . '.jpg')) {
+        gd_convert($premiere['id'], $premiere['poster'], '');
+    }
+    $premiere_output.= '<a href="index.php?id=' . $premiere['id'] . '"><img src="cache/' . $premiere['id'] . '.jpg" title="' . $premiere['title'] . '" alt=""></a>';
 }
 
 /* ##############
@@ -316,13 +339,21 @@ if (!isset($output) or $output == '') {
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
         <link type="text/css" href="css/style.css" rel="stylesheet" media="all" />
         <script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="js/jquery.cycle.lite.js"></script>
         <script type="text/javascript" src="js/jquery.index.js"></script>
     </head>
     <body>
         <?PHP echo $panel_info ?>
-        <div id="recently_random"><?PHP echo $recently_random ?></div>
-        <div id="panel_recently"><?PHP echo $recently_output ?></div>
+        
         <div id="container">
+            <div id="panel_header">
+                <div id="panel_recently"><?PHP echo $recently_output ?></div>
+                <div id="panel_recently_title">Ostatnio dodane</div>
+                <div id="panel_random"><?PHP echo $random_output ?></div>
+                <div id="panel_random_title">Wybrane</div>
+                <div id="panel_premiere"><?PHP echo $premiere_output ?></div>
+                <div id="panel_premiere_title">Premiery</div>
+            </div>
             <div id="panel_left">
                 <?PHP echo $overall_panel ?>
                 <div class="panel_box_title"><?PHP echo $lang['i_genre'] ?>:</div>
