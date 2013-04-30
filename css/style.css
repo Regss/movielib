@@ -59,6 +59,12 @@ a.block, .block {
     overflow: hidden;
     margin: auto;
     margin-bottom: 10px;
+    padding-top: 10px;
+}
+#panel_header, #panel_title {
+    width: 600px;
+    overflow: hidden;
+    margin: auto;
 }
 #panel_left {
     float: left;
@@ -67,10 +73,6 @@ a.block, .block {
 #panel_right {
     float: right;
     width: 660px;
-}
-#panel_header {
-    width: 500px;
-    margin: auto;
 }
 #panel_info {
     position: absolute;
@@ -85,25 +87,30 @@ a.block, .block {
     color: #000;
     padding: 5px;
 }
-#panel_recently_title, #panel_random_title, #panel_premiere_title {
+#panel_recently_title, #panel_random_title, #panel_last_played_title {
+    float: left;
     color: #ff7300;
     font-weight: bold;
     border-top: 0px;
     padding-top: 3px;
     padding-left: 6px;
-    background-color: #111;
+    background-color: #333;
     width: 136px;
     height: 16px;
+    margin-left: 20px;
+    margin-right: 20px;
 }
-#panel_recently, #panel_random, #panel_premiere {
-    width: 142px;
-    height: 200px;
-    overflow: hidden;
-    margin-top: 10px;
-}
-#panel_recently, #panel_random, #panel_premiere img {
-    display: block;
+#panel_recently, #panel_random, #panel_last_played {
     border: 1px solid #fff;
+    width: 140px;
+    height: 198px;
+    margin-left: 20px;
+    margin-right: 20px;
+    overflow: hidden;
+    float: left;
+}
+#panel_recently, #panel_random, #panel_last_played img {
+    display: block;
 }
 .panel_box_title {
     border: 1px  solid #222;

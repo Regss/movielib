@@ -236,12 +236,12 @@ while ($list = mysql_fetch_array($list_result)) {
     }
     
     $panel_list.= '
-<div class="movie">
+<div id="movie_' . $list['id'] . '" class="movie">
     <div class="title">' . $list['title'] . '</div>
     <div class="title_org">' . $list['originaltitle'] . '</div>'
     . $watched 
     . $flag_hd . '
-    <img class="poster" src="' . $poster . '">
+    <img id="poster_movie_' . $list['id'] . '" class="poster" src="' . $poster . '">
     <div class="flags">
         <table id="movie_info">
             <tr>
@@ -309,16 +309,15 @@ if ($random_limit == 0) {
     }
 }
 
-// premiere panel
-$year = date('Y');
-$premiere_sql = 'SELECT id, title, poster, year FROM ' . $mysql_table_ml . ' WHERE year=' . $year;
-$premiere_result = mysql_query($premiere_sql);
-$premiere_output = '';
-while ($premiere = mysql_fetch_array($premiere_result)) {
-    if (!file_exists('cache/' . $premiere['id'] . '.jpg')) {
-        gd_convert($premiere['id'], $premiere['poster'], '');
+// last_played panel
+$last_played_sql = 'SELECT id, title, poster, last_played FROM ' . $mysql_table_ml . ' ORDER BY last_played DESC LIMIT ' . $last_played_limit;
+$last_played_result = mysql_query($last_played_sql);
+$last_played_output = '';
+while ($last_played = mysql_fetch_array($last_played_result)) {
+    if (!file_exists('cache/' . $last_played['id'] . '.jpg')) {
+        gd_convert($last_played['id'], $last_played['poster'], '');
     }
-    $premiere_output.= '<a href="index.php?id=' . $premiere['id'] . '"><img src="cache/' . $premiere['id'] . '.jpg" title="' . $premiere['title'] . '" alt=""></a>';
+    $last_played_output.= '<a href="index.php?id=' . $last_played['id'] . '"><img src="cache/' . $last_played['id'] . '.jpg" title="' . $last_played['title'] . '" alt=""></a>';
 }
 
 /* ##############
@@ -344,16 +343,21 @@ if (!isset($output) or $output == '') {
     </head>
     <body>
         <?PHP echo $panel_info ?>
-        
         <div id="container">
             <div id="panel_header">
                 <div id="panel_recently"><?PHP echo $recently_output ?></div>
-                <div id="panel_recently_title">Ostatnio dodane</div>
+                
                 <div id="panel_random"><?PHP echo $random_output ?></div>
-                <div id="panel_random_title">Wybrane</div>
-                <div id="panel_premiere"><?PHP echo $premiere_output ?></div>
-                <div id="panel_premiere_title">Premiery</div>
+                
+                <div id="panel_last_played"><?PHP echo $last_played_output ?>
+                
             </div>
+            <div id="panel_title">
+                <div id="panel_recently_title">Ostatnio dodane</div>
+                <div id="panel_random_title">Wybrane</div>
+                <div id="panel_last_played_title">Ostatnio oglądane</div>
+            </div>
+        </div>
             <div id="panel_left">
                 <?PHP echo $overall_panel ?>
                 <div class="panel_box_title"><?PHP echo $lang['i_genre'] ?>:</div>

@@ -22,7 +22,7 @@
 $mode = 1;
 
 // MovieLib database
-$mysql_host_ml = '192.168.1.201'; // Database host
+$mysql_host_ml = '127.0.0.1'; // Database host
 $mysql_port_ml = '3306'; // Database port, default is 3306
 $mysql_login_ml = 'root'; // Database login
 $mysql_pass_ml = 'vertrigo'; // Database password
@@ -42,6 +42,7 @@ $language = 'lang_pl.php'; // The file that contains the language, file must be 
 $per_page = 50; // Movies per page, If you do not want to have pagination, set 0
 $recently_limit = 10; // Movies in recently added panel, to turn off panel set 0
 $random_limit = 10; // Movies in random panel, to turn off panel set 0
+$last_played_limit = 10;
 $sync_time = 10; // Time in minutes after which the script will attempt to synchronize databases
 $watched_status = true; // Show watched status
 $set_overall_panel = true; // Show overall panel
