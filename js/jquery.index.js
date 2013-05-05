@@ -1,5 +1,7 @@
-$(function() {
-    $('#panel_recently, #panel_random, #panel_last_played').mouseover(function(){
+$(document).ready(function() {
+    // show panel header when site load
+    $('#panel_recently, #panel_random, #panel_last_played, #panel_top_rated, #panel_recently_title, #panel_random_title, #panel_last_played_title, #panel_top_rated_title').hide().fadeIn(3000);
+    $('#panel_recently, #panel_random, #panel_last_played, #panel_top_rated').mouseover(function(){
         $(this).animate({
             opacity: '.7'
         }, {
@@ -7,7 +9,7 @@ $(function() {
             duration:300
         });
     });
-    $('#panel_recently, #panel_random, #panel_last_played').mouseleave(function(){
+    $('#panel_recently, #panel_random, #panel_last_played, #panel_top_rated').mouseleave(function(){
         $(this).animate({
             opacity: '1'
         }, {
@@ -15,45 +17,33 @@ $(function() {
             duration:300
         });
     });
-    
-    $('.movie').mouseover(function(){
+
+    // toggle box on left panel
+    $('.panel_box_title').click(function(){
         var id = $(this).attr('id');
-        $('#poster_'+id).animate({
-            opacity: '.7',
-            width: '144px',
-            height: '202px'
-        }, {
-            queue:false,
-            duration:300
-        });
+        $('#panel_'+id).slideToggle();
     });
-    $('.movie').mouseleave(function(){
-        var id = $(this).attr('id');
-        $('#poster_'+id).animate({
-            opacity: '1'
-        }, {
-            queue:false,
-            duration:300
-        });
-    });
-    
+
+    // show info panel when database synchronized
     $('#panel_info').fadeIn(5000).delay(3000).fadeOut(5000);
-    
-    $('#panel_recently, #panel_random, #panel_last_played, #panel_recently_title, #panel_random_title, #panel_last_played_title').hide().fadeIn(3000);
-    
+
+    // show panels in loop
     $(function() {
-        $("#panel_recently").cycle({
-            timeout: 4000
+        var timeout = $('#panel_top').attr('class');
+        $('#panel_recently, #panel_random, #panel_last_played, #panel_top_rated').cycle({
+            timeout: +timeout
         });
     });
-    $(function() {
-        $("#panel_random").cycle({
-            timeout: 4000
-        });
-    });
-    $(function() {
-        $("#panel_last_played").cycle({
-            timeout: 4000
-        });
-    });
+
+    // Default value for search input
+    $('input').focus(function () {
+	if ($(this).val() == $(this).attr('title')) {
+		$(this).val('');
+	}
+    }).blur(function () {
+	if ($(this).val() == '') {
+		$(this).val($(this).attr('title'));
+	}
+    });  
+
 });

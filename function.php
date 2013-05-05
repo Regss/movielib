@@ -41,9 +41,9 @@ function create_table($col, $mysql_table_ml, $lang) {
     return $output;
 }
 
-/* ##################################
- * # Sync XBMC database to MovieLib #
- */##################################
+/* ###########################
+ * # Sync with XBMC database #
+ */###########################
 function sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysql_table_ml, $lang) {
     
     // Check movie from XBMC
@@ -201,14 +201,14 @@ function sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysq
     if ($added == 0 && $removed == 0) {
         $output = '';
     } else {
-        $output = $lang['f_synchronized'] . '<br />' . $lang['f_added'] . ': ' . $added . ' ' . $lang['f_movies'] . '<br />' . $lang['f_removed'] . ': ' . $removed . ' ' . $lang['f_movies'];
+        $output = $lang['f_synchronized'] . '<br />' . $lang['f_added'] . ': ' . $added . ' ' . $lang['f_movies'] . '<br />' . $lang['f_removed'] . ': ' . $removed . ' ' . $lang['f_movies'] . '<br />';
     }
     return $output;
 }
 
-/* ######################
- * # Import videodb.xml #
- */######################
+/* #########################
+ * # Sync with videodb.xml #
+ */#########################
 function import_xml($col, $mysql_ml, $conn_ml, $mysql_table_ml, $lang) {
         
     // Load XML file
@@ -332,8 +332,10 @@ function import_xml($col, $mysql_ml, $conn_ml, $mysql_table_ml, $lang) {
     if ($added == 0 && $removed == 0) {
         $output = '';
     } else {
-        $output = $lang['f_synchronized'] . '<br />' . $lang['f_added'] . ': ' . $added . ' ' . $lang['f_movies'] . '<br />' . $lang['f_removed'] . ': ' . $removed . ' ' . $lang['f_movies'];
+        $output = $lang['f_synchronized'] . '<br />' . $lang['f_added'] . ': ' . $added . ' ' . $lang['f_movies'] . '<br />' . $lang['f_removed'] . ': ' . $removed . ' ' . $lang['f_movies'] . '<br />';
+        
     }
+    rename('import/videodb.xml', 'import/videodb.bak');
     return $output;
 }
 

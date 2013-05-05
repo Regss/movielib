@@ -1,35 +1,23 @@
 <?PHP
-/* #############################################################
- * # This is the configuration file.                           #
- */#############################################################
+/* ##################################
+ * # This is the configuration file #
+ */##################################
 
-/* #################
- * # OPTIONS START #
- */#################
-
-/* ######################################
- * # Script can work in two mode:       #
- * #                                    #
- * # To connect to XBMC database and    #
- * # synchronize it set mode to 1.      #
- * #                                    #
- * # To import movies from videodb.xml  #
- * # exported from XBMC set mode to 2   #
- * #                                    #
- */######################################
-
-// Set mode 1 or 2
-$mode = 1;
+/* ##########################################
+ * # 1 - Synchronize witch XBMC database    #
+ * # 2 - Synchronize witch videodb.xml file #
+ */##########################################
+$mode = 2;
 
 // MovieLib database
-$mysql_host_ml = '127.0.0.1'; // Database host
+$mysql_host_ml = '192.168.1.201'; // Database host
 $mysql_port_ml = '3306'; // Database port, default is 3306
 $mysql_login_ml = 'root'; // Database login
 $mysql_pass_ml = 'vertrigo'; // Database password
 $mysql_database_ml = 'movielib'; // Database name
 $mysql_table_ml = 'movies'; // Table name to create
 
-// XBMC database configure only when set to mode 1
+// XBMC database, configure only when set to mode 1
 $mysql_host_xbmc = '192.168.1.201'; // Database host
 $mysql_port_xbmc = '3306'; // Database port, default is 3306
 $mysql_login_xbmc = 'root'; // Database login
@@ -37,34 +25,35 @@ $mysql_pass_xbmc = 'vertrigo'; // Database password
 $mysql_database_xbmc = 'xbmc_video75'; // Database name
 
 // Config
-$site_name = 'MovieLib'; // Site title
-$language = 'lang_pl.php'; // The file that contains the language, file must be in the lang/ folder
-$per_page = 50; // Movies per page, If you do not want to have pagination, set 0
-$recently_limit = 10; // Movies in recently added panel, to turn off panel set 0
-$random_limit = 10; // Movies in random panel, to turn off panel set 0
-$last_played_limit = 10;
-$sync_time = 10; // Time in minutes after which the script will attempt to synchronize databases
-$watched_status = true; // Show watched status
+$set_site_name = 'MovieLib'; // Site title
+$set_language = 'lang_pl.php'; // The file that contains the language, file must be in the lang/ folder
+$set_per_page = 50; // Movies per page
+$set_recently_limit = 10; // Movies in recently added panel
+$set_random_limit = 10; // Movies in random panel
+$set_last_played_limit = 10; // Movies in last played panel
+$set_top_rated_limit = 10; // Movies in top rated panel
+$set_sync_time = 10; // Time in minutes after which the script will attempt to synchronize databases
+$set_panel_top_time = 50; // Time in second to change displayed item
+$set_panel_top = true; // Show top panel
+$set_watched_status = true; // Show watched status
 $set_overall_panel = true; // Show overall panel
-
-// Password
-$protect_site = false; // Protect acess to site
-$pass = 'b27bfe5ba5bec17f80de30b9f23ff658'; // Type password in md5.
-
+$set_protect_site = false; // Protect access to site
+$set_protect_site_pass = 'b27bfe5ba5bec17f80de30b9f23ff658'; // Type password in md5 to protect access to site.
+$set_admin_panel_pass = 'b27bfe5ba5bec17f80de30b9f23ff658'; // Type password in md5 to admin panel
 
 /* ########################################
  * # Don't edit anything below this line! #
  */########################################
 
 // Language 
-require 'lang/' . $language;
+require 'lang/' . $set_language;
 
 // Database config to array
 $mysql_xbmc = array($mysql_host_xbmc, $mysql_port_xbmc, $mysql_login_xbmc, $mysql_pass_xbmc, $mysql_database_xbmc);
 $mysql_ml = array($mysql_host_ml, $mysql_port_ml, $mysql_login_ml, $mysql_pass_ml, $mysql_database_ml);
 
-// Folders
-$folders_assoc = array('import', 'cache');
+// Dir
+$dir_assoc = array('import', 'cache');
 
 // Video resolution
 $vres_array = array('sd', 480, 576, 540, 720, 1080);
@@ -164,7 +153,8 @@ $var = array(
     'sort' => 1,
     'genre' => 'all',
     'search' => '',
-    'page' => 1
+    'page' => 1,
+    'output' => ''
     );
 foreach ($var as $key => $val) {
     if (isset($_GET[$key])) {
