@@ -15,7 +15,6 @@ $mysql_port_ml = '3306'; // Database port, default is 3306
 $mysql_login_ml = 'root'; // Database login
 $mysql_pass_ml = 'vertrigo'; // Database password
 $mysql_database_ml = 'movielib'; // Database name
-$mysql_table_ml = 'movies'; // Table name to create
 
 // XBMC database, configure only when set to mode 1
 $mysql_host_xbmc = '192.168.1.201'; // Database host
@@ -54,6 +53,12 @@ $mysql_ml = array($mysql_host_ml, $mysql_port_ml, $mysql_login_ml, $mysql_pass_m
 
 // Dir
 $dir_assoc = array('import', 'cache');
+
+// Tables
+$mysql_table_ml = 'movies'; // Table name to create
+$mysql_config_ml = 'config'; // Table name to create
+$mysql_users_ml = 'users'; // Table name to create
+$mysql_tables = array($mysql_table_ml, $mysql_config_ml, $mysql_users_ml);
 
 // Video resolution
 $vres_array = array('sd', 480, 576, 540, 720, 1080);

@@ -46,14 +46,20 @@ if (!$sel_ml) {
 mysql_query('SET CHARACTER SET utf8');
 mysql_query('SET NAMES utf8');
 
-// Check table in database
+// Check tables in database
 $table_sql = 'SHOW TABLES';
 $table_result = mysql_query($table_sql);
-$table_count = mysql_num_rows($table_result);
-if ($table_count > 1) {
-    die($lang['i_not_movielib_db']);
-} elseif ($table_count == 0) {
-    $output_sync.= create_table($col, $mysql_table_ml, $lang);
+while ($table = mysql_fetch_array($table_result)) {
+    $table_check[] = $table[0];
+    
+}
+foreach ($mysql_tables as $table_val) {
+    if (!in_array($table_val, $table_check)) {
+        echo $table_val . ': not exist<br />';
+    } else {
+        echo $table_val . ': exist<br />';
+        // $output_sync.= create_table($col, $mysql_table_ml, $lang);
+    }
 }
 
 /* #######################
