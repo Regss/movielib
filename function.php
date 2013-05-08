@@ -1,5 +1,4 @@
 <?PHP
-
 /* #############
  * # FUNCTIONS #
  */#############
@@ -7,7 +6,7 @@
 /* ######################
  * # Create empty table #
  */######################
-function create_table($col, $mysql_table_ml, $lang) {
+function create_table($col, $mysql_table_ml, $mysql_config_ml, $lang) {
     $create_movie_sql = 'CREATE TABLE IF NOT EXISTS `' . $mysql_table_ml . '` (
                 `id` int(11) NOT NULL AUTO_INCREMENT,
                 `file` int(11) NOT NULL,
@@ -37,6 +36,38 @@ function create_table($col, $mysql_table_ml, $lang) {
         $output = $lang['f_tab_cant_create'] . ': ' . mysql_error() . '<br/>';
     } else {
         $output = $lang['f_tab_created'] . ': ' . $mysql_table_ml . '<br/>';
+    }
+    $create_config_sql = 'CREATE TABLE IF NOT EXISTS `' . $mysql_config_ml . '` (
+                `set_mode` int(1) DEFAULT 2,
+                `set_site_name` varchar(30) DEFAULT "MovieLib",
+                `set_language` varchar(15) DEFAULT "lang_pl.php",
+                `set_per_page` int(5) DEFAULT 50,
+                `set_recently_limit` int(5) DEFAULT 10,
+                `set_random_limit` int(5) DEFAULT 10,
+                `set_last_played_limit` int(5) DEFAULT 10,
+                `set_top_rated_limit` int(5) DEFAULT 10,
+                `set_sync_time` int(5) DEFAULT 10,
+                `set_panel_top_time` int(5) DEFAULT 50,
+                `set_panel_top` int(1) DEFAULT 1,
+                `set_watched_status` int(1) DEFAULT 1,
+                `set_overall_panel` int(1) DEFAULT 1,
+                `set_protect_site` int(1) DEFAULT 0,
+                `set_mysql_host_xbmc` text DEFAULT NULL,
+                `set_mysql_port_xbmc` text DEFAULT NULL,
+                `set_mysql_login_xbmc` text DEFAULT NULL,
+                `set_mysql_pass_xbmc` text DEFAULT NULL,
+                `set_mysql_database_xbmc` text DEFAULT NULL
+                ) ENGINE=MyISAM  DEFAULT CHARSET=utf8';
+    if (!mysql_query($create_config_sql)) {
+        $output = $lang['f_tab_cant_create'] . ': ' . mysql_error() . '<br/>';
+    } else {
+        
+        if (mysql_num_rows(mysql_query('SELECT * FROM ' . $mysql_config_ml)) == 0) {
+            $insert_config_sql = 'INSERT INTO `' . $mysql_config_ml . '` () VALUES ()';
+            mysql_query($insert_config_sql);
+        }
+        $output = $lang['f_tab_created'] . ': ' . $mysql_config_ml . '<br/>'; 
+           
     }
     return $output;
 }

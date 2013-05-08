@@ -3,11 +3,12 @@ session_start();
 header('Content-type: text/html; charset=utf-8');
 require_once 'config.php';
 require_once 'function.php';
+$output_sync = '';
 
 /* ##################
  * # CHECK PASSWORD #
  */##################
-if (!isset($set_protect_site) or $set_protect_site !== false) {
+if ($set_protect_site == 1) {
     if ($_SESSION['logged'] !== true) {
         header('Location:login.php');
         die();
@@ -46,26 +47,12 @@ if (!$sel_ml) {
 mysql_query('SET CHARACTER SET utf8');
 mysql_query('SET NAMES utf8');
 
-// Check tables in database
-$table_sql = 'SHOW TABLES';
-$table_result = mysql_query($table_sql);
-while ($table = mysql_fetch_array($table_result)) {
-    $table_check[] = $table[0];
-    
-}
-foreach ($mysql_tables as $table_val) {
-    if (!in_array($table_val, $table_check)) {
-        echo $table_val . ': not exist<br />';
-    } else {
-        echo $table_val . ': exist<br />';
-        // $output_sync.= create_table($col, $mysql_table_ml, $lang);
-    }
-}
+
 
 /* #######################
  * # CHECK XBMC DATABASE #
  */#######################
-if (!isset($_COOKIE['sync']) && $mode == 1) {
+if (!isset($_COOKIE['sync']) && $set_mode == 1) {
     $fp = @fsockopen($mysql_xbmc[0], $mysql_xbmc[1], $errno, $errstr, 3);
     if ($fp) {
         fclose($fp);
@@ -83,7 +70,7 @@ if (!isset($_COOKIE['sync']) && $mode == 1) {
 /* ##########################
  * # CHECK FILE videodb.xml #
  */##########################
-if (file_exists('import/videodb.xml') && $mode == 2) {
+if (file_exists('import/videodb.xml') && $set_mode == 2) {
     $output_sync.= import_xml($col, $mysql_ml, $conn_ml, $mysql_table_ml, $lang);
 }
 
@@ -107,7 +94,7 @@ if (!isset($output_sync) or $output_sync == '') {
 /* ##############
  * # TOP PANELS #
  */##############
-if ($set_panel_top == true) {
+if ($set_panel_top == 1) {
     
     // recently added
     $output_recently = '<div id="panel_recently">';
@@ -167,7 +154,7 @@ if ($set_panel_top == true) {
 /* #################
  * # OVERALL PANEL #
  */#################
-if ($set_overall_panel == true) {
+if ($set_overall_panel == 1) {
     $overall_sql = 'SELECT play_count FROM ' . $mysql_table_ml;
     $overall_result = mysql_query($overall_sql);
     $overall_all = mysql_num_rows($overall_result);
@@ -312,7 +299,7 @@ while ($list = mysql_fetch_array($list_result)) {
     $img_flag = $img_flag_vres . $img_flag_vtype . $img_flag_atype . $img_flag_achan;
 
     // wached status
-    if ($set_watched_status == true && $list['play_count'] > 0) {
+    if ($set_watched_status == 1 && $list['play_count'] > 0) {
         $watched = '<img class="watched" src="img/watched.png" alt="" title="' . $lang['i_last_played'] . ': ' . $list['last_played'] . '">';
     } else {
         $watched = '';
