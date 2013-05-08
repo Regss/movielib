@@ -3,10 +3,30 @@ session_start();
 require_once 'config.php';
 require_once 'function.php';
 
+if ($_GET['option'] == 'delete_install') {
+    // unlink('install.php');
+}
+
+if (file_exists('install.php') or !file_exists('db.php')) {
+    header('Location:install.php');
+    die();
+}
+
+
+
 // Check admin password
 if ($_SESSION['logged_admin'] !== true) {
     header('Location:login.php?login=admin');
     die();
+}
+
+/* #############
+ * # CHECK DIR #
+ */#############
+foreach ($dir_assoc as $dir) {
+    if (!file_exists($dir)) {
+        mkdir($dir);
+    }
 }
 
 // Connect to database

@@ -5,6 +5,11 @@ require_once 'config.php';
 require_once 'function.php';
 $output_sync = '';
 
+if (file_exists('install.php') or !file_exists('db.php')) {
+    header('Location:install.php');
+    die();
+}
+
 /* ##################
  * # CHECK PASSWORD #
  */##################
@@ -12,15 +17,6 @@ if ($set_protect_site == 1) {
     if ($_SESSION['logged'] !== true) {
         header('Location:login.php');
         die();
-    }
-}
-
-/* #############
- * # CHECK DIR #
- */#############
-foreach ($dir_assoc as $dir) {
-    if (!file_exists($dir)) {
-        mkdir($dir);
     }
 }
 
@@ -46,8 +42,6 @@ if (!$sel_ml) {
 // Sets utf8 connections
 mysql_query('SET CHARACTER SET utf8');
 mysql_query('SET NAMES utf8');
-
-
 
 /* #######################
  * # CHECK XBMC DATABASE #

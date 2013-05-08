@@ -2,12 +2,94 @@
 /* #############
  * # FUNCTIONS #
  */#############
+ /*
+$conn_ml = @mysql_connect($mysql_ml[0] . ':' . $mysql_ml[1], $mysql_ml[2], $mysql_ml[3]);
+if (!$conn_ml) {
+    die(mysql_error());
+}
+$sel_ml = mysql_select_db($mysql_ml[4]);
+if (!$sel_ml) {
+    $create_db_sql = 'CREATE DATABASE ' . $mysql_database_ml;
+    $create_db_result = mysql_query($create_db_sql);
+    if (!$create_db_result) {
+        die(mysql_error());
+    } else {
+        $sel_ml = mysql_select_db($mysql_ml[4]);
+    }
+}
+
+// Sets utf8 connections
+mysql_query('SET CHARACTER SET utf8');
+mysql_query('SET NAMES utf8');
+
+// Check tables in database
+$table_sql = 'SHOW TABLES';
+$table_result = mysql_query($table_sql);
+while ($table = mysql_fetch_array($table_result)) {
+    $table_check[] = $table[0];
+
+}
+foreach ($mysql_tables as $table_val) {
+    if (!in_array($table_val, $table_check)) {
+        $output_sync = create_table($col, $mysql_table_ml, $mysql_config_ml, $lang);
+    }
+}
+// Get Settings from sql
+if (!isset($_SESSION['set_site_name'])) {
+    $set_sql = 'SELECT * FROM config';
+    $set_result = mysql_query($set_sql);
+    while ($set = mysql_fetch_array($set_result)) {
+        $_SESSION['set_mode']               = $set['set_mode']; // 1 - Synchronize witch XBMC database, 2 - Synchronize witch videodb.xml file
+        $_SESSION['set_site_name']          = $set['set_site_name']; // Site title
+        $_SESSION['set_language']           = $set['set_language']; // The file that contains the language, file must be in the lang/ folder
+        $_SESSION['set_per_page']           = $set['set_per_page']; // Movies per page
+        $_SESSION['set_recently_limit']     = $set['set_recently_limit']; // Movies in recently added panel
+        $_SESSION['set_random_limit']       = $set['set_random_limit']; // Movies in random panel
+        $_SESSION['set_last_played_limit']  = $set['set_last_played_limit']; // Movies in last played panel
+        $_SESSION['set_top_rated_limit']    = $set['set_top_rated_limit']; // Movies in top rated panel
+        $_SESSION['set_sync_time']          = $set['set_sync_time']; // Time in minutes after which the script will attempt to synchronize databases
+        $_SESSION['set_panel_top_time']     = $set['set_panel_top_time']; // Time in second to change displayed item
+        $_SESSION['set_panel_top']          = $set['set_panel_top']; // Show top panel
+        $_SESSION['set_watched_status']     = $set['set_watched_status']; // Show watched status
+        $_SESSION['set_overall_panel']      = $set['set_overall_panel']; // Show overall panel
+        $_SESSION['set_protect_site']       = $set['set_protect_site']; // Protect access to site
+        $_SESSION['set_mysql_host_xbmc']    = $set['set_mysql_host_xbmc']; // Database host
+        $_SESSION['set_mysql_port_xbmc']    = $set['set_mysql_port_xbmc']; // Database port, default is 3306
+        $_SESSION['set_mysql_login_xbmc']   = $set['set_mysql_login_xbmc']; // Database login
+        $_SESSION['set_mysql_pass_xbmc']    = $set['set_mysql_pass_xbmc']; // Database password
+        $_SESSION['set_mysql_database_xbmc']= $set['set_mysql_database_xbmc']; // Database name
+    }
+}
+$set_mode                   = $_SESSION['set_mode']; // 1 - Synchronize witch XBMC database, 2 - Synchronize witch videodb.xml file
+$set_site_name              = $_SESSION['set_site_name']; // Site title
+$set_language               = $_SESSION['set_language']; // The file that contains the language, file must be in the lang/ folder
+$set_per_page               = $_SESSION['set_per_page']; // Movies per page
+$set_recently_limit         = $_SESSION['set_recently_limit']; // Movies in recently added panel
+$set_random_limit           = $_SESSION['set_random_limit']; // Movies in random panel
+$set_last_played_limit      = $_SESSION['set_last_played_limit']; // Movies in last played panel
+$set_top_rated_limit        = $_SESSION['set_top_rated_limit']; // Movies in top rated panel
+$set_sync_time              = $_SESSION['set_sync_time']; // Time in minutes after which the script will attempt to synchronize databases
+$set_panel_top_time         = $_SESSION['set_panel_top_time']; // Time in second to change displayed item
+$set_panel_top              = $_SESSION['set_panel_top']; // Show top panel
+$set_watched_status         = $_SESSION['set_watched_status']; // Show watched status
+$set_overall_panel          = $_SESSION['set_overall_panel']; // Show overall panel
+$set_protect_site           = $_SESSION['set_protect_site']; // Protect access to site
+$set_mysql_host_xbmc        = $_SESSION['set_mysql_host_xbmc']; // Database host
+$set_mysql_port_xbmc        = $_SESSION['set_mysql_port_xbmc']; // Database port, default is 3306
+$set_mysql_login_xbmc       = $_SESSION['set_mysql_login_xbmc']; // Database login
+$set_mysql_pass_xbmc        = $_SESSION['set_mysql_pass_xbmc']; // Database password
+$set_mysql_database_xbmc    = $_SESSION['set_mysql_database_xbmc']; // Database name
+*/
 
 /* ######################
  * # Create empty table #
  */######################
-function create_table($col, $mysql_table_ml, $mysql_config_ml, $lang) {
-    $create_movie_sql = 'CREATE TABLE IF NOT EXISTS `' . $mysql_table_ml . '` (
+function create_table($mysql_table) {
+    
+    $output_create_table = '';
+    
+    // table movie
+    $create_movies_sql = 'CREATE TABLE IF NOT EXISTS `' . $mysql_table[0] . '` (
                 `id` int(11) NOT NULL AUTO_INCREMENT,
                 `file` int(11) NOT NULL,
                 `title` varchar(100),
@@ -32,12 +114,12 @@ function create_table($col, $mysql_table_ml, $mysql_config_ml, $lang) {
                 `date_added` text DEFAULT NULL,
                 PRIMARY KEY (`id`)
                 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8';
-    if (!mysql_query($create_movie_sql)) {
-        $output = $lang['f_tab_cant_create'] . ': ' . mysql_error() . '<br/>';
-    } else {
-        $output = $lang['f_tab_created'] . ': ' . $mysql_table_ml . '<br/>';
+    if (!@mysql_query($create_movies_sql)) {
+        $output_create_table.= 'Could not create table: ' . $mysql_table[0] . ' - ' . mysql_error() . '<br/>';
     }
-    $create_config_sql = 'CREATE TABLE IF NOT EXISTS `' . $mysql_config_ml . '` (
+    
+    // table config
+    $create_config_sql = 'CREATE TABLE IF NOT EXISTS `' . $mysql_table[1] . '` (
                 `set_mode` int(1) DEFAULT 2,
                 `set_site_name` varchar(30) DEFAULT "MovieLib",
                 `set_language` varchar(15) DEFAULT "lang_pl.php",
@@ -58,18 +140,31 @@ function create_table($col, $mysql_table_ml, $mysql_config_ml, $lang) {
                 `set_mysql_pass_xbmc` text DEFAULT NULL,
                 `set_mysql_database_xbmc` text DEFAULT NULL
                 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8';
-    if (!mysql_query($create_config_sql)) {
-        $output = $lang['f_tab_cant_create'] . ': ' . mysql_error() . '<br/>';
-    } else {
-        
-        if (mysql_num_rows(mysql_query('SELECT * FROM ' . $mysql_config_ml)) == 0) {
-            $insert_config_sql = 'INSERT INTO `' . $mysql_config_ml . '` () VALUES ()';
-            mysql_query($insert_config_sql);
-        }
-        $output = $lang['f_tab_created'] . ': ' . $mysql_config_ml . '<br/>'; 
-           
+    if (!@mysql_query($create_config_sql)) {
+        $output_create_table.= 'Could not create table: ' . $mysql_table[1] . ' - ' . mysql_error() . '<br/>';
     }
-    return $output;
+    if (mysql_num_rows(mysql_query('SELECT * FROM ' . $mysql_table[1])) == 0) {
+        $insert_config_sql = 'INSERT INTO `' . $mysql_table[1] . '` () VALUES ()';
+    }
+    
+    // table users
+    $create_users_sql = 'CREATE TABLE IF NOT EXISTS `' . $mysql_table[2] . '` (
+                `id` int(2) NOT NULL AUTO_INCREMENT,
+                `login` varchar(5) DEFAULT NULL,
+                `password` varchar(30) DEFAULT NULL,
+                `s_id` varchar(30) DEFAULT NULL,
+                PRIMARY KEY (`id`)
+                ) ENGINE=MyISAM  DEFAULT CHARSET=utf8';
+    if (!@mysql_query($create_users_sql)) {
+        $output_create_table.= 'Could not create table: ' . $mysql_table[2] . ' - ' . mysql_error() . '<br/>';
+    }
+    if (mysql_num_rows(mysql_query('SELECT * FROM ' . $mysql_table[2])) == 0) {
+        $insert_users_sql = 'INSERT INTO `' . $mysql_table[2] . '` (`id`, `login`, `password`, `s_id`) VALUES ("", "admin", "", "")';
+        mysql_query($insert_users_sql);
+        $insert_users_sql = 'INSERT INTO `' . $mysql_table[2] . '` (`id`, `login`, `password`, `s_id`) VALUES ("", "user", "", "")';
+        mysql_query($insert_users_sql);
+    }
+    return $output_create_table;
 }
 
 /* ###########################

@@ -307,6 +307,44 @@ input {
 /*###########*
  *# INSTALL #*
  *###########*/
- #database {
-    width: 200px;
- }
+#install_database {
+    width: 300px;
+    margin: auto;
+    background-color: #111;
+    border: 1px solid #222;
+    margin-top: 10px;
+    padding-bottom: 10px;
+    text-align: center;
+}
+#install_database input {
+    background-color: #222;
+    color: #DDD;
+    border: 1px solid #444;
+    font-size: 11px;
+    margin: 0px;
+    padding-left: 5px;
+    height: 20px;
+}
+#install_delete {
+    background-color: #000;
+    border: 1px solid #444;
+    margin: 10px;
+}
+#install_delete a {
+    font-weight: bold;
+    display: inline-block;
+    border: 1px solid #444;
+    padding: 3px 5px 3px 5px;
+    margin: 5px 0px 5px 0px;
+}
+#install_table {
+    display: block;
+    border-collapse: collapse;
+    background-color: #000;
+    border: 1px solid #444;
+    margin: 10px;
+}
+#install_table td {
+    padding: 5px 5px 5px 15px;
+    text-align: right;
+}
