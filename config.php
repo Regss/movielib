@@ -1,13 +1,17 @@
 <?PHP
 require_once 'function.php';
-/* ##################################
- * # This is the configuration file #
- */##################################
 
 // Default language
 $set_language = 'lang_en.php'; // The file that contains the language, file must be in the lang/ folder
 require 'lang/' . $set_language;
 
+if(!file_exists('db.php')) {
+    if(!file_exists('install.php') {
+        die('Installation file not exists!');
+    } else {
+        header('Location:install.php');
+    }
+}
 
 // MovieLib database
 $mysql_host_ml = '127.0.0.1'; // Database host

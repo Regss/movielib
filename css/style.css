@@ -303,3 +303,10 @@ input {
     width: 12px;
     height: 12px;
 }
+
+/*###########*
+ *# INSTALL #*
+ *###########*/
+ #database {
+    width: 200px;
+ }
