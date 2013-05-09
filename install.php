@@ -45,7 +45,7 @@ if (isset($_POST['host'])) {
         }    
     }
     if ($output_install == '') {
-        $output_install = 'Instalation successfull, delete install.php file, and go to admin panel change default password.';
+        $output_install = 'Instalation successfull, delete install.php file, and go to admin panel to change default password.';
         $install_delete = '<div id="install_delete"><a href="admin.php?option=delete_install">DELETE INSTALL FILE</a></div>';
     }
 }
@@ -65,11 +65,11 @@ if (isset($_POST['host'])) {
             Connection to database:
             <form action="install.php" method="post">
                 <table id="install_table">
-                <tr><td>Server:</td><td><input type="host" name="host" value="<?PHP echo $host ?>"></td></tr>
-                <tr><td>Port:</td><td><input type="port" name="port" value="<?PHP echo $port ?>"></td></tr>
-                <tr><td>Login:</td><td><input type="login" name="login" value="<?PHP echo $login ?>"></td></tr>
-                <tr><td>Password:</td><td><input type="pass" name="pass" value="<?PHP echo $pass ?>"></td></tr>
-                <tr><td>Database:</td><td><input type="database" name="database" value="<?PHP echo $database ?>"></td></tr>
+                <tr><td>Server:</td><td><input type="text" name="host" value="<?PHP echo $host ?>"></td></tr>
+                <tr><td>Port:</td><td><input type="text" name="port" value="<?PHP echo $port ?>"></td></tr>
+                <tr><td>Login:</td><td><input type="text" name="login" value="<?PHP echo $login ?>"></td></tr>
+                <tr><td>Password:</td><td><input type="text" name="pass" value="<?PHP echo $pass ?>"></td></tr>
+                <tr><td>Database:</td><td><input type="text" name="database" value="<?PHP echo $database ?>"></td></tr>
                 </table>
                 <input type="submit" value="Check">
             </form>

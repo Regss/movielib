@@ -3,16 +3,22 @@ session_start();
 require_once 'config.php';
 require_once 'function.php';
 
-if ($_GET['option'] == 'delete_install') {
-    // unlink('install.php');
-}
+// connect to database
+connect($mysql_ml);
 
-if (file_exists('install.php') or !file_exists('db.php')) {
-    header('Location:install.php');
+// get settings from db
+$set = get_settings($mysql_ml, $mysql_tables);
+require_once 'lang/' . $set['language'];
+
+if (isset($_GET['option']) && $_GET['option'] == 'delete_install') {
+    // unlink('install.php');
+    header('Location:admin.php');
     die();
 }
-
-
+if (file_exists('install.php') or !file_exists('db.php')) {
+    // header('Location:install.php');
+    // die();
+}
 
 // Check admin password
 if ($_SESSION['logged_admin'] !== true) {
@@ -35,7 +41,7 @@ mysql_select_db($mysql_ml[4]);
 
 // Overall
 if (!isset($_GET['option'])) {
-    $overall_sql = 'SELECT play_count FROM ' . $mysql_table_ml;
+    $overall_sql = 'SELECT play_count FROM ' . $mysql_tables[0];
     $overall_result = mysql_query($overall_sql);
     $overall_watched = 0;
     while ($overall = mysql_fetch_array($overall_result)) {
@@ -53,7 +59,7 @@ if (!isset($_GET['option'])) {
 // Create cache for all posters
 if (isset($_SESSION['id_to_create']) && count($_SESSION['id_to_create']) > 0) {
     foreach ($_SESSION['id_to_create'] as $key => $id) {
-        $list_sql = 'SELECT id, poster FROM ' . $mysql_table_ml . ' WHERE id = ' . $id;
+        $list_sql = 'SELECT id, poster FROM ' . $mysql_tables[0] . ' WHERE id = ' . $id;
         $list_result = mysql_query($list_sql);
         while ($list = mysql_fetch_array($list_result)) {
             gd_convert($list['id'], $list['poster']);
@@ -62,8 +68,8 @@ if (isset($_SESSION['id_to_create']) && count($_SESSION['id_to_create']) > 0) {
         }
     }
 }
-if (isset($_GET['option']) && $_GET['option'] === 'create_cache') {
-    $list_sql = 'SELECT id, poster FROM ' . $mysql_table_ml;
+if (isset($_GET['option']) && $_GET['option'] == 'create_cache') {
+    $list_sql = 'SELECT id, poster FROM ' . $mysql_tables[0];
     $list_result = mysql_query($list_sql);
     while ($list = mysql_fetch_array($list_result)) {
         if (!file_exists('cache/' . $list['id'] . '.jpg')) {
@@ -75,7 +81,7 @@ if (isset($_GET['option']) && $_GET['option'] === 'create_cache') {
 }
 
 // Rebuild cache
-if (isset($_GET['option']) && $_GET['option'] === 'rebuild_cache') {
+if (isset($_GET['option']) && $_GET['option'] == 'rebuild_cache') {
     $dir_path = 'cache/';
     $dir = opendir($dir_path);
     while($file = readdir($dir)) {
@@ -91,7 +97,7 @@ mysql_query('SET CHARACTER SET utf8');
 mysql_query('SET NAMES utf8');
 
 // Movie list
-if (isset($_GET['option']) && $_GET['option'] === 'list') {
+if (isset($_GET['option']) && $_GET['option'] == 'list') {
     $list_sql = 'SELECT id, title, poster, play_count FROM ' . $mysql_table_ml . ' ORDER BY title';
     $list_result = mysql_query($list_sql);
     $output_panel_list = '<table id="admin_table_movie">';
@@ -107,11 +113,34 @@ if (isset($_GET['option']) && $_GET['option'] === 'list') {
 } else {
     $output_panel_list = '';
 }
+
+// Settings
+if (isset($_GET['option']) && $_GET['option'] == 'settings') {
+    $sel_language = scandir('lang/');
+    print_r($sel_language);
+    foreach ($sel_language as $language) {
+        
+    }
+    
+    $output_panel_list.= '<form action="admin.php?option=settings_save" method="post">
+                <input type="text" name="mode" value="' . $_SESSION['set_mode'] . '">
+                <input type="text" name="site_name" value="' . $_SESSION['set_site_name'] . '">
+                    <select name="language">
+                        <option>Netscape</option>
+                        <option>Netscape</option>
+                        <option>Netscape</option>
+                    </select>
+                <input type="submit" value="SAVE">
+            </form>';
+}
+if (isset($_GET['option']) && $_GET['option'] == 'settings_save') {
+    
+}
 ?>
 <!DOCTYPE HTML>
 <html>
     <head>
-        <title><?PHP echo $set_site_name ?> - Admin Panel</title>
+        <title><?PHP echo $set['site_name'] ?> - Admin Panel</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <link href="css/style.css" rel="stylesheet" type="text/css">
     </head>
@@ -122,6 +151,7 @@ if (isset($_GET['option']) && $_GET['option'] === 'list') {
                 <a class="admin" href="admin.php?option=list">Movie list</a>
                 <a class="admin" href="admin.php?option=create_cache">Create cache</a>
                 <a class="admin" href="admin.php?option=rebuild_cache">Rebuild cache</a>
+                <a class="admin" href="admin.php?option=settings">Settings</a>
             </div>
             <div id="admin_panel_right">
                 <?PHP echo $output_panel_overall ?>

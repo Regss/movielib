@@ -3,17 +3,8 @@ if (file_exists('db.php')) {
     include_once 'db.php';
 }
 
-// Default language
-// $set_language = 'lang_en.php'; // The file that contains the language, file must be in the lang/ folder
-// require 'lang/' . $set_language;
-
-// Database config to array
-
-// Tables
-$mysql_table_ml = 'movies'; // Table name to create
-$mysql_config_ml = 'config'; // Table name to create
-$mysql_users_ml = 'users'; // Table name to create
-$mysql_tables = array($mysql_table_ml, $mysql_config_ml, $mysql_users_ml);
+// Tables to array
+$mysql_tables = array('movies', 'config', 'users');
 
 // XBMC database column
 $col['id_movie']        =   'idMovie';
@@ -42,12 +33,6 @@ $col['fanart']          =   'c20';
 $col['country']         =   'c21';
 $col['file_path']       =   'c22';
 $col['id_path']         =   'c23';
-
-$set_protect_site_pass = 'b27bfe5ba5bec17f80de30b9f23ff658'; // Type password in md5 to protect access to site.
-$set_admin_panel_pass = 'b27bfe5ba5bec17f80de30b9f23ff658'; // Type password in md5 to admin panel
-
-// Language 
-// require 'lang/' . $set_language;
 
 // Dir
 $dir_assoc = array('import', 'cache');

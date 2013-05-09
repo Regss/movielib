@@ -3,50 +3,33 @@ session_start();
 header('Content-type: text/html; charset=utf-8');
 require_once 'config.php';
 require_once 'function.php';
-$output_sync = '';
 
 if (file_exists('install.php') or !file_exists('db.php')) {
-    header('Location:install.php');
-    die();
+    // header('Location:install.php');
+    // die();
 }
+
+// connect to database
+connect($mysql_ml);
+
+// get settings from db
+$set = get_settings($mysql_ml, $mysql_tables);
+require_once 'lang/' . $set['language'];
 
 /* ##################
  * # CHECK PASSWORD #
  */##################
-if ($set_protect_site == 1) {
+if ($set['protect_site'] == 1) {
     if ($_SESSION['logged'] !== true) {
         header('Location:login.php');
         die();
     }
 }
 
-/* ##################
- * # CHECK DATABASE #
- */##################
-$conn_ml = @mysql_connect($mysql_ml[0] . ':' . $mysql_ml[1], $mysql_ml[2], $mysql_ml[3]);
-if (!$conn_ml) {
-    die($lang['i_could_not_connect'] . ': ' . mysql_error());
-}
-$sel_ml = mysql_select_db($mysql_ml[4]);
-if (!$sel_ml) {
-    $create_db_sql = 'CREATE DATABASE ' . $mysql_database_ml;
-    $create_db_result = mysql_query($create_db_sql);
-    if (!$create_db_result) {
-        die($lang['i_cant_create_db']);
-    } else {
-        $output_sync.= $lang['i_created_db'] . '<br />';
-        $sel_ml = mysql_select_db($mysql_ml[4]);
-    }
-}
-
-// Sets utf8 connections
-mysql_query('SET CHARACTER SET utf8');
-mysql_query('SET NAMES utf8');
-
 /* #######################
  * # CHECK XBMC DATABASE #
  */#######################
-if (!isset($_COOKIE['sync']) && $set_mode == 1) {
+if (!isset($_COOKIE['sync']) && $set['mode'] == 1) {
     $fp = @fsockopen($mysql_xbmc[0], $mysql_xbmc[1], $errno, $errstr, 3);
     if ($fp) {
         fclose($fp);
@@ -54,8 +37,8 @@ if (!isset($_COOKIE['sync']) && $set_mode == 1) {
         if ($conn_xbmc) {
             $sel_xbmc = @mysql_select_db($mysql_xbmc[4]);
             if ($sel_xbmc) {
-                $output_sync.= sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysql_table_ml, $lang);
-                setcookie('sync', true, time()+$set_sync_time*60);
+                $output_sync.= sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysql_tables[0], $lang);
+                setcookie('sync', true, time()+$set['sync_time']*60);
             }
         }
     }
@@ -64,17 +47,14 @@ if (!isset($_COOKIE['sync']) && $set_mode == 1) {
 /* ##########################
  * # CHECK FILE videodb.xml #
  */##########################
-if (file_exists('import/videodb.xml') && $set_mode == 2) {
-    $output_sync.= import_xml($col, $mysql_ml, $conn_ml, $mysql_table_ml, $lang);
+if (file_exists('import/videodb.xml') && $set['mode'] == 2) {
+    $output_sync.= import_xml($col, $mysql_ml, $conn_ml, $mysql_tables[0], $lang);
 }
 
 /* ################################
  * # CONNECT TO MOVIELIB DATABASE #
  */################################
-mysql_connect($mysql_ml[0] . ':' . $mysql_ml[1], $mysql_ml[2], $mysql_ml[3]);
-mysql_select_db($mysql_ml[4]);
-mysql_query('SET CHARACTER SET utf8');
-mysql_query('SET NAMES utf8');
+connect($mysql_ml);
 
 /* ##############
  * # INFO PANEL #
@@ -88,11 +68,11 @@ if (!isset($output_sync) or $output_sync == '') {
 /* ##############
  * # TOP PANELS #
  */##############
-if ($set_panel_top == 1) {
+if ($set['panel_top'] == 1) {
     
     // recently added
     $output_recently = '<div id="panel_recently">';
-    $recently_sql = 'SELECT id, title, poster, date_added FROM ' . $mysql_table_ml . ' ORDER BY date_added DESC LIMIT ' . $set_recently_limit;
+    $recently_sql = 'SELECT id, title, poster, date_added FROM ' . $mysql_tables[0] . ' ORDER BY date_added DESC LIMIT ' . $set['recently_limit'];
     $recently_result = mysql_query($recently_sql);
     while ($recently = mysql_fetch_array($recently_result)) {
         if (!file_exists('cache/' . $recently['id'] . '.jpg')) {
@@ -104,7 +84,7 @@ if ($set_panel_top == 1) {
 
     // random
     $output_random = '<div id="panel_random">';
-    $random_sql = 'SELECT id, title, poster FROM ' . $mysql_table_ml . ' ORDER BY RAND() LIMIT ' . $set_random_limit;
+    $random_sql = 'SELECT id, title, poster FROM ' . $mysql_tables[0] . ' ORDER BY RAND() LIMIT ' . $set['random_limit'];
     $random_result = mysql_query($random_sql);
     while ($random = mysql_fetch_array($random_result)) {
         if (!file_exists('cache/' . $random['id'] . '.jpg')) {
@@ -116,7 +96,7 @@ if ($set_panel_top == 1) {
 
     // last_played
     $output_last_played = '<div id="panel_last_played">';
-    $last_played_sql = 'SELECT id, title, poster, last_played FROM ' . $mysql_table_ml . ' ORDER BY last_played DESC LIMIT ' . $set_last_played_limit;
+    $last_played_sql = 'SELECT id, title, poster, last_played FROM ' . $mysql_tables[0] . ' ORDER BY last_played DESC LIMIT ' . $set['last_played_limit'];
     $last_played_result = mysql_query($last_played_sql);
     while ($last_played = mysql_fetch_array($last_played_result)) {
         if (!file_exists('cache/' . $last_played['id'] . '.jpg')) {
@@ -128,7 +108,7 @@ if ($set_panel_top == 1) {
 
     // top_rated
     $output_top_rated = '<div id="panel_top_rated">';
-    $top_rated_sql = 'SELECT id, title, poster, rating FROM ' . $mysql_table_ml . ' ORDER BY rating DESC LIMIT ' . $set_top_rated_limit;
+    $top_rated_sql = 'SELECT id, title, poster, rating FROM ' . $mysql_tables[0] . ' ORDER BY rating DESC LIMIT ' . $set['top_rated_limit'];
     $top_rated_result = mysql_query($top_rated_sql);
     while ($top_rated = mysql_fetch_array($top_rated_result)) {
         if (!file_exists('cache/' . $last_played['id'] . '.jpg')) {
@@ -138,7 +118,7 @@ if ($set_panel_top == 1) {
     }
     $output_top_rated.= '</div>';
     
-    $output_panel_top = '<div id="panel_top" class="' . $set_panel_top_time * 100 . '">' . $output_recently . $output_random . $output_last_played . $output_top_rated . '</div>';
+    $output_panel_top = '<div id="panel_top" class="' . $set['panel_top_time'] * 100 . '">' . $output_recently . $output_random . $output_last_played . $output_top_rated . '</div>';
     $output_panel_top_title = '<div id="panel_title"><div id="panel_recently_title">' . $lang['i_last_added'] . '</div><div id="panel_random_title">' . $lang['i_randomly'] . '</div><div id="panel_last_played_title">' . $lang['i_last_played'] . '</div><div id="panel_top_rated_title">' . $lang['i_top_rated'] . '</div></div>';
 } else {
     $output_panel_top = '';
@@ -148,8 +128,8 @@ if ($set_panel_top == 1) {
 /* #################
  * # OVERALL PANEL #
  */#################
-if ($set_overall_panel == 1) {
-    $overall_sql = 'SELECT play_count FROM ' . $mysql_table_ml;
+if ($set['overall_panel'] == 1) {
+    $overall_sql = 'SELECT play_count FROM ' . $mysql_tables[0];
     $overall_result = mysql_query($overall_sql);
     $overall_all = mysql_num_rows($overall_result);
     $overall_nw = 0;
@@ -167,7 +147,7 @@ if ($set_overall_panel == 1) {
 /* ##########
  * # GENRES #
  */##########
-$genre_sql = 'SELECT genre FROM ' . $mysql_table_ml . ' ORDER BY genre';
+$genre_sql = 'SELECT genre FROM ' . $mysql_tables[0] . ' ORDER BY genre';
 $genre_result = mysql_query($genre_sql);
 $genre_array = array();
 while ($genre_mysql_array = mysql_fetch_array($genre_result)) {
@@ -214,14 +194,14 @@ if ($search == '') {
 /* #############
  * # PANEL NAV #
  */#############
-$nav_sql = 'SELECT id, title, rating, year, genre, country FROM ' . $mysql_table_ml . ' WHERE genre LIKE "%' . $genre_mysql . '%" AND title LIKE "%' . $search_mysql . '%" AND id LIKE "' . $id_mysql . '" ORDER BY ' . $sort_mysql[$sort];
+$nav_sql = 'SELECT id, title, rating, year, genre, country FROM ' . $mysql_tables[0] . ' WHERE genre LIKE "%' . $genre_mysql . '%" AND title LIKE "%' . $search_mysql . '%" AND id LIKE "' . $id_mysql . '" ORDER BY ' . $sort_mysql[$sort];
 $nav_result = mysql_query($nav_sql);
 $row = mysql_num_rows($nav_result);
-if ($set_per_page == 0) {
+if ($set['per_page'] == 0) {
     $i_pages = 1;
     $output_nav = '';
 } else {
-    $i_pages = (ceil($row / $set_per_page));
+    $i_pages = (ceil($row / $set['per_page']));
     $output_nav = ($page == 1 ? $lang['i_previous'] : '<a href="index.php?sort=' . $sort . '&amp;genre=' . $genre . '&amp;page=' . ($page - 1) . '&amp;search=' . $search . '">' . $lang['i_previous'] . '</a>') . ' ' .
             $lang['i_page'] . ' ' . $page . ' / ' . $i_pages . ' ' .
             ($page == $i_pages ? $lang['i_next'] : '<a href="index.php?sort=' . $sort . '&amp;genre=' . $genre . '&amp;page=' . ($page + 1) . '&amp;search=' . $search . '">' . $lang['i_next'] . '</a>');
@@ -233,14 +213,14 @@ if ($set_per_page == 0) {
 /* ##############
  * # MOVIE LIST #
  */##############
-if ($set_per_page == 0) {
+if ($set['per_page'] == 0) {
     $limit_sql = '';
 } else {
-    $start = ($page - 1) * $set_per_page;
-    $limit_sql = ' LIMIT ' . $start . ', ' . $set_per_page;
+    $start = ($page - 1) * $set['per_page'];
+    $limit_sql = ' LIMIT ' . $start . ', ' . $set['per_page'];
 }
 
-$list_sql = 'SELECT * FROM ' . $mysql_table_ml . ' WHERE genre LIKE "%' . $genre_mysql . '%" AND title LIKE "%' . $search_mysql . '%" AND id LIKE "' . $id_mysql . '" ORDER by ' . $sort_mysql[$sort] . $limit_sql;
+$list_sql = 'SELECT * FROM ' . $mysql_tables[0] . ' WHERE genre LIKE "%' . $genre_mysql . '%" AND title LIKE "%' . $search_mysql . '%" AND id LIKE "' . $id_mysql . '" ORDER by ' . $sort_mysql[$sort] . $limit_sql;
 $list_result = mysql_query($list_sql);
 $output_panel_list = '';
 while ($list = mysql_fetch_array($list_result)) {
@@ -293,7 +273,7 @@ while ($list = mysql_fetch_array($list_result)) {
     $img_flag = $img_flag_vres . $img_flag_vtype . $img_flag_atype . $img_flag_achan;
 
     // wached status
-    if ($set_watched_status == 1 && $list['play_count'] > 0) {
+    if ($set['watched_status'] == 1 && $list['play_count'] > 0) {
         $watched = '<img class="watched" src="img/watched.png" alt="" title="' . $lang['i_last_played'] . ': ' . $list['last_played'] . '">';
     } else {
         $watched = '';
@@ -347,7 +327,7 @@ while ($list = mysql_fetch_array($list_result)) {
 <!DOCTYPE HTML>
 <html>
     <head>
-        <title><?PHP echo $set_site_name ?></title>
+        <title><?PHP echo $set['site_name'] ?></title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
         <link type="text/css" href="css/style.css" rel="stylesheet" media="all" />

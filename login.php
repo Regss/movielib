@@ -1,35 +1,49 @@
 <?php
 session_start();
 require_once 'config.php';
+require_once 'function.php';
+
+// connect to database
+connect($mysql_ml);
+
+$set = get_settings($mysql_ml, $mysql_tables);
+require_once 'lang/' . $set['language'];
 
 // Check password
 if (isset($_GET['login']) && $_GET['login'] === 'admin') {
-    if (isset($_POST['admin_pass']) && md5($_POST['admin_pass']) === $set_admin_panel_pass) {
-        $_SESSION['logged_admin'] = true;
-        header('Location:admin.php');
-        die();
-    } else {
-        $login_info = $lang['l_pass_admin'];
-        $input_action = 'login.php?login=admin';
-        $input_name = 'admin_pass';
+    $admin_check_sql = 'SELECT * FROM ' . $mysql_tables[2] . ' WHERE login = "admin"';
+    $admin_check_result = mysql_query($admin_check_sql);
+    while ($admin_check = mysql_fetch_array($admin_check_result)) {
+        if (isset($_POST['admin_pass']) && md5($_POST['admin_pass']) == $admin_check['password']) {
+            $_SESSION['logged_admin'] = true;
+            header('Location:admin.php');
+            die();
+        } else {
+            $login_info = $lang['l_pass_admin'];
+            $input_action = 'login.php?login=admin';
+            $input_name = 'admin_pass';
+        }
     }
+    
 } else {
-    if (isset($_POST['pass']) && md5($_POST['pass']) === $set_protect_site_pass) {
-        $_SESSION['logged'] = true;
-        header('Location:index.php');
-        die();
-    } else{
-        $login_info = $lang['l_pass'];
-        $input_action = 'login.php';
-        $input_name = 'pass';
+    $user_check_sql = 'SELECT * FROM ' . $mysql_tables[2] . ' WHERE login = "user"';
+    $user_check_result = mysql_query($user_check_sql);
+    while ($user_check = mysql_fetch_array($user_check_result)) {
+        if (isset($_POST['pass']) && md5($_POST['pass']) == $user_check['password']) {
+            $_SESSION['logged'] = true;
+            header('Location:index.php');
+        } else{
+            $login_info = $lang['l_pass'];
+            $input_action = 'login.php';
+            $input_name = 'pass';
+        }
     }
 }
-
 ?>
 <!DOCTYPE HTML>
 <html>
     <head>
-        <title><?PHP echo $set_site_name ?> - <?PHP echo $lang['l_html_login'] ?></title>
+        <title><?PHP echo $set['site_name'] ?> - <?PHP echo $lang['l_html_login'] ?></title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <link href="css/style.css" rel="stylesheet" type="text/css">
     </head>
