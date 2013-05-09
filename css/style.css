@@ -303,6 +303,14 @@ input {
     width: 12px;
     height: 12px;
 }
+#admin_panel_right input, select {
+    background-color:#111;
+    color:#fff;
+    border: 1px solid #222;
+    font-size:11px;
+    width:160px;
+    margin-top: 10px;
+}
 
 /*###########*
  *# INSTALL #*

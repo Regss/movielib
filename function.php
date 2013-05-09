@@ -25,51 +25,51 @@ function connect($mysql_ml) {
  * # Get settings from database #
  */##############################
 function get_settings($mysql_ml, $mysql_tables) {
-    if (!isset($_SESSION['set_mode'])) {
+    if (!isset($_SESSION['mode'])) {
         $set_sql = 'SELECT * FROM ' . $mysql_tables[1];
         $set_result = mysql_query($set_sql);
         while ($set = mysql_fetch_array($set_result)) {
-            $_SESSION['set_mode']               = $set['set_mode']; // 1 - Synchronize witch XBMC database, 2 - Synchronize witch videodb.xml file
-            $_SESSION['set_site_name']          = $set['set_site_name']; // Site title
-            $_SESSION['set_language']           = $set['set_language']; // The file that contains the language, file must be in the lang/ folder
-            $_SESSION['set_per_page']           = $set['set_per_page']; // Movies per page
-            $_SESSION['set_recently_limit']     = $set['set_recently_limit']; // Movies in recently added panel
-            $_SESSION['set_random_limit']       = $set['set_random_limit']; // Movies in random panel
-            $_SESSION['set_last_played_limit']  = $set['set_last_played_limit']; // Movies in last played panel
-            $_SESSION['set_top_rated_limit']    = $set['set_top_rated_limit']; // Movies in top rated panel
-            $_SESSION['set_sync_time']          = $set['set_sync_time']; // Time in minutes after which the script will attempt to synchronize databases
-            $_SESSION['set_panel_top_time']     = $set['set_panel_top_time']; // Time in second to change displayed item
-            $_SESSION['set_panel_top']          = $set['set_panel_top']; // Show top panel
-            $_SESSION['set_watched_status']     = $set['set_watched_status']; // Show watched status
-            $_SESSION['set_overall_panel']      = $set['set_overall_panel']; // Show overall panel
-            $_SESSION['set_protect_site']       = $set['set_protect_site']; // Protect access to site
-            $_SESSION['set_mysql_host_xbmc']    = $set['set_mysql_host_xbmc']; // Database host
-            $_SESSION['set_mysql_port_xbmc']    = $set['set_mysql_port_xbmc']; // Database port, default is 3306
-            $_SESSION['set_mysql_login_xbmc']   = $set['set_mysql_login_xbmc']; // Database login
-            $_SESSION['set_mysql_pass_xbmc']    = $set['set_mysql_pass_xbmc']; // Database password
-            $_SESSION['set_mysql_database_xbmc']= $set['set_mysql_database_xbmc']; // Database name
+            $_SESSION['mode']               = $set['mode']; // 1 - Synchronize witch XBMC database, 2 - Synchronize witch videodb.xml file
+            $_SESSION['site_name']          = $set['site_name']; // Site title
+            $_SESSION['language']           = $set['language']; // The file that contains the language, file must be in the lang/ folder
+            $_SESSION['per_page']           = $set['per_page']; // Movies per page
+            $_SESSION['recently_limit']     = $set['recently_limit']; // Movies in recently added panel
+            $_SESSION['random_limit']       = $set['random_limit']; // Movies in random panel
+            $_SESSION['last_played_limit']  = $set['last_played_limit']; // Movies in last played panel
+            $_SESSION['top_rated_limit']    = $set['top_rated_limit']; // Movies in top rated panel
+            $_SESSION['sync_time']          = $set['sync_time']; // Time in minutes after which the script will attempt to synchronize databases
+            $_SESSION['panel_top_time']     = $set['panel_top_time']; // Time in second to change displayed item
+            $_SESSION['panel_top']          = $set['panel_top']; // Show top panel
+            $_SESSION['watched_status']     = $set['watched_status']; // Show watched status
+            $_SESSION['overall_panel']      = $set['overall_panel']; // Show overall panel
+            $_SESSION['protect_site']       = $set['protect_site']; // Protect access to site
+            $_SESSION['mysql_host_xbmc']    = $set['mysql_host_xbmc']; // Database host
+            $_SESSION['mysql_port_xbmc']    = $set['mysql_port_xbmc']; // Database port, default is 3306
+            $_SESSION['mysql_login_xbmc']   = $set['mysql_login_xbmc']; // Database login
+            $_SESSION['mysql_pass_xbmc']    = $set['mysql_pass_xbmc']; // Database password
+            $_SESSION['mysql_database_xbmc']= $set['mysql_database_xbmc']; // Database name
         }
     }
     $output_set = array(
-    'mode'                  => $_SESSION['set_mode'],
-    'site_name'             => $_SESSION['set_site_name'],
-    'language'              => $_SESSION['set_language'],
-    'per_page'              => $_SESSION['set_per_page'],
-    'recently_limit'        => $_SESSION['set_recently_limit'],
-    'random_limit'          => $_SESSION['set_random_limit'],
-    'last_played_limit'     => $_SESSION['set_last_played_limit'],
-    'top_rated_limit'       => $_SESSION['set_top_rated_limit'],
-    'sync_time'             => $_SESSION['set_sync_time'],
-    'panel_top_time'        => $_SESSION['set_panel_top_time'],
-    'panel_top'             => $_SESSION['set_panel_top'],
-    'watched_status'        => $_SESSION['set_watched_status'],
-    'overall_panel'         => $_SESSION['set_overall_panel'],
-    'protect_site'          => $_SESSION['set_protect_site'],
-    'mysql_host_xbmc'       => $_SESSION['set_mysql_host_xbmc'],
-    'mysql_port_xbmc'       => $_SESSION['set_mysql_port_xbmc'],
-    'mysql_login_xbmc'      => $_SESSION['set_mysql_login_xbmc'],
-    'mysql_pass_xbmc'       => $_SESSION['set_mysql_pass_xbmc'],
-    'mysql_database_xbmc'   => $_SESSION['set_mysql_database_xbmc']
+    'mode'                  => $_SESSION['mode'],
+    'site_name'             => $_SESSION['site_name'],
+    'language'              => $_SESSION['language'],
+    'per_page'              => $_SESSION['per_page'],
+    'recently_limit'        => $_SESSION['recently_limit'],
+    'random_limit'          => $_SESSION['random_limit'],
+    'last_played_limit'     => $_SESSION['last_played_limit'],
+    'top_rated_limit'       => $_SESSION['top_rated_limit'],
+    'sync_time'             => $_SESSION['sync_time'],
+    'panel_top_time'        => $_SESSION['panel_top_time'],
+    'panel_top'             => $_SESSION['panel_top'],
+    'watched_status'        => $_SESSION['watched_status'],
+    'overall_panel'         => $_SESSION['overall_panel'],
+    'protect_site'          => $_SESSION['protect_site'],
+    'mysql_host_xbmc'       => $_SESSION['mysql_host_xbmc'],
+    'mysql_port_xbmc'       => $_SESSION['mysql_port_xbmc'],
+    'mysql_login_xbmc'      => $_SESSION['mysql_login_xbmc'],
+    'mysql_pass_xbmc'       => $_SESSION['mysql_pass_xbmc'],
+    'mysql_database_xbmc'   => $_SESSION['mysql_database_xbmc']
     );
 return $output_set;
 }
@@ -113,31 +113,32 @@ function create_table($mysql_table) {
     
     // table config
     $create_config_sql = 'CREATE TABLE IF NOT EXISTS `' . $mysql_table[1] . '` (
-                `set_mode` int(1) DEFAULT 2,
-                `set_site_name` varchar(30) DEFAULT "MovieLib",
-                `set_language` varchar(15) DEFAULT "lang_pl.php",
-                `set_per_page` int(5) DEFAULT 50,
-                `set_recently_limit` int(5) DEFAULT 10,
-                `set_random_limit` int(5) DEFAULT 10,
-                `set_last_played_limit` int(5) DEFAULT 10,
-                `set_top_rated_limit` int(5) DEFAULT 10,
-                `set_sync_time` int(5) DEFAULT 10,
-                `set_panel_top_time` int(5) DEFAULT 50,
-                `set_panel_top` int(1) DEFAULT 1,
-                `set_watched_status` int(1) DEFAULT 1,
-                `set_overall_panel` int(1) DEFAULT 1,
-                `set_protect_site` int(1) DEFAULT 0,
-                `set_mysql_host_xbmc` text DEFAULT NULL,
-                `set_mysql_port_xbmc` text DEFAULT NULL,
-                `set_mysql_login_xbmc` text DEFAULT NULL,
-                `set_mysql_pass_xbmc` text DEFAULT NULL,
-                `set_mysql_database_xbmc` text DEFAULT NULL
+                `mode` int(1) DEFAULT 0,
+                `site_name` varchar(30) DEFAULT "MovieLib",
+                `language` varchar(15) DEFAULT "lang_pl.php",
+                `per_page` int(5) DEFAULT 50,
+                `recently_limit` int(5) DEFAULT 10,
+                `random_limit` int(5) DEFAULT 10,
+                `last_played_limit` int(5) DEFAULT 10,
+                `top_rated_limit` int(5) DEFAULT 10,
+                `sync_time` int(5) DEFAULT 10,
+                `panel_top_time` int(5) DEFAULT 50,
+                `panel_top` int(1) DEFAULT 1,
+                `watched_status` int(1) DEFAULT 1,
+                `overall_panel` int(1) DEFAULT 1,
+                `protect_site` int(1) DEFAULT 0,
+                `mysql_host_xbmc` text DEFAULT NULL,
+                `mysql_port_xbmc` text DEFAULT NULL,
+                `mysql_login_xbmc` text DEFAULT NULL,
+                `mysql_pass_xbmc` text DEFAULT NULL,
+                `mysql_database_xbmc` text DEFAULT NULL
                 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8';
     if (!@mysql_query($create_config_sql)) {
         $output_create_table.= 'Could not create table: ' . $mysql_table[1] . ' - ' . mysql_error() . '<br/>';
     }
     if (mysql_num_rows(mysql_query('SELECT * FROM ' . $mysql_table[1])) == 0) {
         $insert_config_sql = 'INSERT INTO `' . $mysql_table[1] . '` () VALUES ()';
+        mysql_query ($insert_config_sql);
     }
     
     // table users

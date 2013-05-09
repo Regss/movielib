@@ -47,7 +47,7 @@ if (!isset($_COOKIE['sync']) && $set['mode'] == 1) {
 /* ##########################
  * # CHECK FILE videodb.xml #
  */##########################
-if (file_exists('import/videodb.xml') && $set['mode'] == 2) {
+if (file_exists('import/videodb.xml') && $set['mode'] == 0) {
     $output_sync.= import_xml($col, $mysql_ml, $conn_ml, $mysql_tables[0], $lang);
 }
 

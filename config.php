@@ -6,6 +6,9 @@ if (file_exists('db.php')) {
 // Tables to array
 $mysql_tables = array('movies', 'config', 'users');
 
+// Config name to array
+$settings_name = array('mode', 'site_name', 'language', 'per_page', 'recently_limit', 'random_limit', 'last_played_limit', 'top_rated_limit', 'sync_time', 'panel_top_time', 'panel_top', 'watched_status', 'overall_panel', 'protect_site', 'mysql_host_xbmc', 'mysql_port_xbmc', 'mysql_login_xbmc', 'mysql_pass_xbmc', 'mysql_database_xbmc');
+
 // XBMC database column
 $col['id_movie']        =   'idMovie';
 $col['id_file']         =   'idFile';

@@ -58,6 +58,29 @@ $lang['l_html_login']                   =   'Login panel';
 $lang['l_pass']                         =   'Password to access site';
 $lang['l_pass_admin']                   =   'Password to access Admin Panel';
 
+/* #############
+ * # ADMIN.PHP #
+ */#############
+$lang['a_mode']                         =   'Mode';
+$lang['a_site_name']                    =   'Site title';
+$lang['a_language']                     =   'Language';
+$lang['a_per_page']                     =   'Per page';
+$lang['a_recently_limit']               =   'Recently item';
+$lang['a_random_limit']                 =   'Random item';
+$lang['a_last_played_limit']            =   'Last played item';
+$lang['a_top_rated_limit']              =   'Top rated item';
+$lang['a_sync_time']                    =   'Sync time';
+$lang['a_panel_top_time']               =   'Panel top changeing time';
+$lang['a_panel_top']                    =   'Panel top';
+$lang['a_watched_status']               =   'Watched status';
+$lang['a_overall_panel']                =   'Overall panel';
+$lang['a_protect_site']                 =   'Protect site';
+$lang['a_mysql_host_xbmc']              =   'XBMC host';
+$lang['a_mysql_port_xbmc']              =   'XBMC port';
+$lang['a_mysql_login_xbmc']             =   'XBMC login';
+$lang['a_mysql_pass_xbmc']              =   'XBMC pass';
+$lang['a_mysql_database_xbmc']          =   'XBMC database';
+
 /* ####################
  * # ENGLISH LANGUAGE #
  */####################

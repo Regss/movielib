@@ -35,11 +35,11 @@ foreach ($dir_assoc as $dir) {
     }
 }
 
-// Connect to database
-mysql_connect($mysql_ml[0] . ':' . $mysql_ml[1], $mysql_ml[2], $mysql_ml[3]);
-mysql_select_db($mysql_ml[4]);
+$output_panel = '';
 
-// Overall
+/* ###########
+ * # OVERALL #
+ */###########
 if (!isset($_GET['option'])) {
     $overall_sql = 'SELECT play_count FROM ' . $mysql_tables[0];
     $overall_result = mysql_query($overall_sql);
@@ -51,12 +51,12 @@ if (!isset($_GET['option'])) {
     }
     $overall_all = mysql_num_rows($overall_result);
     $overall_unwatched = $overall_all - $overall_watched;
-    $output_panel_overall = 'All: ' . $overall_all . ' Watched: ' . $overall_watched . ' Unwatched: ' . $overall_unwatched;
-} else {
-    $output_panel_overall = '';
+    $output_panel = 'All: ' . $overall_all . ' Watched: ' . $overall_watched . ' Unwatched: ' . $overall_unwatched;
 }
 
-// Create cache for all posters
+/* ################
+ * # CREATE CACHE #
+ */################
 if (isset($_SESSION['id_to_create']) && count($_SESSION['id_to_create']) > 0) {
     foreach ($_SESSION['id_to_create'] as $key => $id) {
         $list_sql = 'SELECT id, poster FROM ' . $mysql_tables[0] . ' WHERE id = ' . $id;
@@ -80,7 +80,9 @@ if (isset($_GET['option']) && $_GET['option'] == 'create_cache') {
     header('Location:admin.php');
 }
 
-// Rebuild cache
+/* #################
+ * # REBUILD CACHE #
+ */#################
 if (isset($_GET['option']) && $_GET['option'] == 'rebuild_cache') {
     $dir_path = 'cache/';
     $dir = opendir($dir_path);
@@ -92,48 +94,130 @@ if (isset($_GET['option']) && $_GET['option'] == 'rebuild_cache') {
     header('Location:admin.php?option=create_cache');
 }
 
-// Set UTF8 connection
-mysql_query('SET CHARACTER SET utf8');
-mysql_query('SET NAMES utf8');
-
-// Movie list
+/* ##############
+ * # MOVIE LIST #
+ */##############
 if (isset($_GET['option']) && $_GET['option'] == 'list') {
-    $list_sql = 'SELECT id, title, poster, play_count FROM ' . $mysql_table_ml . ' ORDER BY title';
+    $list_sql = 'SELECT id, title, poster, play_count FROM ' . $mysql_tables[0] . ' ORDER BY title';
     $list_result = mysql_query($list_sql);
-    $output_panel_list = '<table id="admin_table_movie">';
+    $output_panel = '<table id="admin_table_movie">';
     while ($list = mysql_fetch_array($list_result)) {
         if (file_exists('cache/' . $list['id'] . '.jpg')) {
             $poster_exist = '<img src="img/watched.png">';
         } else {
             $poster_exist = '<img src="img/delete.png">';
         }
-        $output_panel_list.= '<tr><td>' . $list['id'] . '</td><td>' . $list['title'] . '</td><td><a href="' . $list['poster'] . '" target="_blank">' . $list['poster'] . '</a></td><td>'  . $poster_exist . '</td></tr>';
+        $output_panel.= '<tr><td>' . $list['id'] . '</td><td>' . $list['title'] . '</td><td><a href="' . $list['poster'] . '" target="_blank">' . $list['poster'] . '</a></td><td>'  . $poster_exist . '</td></tr>';
     }
-    $output_panel_list.= '</table>';
-} else {
-    $output_panel_list = '';
+    $output_panel.= '</table>';
 }
 
-// Settings
+/* ############
+ * # SETTINGS #
+ */############
 if (isset($_GET['option']) && $_GET['option'] == 'settings') {
-    $sel_language = scandir('lang/');
-    print_r($sel_language);
-    foreach ($sel_language as $language) {
-        
+    
+    // set lenguage input
+    $output_lang = '';
+    $option_language = scandir('lang/');
+    foreach ($option_language as $val) {
+        if ($val !== '.' && $val !== '..') {
+            $output_lang.= '<option' . ($set['language'] == $val ? ' selected="selected"' : '') . '>' . $val . '</option>';
+        }
     }
     
-    $output_panel_list.= '<form action="admin.php?option=settings_save" method="post">
-                <input type="text" name="mode" value="' . $_SESSION['set_mode'] . '">
-                <input type="text" name="site_name" value="' . $_SESSION['set_site_name'] . '">
-                    <select name="language">
-                        <option>Netscape</option>
-                        <option>Netscape</option>
-                        <option>Netscape</option>
-                    </select>
+    $output_mode = '';
+    $output_panel_top = '';
+    $output_watched_status = '';
+    $output_overall_panel = '';
+    $output_protect_site = '';
+    $output_per_page = '';
+    $output_recently_limit = '';
+    $output_random_limit = '';
+    $output_last_played_limit = '';
+    $output_top_rated_limit = '';
+    
+    $mode = array(0 => 'OFF', 1 => 'ON');
+    foreach ($mode as $key => $val) {
+            // set mode input
+            $output_mode.= '<option value="' . $key . '" ' . ($set['mode'] == $key ? ' selected="selected"' : '') . '>' . $val . '</option>';
+            // set panel_top input
+            $output_panel_top.= '<option value="' . $key . '" ' . ($set['panel_top'] == $key ? ' selected="selected"' : '') . '>' . $val . '</option>';
+            // set wached status input
+            $output_watched_status.= '<option value="' . $key . '" ' . ($set['watched_status'] == $key ? ' selected="selected"' : '') . '>' . $val . '</option>';
+            // set overall panel input
+            $output_overall_panel.= '<option value="' . $key . '" ' . ($set['overall_panel'] == $key ? ' selected="selected"' : '') . '>' . $val . '</option>';
+            // set protect site input
+            $output_protect_site.= '<option value="' . $key . '" ' . ($set['protect_site'] == $key ? ' selected="selected"' : '') . '>' . $val . '</option>';
+    }
+    
+    $quantity = array(5, 10, 20, 50, 100);
+    foreach ($quantity as $val) {
+        // set per page input
+        $output_per_page.= '<option' . ($set['per_page'] == $val ? ' selected="selected"' : '') . '>' . $val . '</option>';
+        // set recently limit
+        $output_recently_limit.= '<option' . ($set['recently_limit'] == $val ? ' selected="selected"' : '') . '>' . $val . '</option>';
+        // set random limit
+        $output_random_limit.= '<option' . ($set['random_limit'] == $val ? ' selected="selected"' : '') . '>' . $val . '</option>';
+        // set last played limit
+        $output_last_played_limit.= '<option' . ($set['last_played_limit'] == $val ? ' selected="selected"' : '') . '>' . $val . '</option>';
+        // set top rated limit
+        $output_top_rated_limit.= '<option' . ($set['top_rated_limit'] == $val ? ' selected="selected"' : '') . '>' . $val . '</option>';
+        
+    }
+
+    // output form
+    $output_panel.= '<form action="admin.php?option=settings_save" method="post"><table id="admin_table_movie">
+                <tr><td>' . $lang['a_mode'] . '</td>:<td><select name="mode">' . $output_mode . '</select></td></tr>
+                <tr><td>' . $lang['a_site_name'] . '</td><td><input type="text" name="site_name" value="' . $set['site_name'] . '"></td></tr>
+                <tr><td>' . $lang['a_language'] . '</td><td><select name="language">' . $output_lang . '</select></td></tr>
+                <tr><td>' . $lang['a_per_page'] . '</td><td><select name="per_page">' . $output_per_page . '</select></td></tr>
+                <tr><td>' . $lang['a_recently_limit'] . '</td><td><select name="recently_limit">' . $output_recently_limit . '</select></td></tr>
+                <tr><td>' . $lang['a_random_limit'] . '</td><td><select name="random_limit">' . $output_random_limit . '</select></td></tr>
+                <tr><td>' . $lang['a_last_played_limit'] . '</td><td><select name="last_played_limit">' . $output_last_played_limit . '</select></td></tr>
+                <tr><td>' . $lang['a_top_rated_limit'] . '</td><td><select name="top_rated_limit">' . $output_top_rated_limit . '</select></td></tr>
+                <tr><td>' . $lang['a_sync_time'] . '</td><td><input type="text" name="sync_time" value="' . $set['sync_time'] . '"></td></tr>
+                <tr><td>' . $lang['a_panel_top_time'] . '</td><td><input type="text" name="panel_top_time" value="' . $set['panel_top_time'] . '"></td></tr>
+                <tr><td>' . $lang['a_panel_top'] . '</td><td><select name="panel_top">' . $output_panel_top . '</select></td></tr>
+                <tr><td>' . $lang['a_watched_status'] . '</td><td><select name="watched_status">' . $output_watched_status . '</select></td></tr>
+                <tr><td>' . $lang['a_overall_panel'] . '</td><td><select name="overall_panel">' . $output_overall_panel . '</select></td></tr>
+                <tr><td>' . $lang['a_protect_site']  . '</td><td><select name="protect_site">' . $output_protect_site . '</select></td></tr>
+                <tr><td>' . $lang['a_mysql_host_xbmc'] . '</td><td><input type="text" name="mysql_host_xbmc" value="' . $set['mysql_host_xbmc'] . '"></td></tr>
+                <tr><td>' . $lang['a_mysql_port_xbmc'] . '</td><td><input type="text" name="mysql_port_xbmc" value="' . $set['mysql_port_xbmc'] . '"></td></tr>
+                <tr><td>' . $lang['a_mysql_login_xbmc'] . '</td><td><input type="text" name="mysql_login_xbmc" value="' . $set['mysql_login_xbmc'] . '"></td></tr>
+                <tr><td>' . $lang['a_mysql_pass_xbmc'] . '</td><td><input type="text" name="mysql_pass_xbmc" value="' . $set['mysql_pass_xbmc'] . '"></td></tr>
+                <tr><td>' . $lang['a_mysql_database_xbmc'] . '</td><td><input type="text" name="mysql_database_xbmc" value="' . $set['mysql_database_xbmc'] . '"></td></tr>
+                </table>
                 <input type="submit" value="SAVE">
-            </form>';
+                </form>';
 }
-if (isset($_GET['option']) && $_GET['option'] == 'settings_save') {
+
+/* ###################
+ * # SAVING SETTINGS #
+ */###################
+if (isset($_GET['option']) && $_GET['option'] === 'settings_save') {
+    print_r($_POST);
+    $settings_update_sql = 'UPDATE ' . $mysql_tables[1] . ' SET 
+        mode = "' . $_POST['mode'] . '",
+        site_name = "' . $_POST['site_name'] . '",
+        language = "' . $_POST['language'] . '",
+        per_page = "' . $_POST['per_page'] . '",
+        recently_limit = "' . $_POST['recently_limit'] . '",
+        random_limit = "' . $_POST['random_limit'] . '",
+        last_played_limit = "' . $_POST['last_played_limit'] . '",
+        top_rated_limit = "' . $_POST['top_rated_limit'] . '",
+        sync_time = "' . $_POST['sync_time'] . '",
+        panel_top_time = "' . $_POST['panel_top_time'] . '",
+        panel_top = "' . $_POST['panel_top'] . '",
+        watched_status = "' . $_POST['watched_status'] . '",
+        overall_panel = "' . $_POST['overall_panel'] . '",
+        protect_site = "' . $_POST['protect_site'] . '",
+        mysql_host_xbmc = ' . (isset($_POST['mysql_host_xbmc']) ? '"' . $_POST['mysql_host_xbmc'] . '"' : 'NULL') . ',
+        mysql_port_xbmc = ' . (isset($_POST['mysql_port_xbmc']) ? '"' . $_POST['mysql_port_xbmc'] . '"' : 'NULL') . ',
+        mysql_login_xbmc = ' . (isset($_POST['mysql_login_xbmc']) ? '"' . $_POST['mysql_login_xbmc'] . '"' : 'NULL') . ',
+        mysql_pass_xbmc = ' . (isset($_POST['mysql_pass_xbmc']) ? '"' . $_POST['mysql_pass_xbmc'] . '"' : 'NULL') . ',
+        mysql_database_xbmc = ' . (isset($_POST['mysql_database_xbmc']) ? '"' . $_POST['mysql_database_xbmc'] . '"' : 'NULL');
+    mysql_query($settings_update_sql);
     
 }
 ?>
@@ -154,8 +238,7 @@ if (isset($_GET['option']) && $_GET['option'] == 'settings_save') {
                 <a class="admin" href="admin.php?option=settings">Settings</a>
             </div>
             <div id="admin_panel_right">
-                <?PHP echo $output_panel_overall ?>
-                <?PHP echo $output_panel_list ?>
+                <?PHP echo $output_panel ?>
             </div>
         </div>
     </body>

@@ -58,6 +58,29 @@ $lang['l_html_login']                   =   'Panel logowania';
 $lang['l_pass']                         =   'Hasło dostępu do strony';
 $lang['l_pass_admin']                   =   'Hasło dostępu do panelu Administratora';
 
+/* #############
+ * # ADMIN.PHP #
+ */#############
+$lang['a_mode']                         =   'Synchronizuj z bazą XBMC';
+$lang['a_site_name']                    =   'Tytuł strony';
+$lang['a_language']                     =   'Język';
+$lang['a_per_page']                     =   'Na stronie';
+$lang['a_recently_limit']               =   'Ostatnio dodane';
+$lang['a_random_limit']                 =   'Losowo wybrane';
+$lang['a_last_played_limit']            =   'Ostatnio oglądane';
+$lang['a_top_rated_limit']              =   'Najwyżej oceniane';
+$lang['a_sync_time']                    =   'Synchronizacja co';
+$lang['a_panel_top_time']               =   'Czas zmiany panelu';
+$lang['a_panel_top']                    =   'Górny panel';
+$lang['a_watched_status']               =   'Status oglądania';
+$lang['a_overall_panel']                =   'Panel podsumowania';
+$lang['a_protect_site']                 =   'Chronić dostę do strony';
+$lang['a_mysql_host_xbmc']              =   'XBMC adres';
+$lang['a_mysql_port_xbmc']              =   'XBMC port';
+$lang['a_mysql_login_xbmc']             =   'XBMC użytkownik';
+$lang['a_mysql_pass_xbmc']              =   'XBMC hasło';
+$lang['a_mysql_database_xbmc']          =   'XBMC baza danych';
+
 /* ###################
  * # POLISH LANGUAGE #
  */###################
