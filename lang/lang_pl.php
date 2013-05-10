@@ -57,10 +57,14 @@ $lang['f_movies']                       =   'filmów';
 $lang['l_html_login']                   =   'Panel logowania';
 $lang['l_pass']                         =   'Hasło dostępu do strony';
 $lang['l_pass_admin']                   =   'Hasło dostępu do panelu Administratora';
+$lang['l_wrong_pass']                   =   'Błędne hasło';
 
 /* #############
  * # ADMIN.PHP #
  */#############
+$lang['a_all']                          =   'Wszystkie';
+$lang['a_watched']                      =   'Oglądane';
+$lang['a_unwatched']                    =   'Nieoglądane';
 $lang['a_mode']                         =   'Synchronizuj z bazą XBMC';
 $lang['a_site_name']                    =   'Tytuł strony';
 $lang['a_language']                     =   'Język';
@@ -80,6 +84,12 @@ $lang['a_mysql_port_xbmc']              =   'XBMC port';
 $lang['a_mysql_login_xbmc']             =   'XBMC użytkownik';
 $lang['a_mysql_pass_xbmc']              =   'XBMC hasło';
 $lang['a_mysql_database_xbmc']          =   'XBMC baza danych';
+$lang['a_html_main_site']               =   'Strona Główna';
+$lang['a_html_movie_list']              =   'Lista Filmów';
+$lang['a_html_create_cache']            =   'Utwórz Cache';
+$lang['a_html_rebuild_cahce']           =   'Przebuduj Cache';
+$lang['a_html_settings']                =   'Ustawienia';
+$lang['a_html_logout']                  =   'Wyloguj';
 
 /* ###################
  * # POLISH LANGUAGE #

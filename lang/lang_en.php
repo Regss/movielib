@@ -57,10 +57,14 @@ $lang['f_movies']                       =   'movies';
 $lang['l_html_login']                   =   'Login panel';
 $lang['l_pass']                         =   'Password to access site';
 $lang['l_pass_admin']                   =   'Password to access Admin Panel';
+$lang['l_wrong_pass']                   =   'Wrong password';
 
 /* #############
  * # ADMIN.PHP #
  */#############
+$lang['a_all']                          =   'All';
+$lang['a_watched']                      =   'Watched';
+$lang['a_unwatched']                    =   'Unwatched';
 $lang['a_mode']                         =   'Mode';
 $lang['a_site_name']                    =   'Site title';
 $lang['a_language']                     =   'Language';
@@ -80,6 +84,12 @@ $lang['a_mysql_port_xbmc']              =   'XBMC port';
 $lang['a_mysql_login_xbmc']             =   'XBMC login';
 $lang['a_mysql_pass_xbmc']              =   'XBMC pass';
 $lang['a_mysql_database_xbmc']          =   'XBMC database';
+$lang['a_html_main_site']               =   'Main Site';
+$lang['a_html_movie_list']              =   'Movie List';
+$lang['a_html_create_cache']            =   'Create Cache';
+$lang['a_html_rebuild_cahce']           =   'Rebuild Cache';
+$lang['a_html_settings']                =   'Settings';
+$lang['a_html_logout']                  =   'Logout';
 
 /* ####################
  * # ENGLISH LANGUAGE #

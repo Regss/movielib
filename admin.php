@@ -7,7 +7,7 @@ require_once 'function.php';
 connect($mysql_ml);
 
 // get settings from db
-$set = get_settings($mysql_ml, $mysql_tables);
+$set = get_settings($mysql_ml, $mysql_tables, $settings_name);
 require_once 'lang/' . $set['language'];
 
 if (isset($_GET['option']) && $_GET['option'] == 'delete_install') {
@@ -51,7 +51,7 @@ if (!isset($_GET['option'])) {
     }
     $overall_all = mysql_num_rows($overall_result);
     $overall_unwatched = $overall_all - $overall_watched;
-    $output_panel = 'All: ' . $overall_all . ' Watched: ' . $overall_watched . ' Unwatched: ' . $overall_unwatched;
+    $output_panel = $lang['a_all'] . ': ' . $overall_all . ' ' . $lang['a_watched'] . ': ' . $overall_watched . ' ' . $lang['a_unwatched'] . ': ' . $overall_unwatched;
 }
 
 /* ################
@@ -168,7 +168,7 @@ if (isset($_GET['option']) && $_GET['option'] == 'settings') {
 
     // output form
     $output_panel.= '<form action="admin.php?option=settings_save" method="post"><table id="admin_table_movie">
-                <tr><td>' . $lang['a_mode'] . '</td>:<td><select name="mode">' . $output_mode . '</select></td></tr>
+                <tr><td>' . $lang['a_mode'] . '</td><td><select name="mode">' . $output_mode . '</select></td></tr>
                 <tr><td>' . $lang['a_site_name'] . '</td><td><input type="text" name="site_name" value="' . $set['site_name'] . '"></td></tr>
                 <tr><td>' . $lang['a_language'] . '</td><td><select name="language">' . $output_lang . '</select></td></tr>
                 <tr><td>' . $lang['a_per_page'] . '</td><td><select name="per_page">' . $output_per_page . '</select></td></tr>
@@ -219,6 +219,11 @@ if (isset($_GET['option']) && $_GET['option'] === 'settings_save') {
         mysql_database_xbmc = ' . (isset($_POST['mysql_database_xbmc']) ? '"' . $_POST['mysql_database_xbmc'] . '"' : 'NULL');
     mysql_query($settings_update_sql);
     
+    // delete session var
+    foreach ($settings_name as $val) {
+        unset($_SESSION[$val]);
+    }
+    
 }
 ?>
 <!DOCTYPE HTML>
@@ -236,6 +241,7 @@ if (isset($_GET['option']) && $_GET['option'] === 'settings_save') {
                 <a class="admin" href="admin.php?option=create_cache">Create cache</a>
                 <a class="admin" href="admin.php?option=rebuild_cache">Rebuild cache</a>
                 <a class="admin" href="admin.php?option=settings">Settings</a>
+                <a class="admin" href="login.php?login=admin_logout">Logout</a>
             </div>
             <div id="admin_panel_right">
                 <?PHP echo $output_panel ?>

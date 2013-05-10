@@ -13,7 +13,7 @@ if (file_exists('install.php') or !file_exists('db.php')) {
 connect($mysql_ml);
 
 // get settings from db
-$set = get_settings($mysql_ml, $mysql_tables);
+$set = get_settings($mysql_ml, $mysql_tables, $settings_name);
 require_once 'lang/' . $set['language'];
 
 /* ##################

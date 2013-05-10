@@ -24,53 +24,24 @@ function connect($mysql_ml) {
 /* ##############################
  * # Get settings from database #
  */##############################
-function get_settings($mysql_ml, $mysql_tables) {
+function get_settings($mysql_ml, $mysql_tables, $settings_name) {
+    
+    // in settings in session not exists get it from database
     if (!isset($_SESSION['mode'])) {
         $set_sql = 'SELECT * FROM ' . $mysql_tables[1];
         $set_result = mysql_query($set_sql);
         while ($set = mysql_fetch_array($set_result)) {
-            $_SESSION['mode']               = $set['mode']; // 1 - Synchronize witch XBMC database, 2 - Synchronize witch videodb.xml file
-            $_SESSION['site_name']          = $set['site_name']; // Site title
-            $_SESSION['language']           = $set['language']; // The file that contains the language, file must be in the lang/ folder
-            $_SESSION['per_page']           = $set['per_page']; // Movies per page
-            $_SESSION['recently_limit']     = $set['recently_limit']; // Movies in recently added panel
-            $_SESSION['random_limit']       = $set['random_limit']; // Movies in random panel
-            $_SESSION['last_played_limit']  = $set['last_played_limit']; // Movies in last played panel
-            $_SESSION['top_rated_limit']    = $set['top_rated_limit']; // Movies in top rated panel
-            $_SESSION['sync_time']          = $set['sync_time']; // Time in minutes after which the script will attempt to synchronize databases
-            $_SESSION['panel_top_time']     = $set['panel_top_time']; // Time in second to change displayed item
-            $_SESSION['panel_top']          = $set['panel_top']; // Show top panel
-            $_SESSION['watched_status']     = $set['watched_status']; // Show watched status
-            $_SESSION['overall_panel']      = $set['overall_panel']; // Show overall panel
-            $_SESSION['protect_site']       = $set['protect_site']; // Protect access to site
-            $_SESSION['mysql_host_xbmc']    = $set['mysql_host_xbmc']; // Database host
-            $_SESSION['mysql_port_xbmc']    = $set['mysql_port_xbmc']; // Database port, default is 3306
-            $_SESSION['mysql_login_xbmc']   = $set['mysql_login_xbmc']; // Database login
-            $_SESSION['mysql_pass_xbmc']    = $set['mysql_pass_xbmc']; // Database password
-            $_SESSION['mysql_database_xbmc']= $set['mysql_database_xbmc']; // Database name
+            foreach($settings_name as $val) {
+                $_SESSION[$val] = $set[$val];
+            }
         }
     }
-    $output_set = array(
-    'mode'                  => $_SESSION['mode'],
-    'site_name'             => $_SESSION['site_name'],
-    'language'              => $_SESSION['language'],
-    'per_page'              => $_SESSION['per_page'],
-    'recently_limit'        => $_SESSION['recently_limit'],
-    'random_limit'          => $_SESSION['random_limit'],
-    'last_played_limit'     => $_SESSION['last_played_limit'],
-    'top_rated_limit'       => $_SESSION['top_rated_limit'],
-    'sync_time'             => $_SESSION['sync_time'],
-    'panel_top_time'        => $_SESSION['panel_top_time'],
-    'panel_top'             => $_SESSION['panel_top'],
-    'watched_status'        => $_SESSION['watched_status'],
-    'overall_panel'         => $_SESSION['overall_panel'],
-    'protect_site'          => $_SESSION['protect_site'],
-    'mysql_host_xbmc'       => $_SESSION['mysql_host_xbmc'],
-    'mysql_port_xbmc'       => $_SESSION['mysql_port_xbmc'],
-    'mysql_login_xbmc'      => $_SESSION['mysql_login_xbmc'],
-    'mysql_pass_xbmc'       => $_SESSION['mysql_pass_xbmc'],
-    'mysql_database_xbmc'   => $_SESSION['mysql_database_xbmc']
-    );
+    
+    // settings from session to var
+    $output_set = array();
+    foreach ($settings_name as $val) {
+        $output_set[$val] = $_SESSION[$val];
+    }
 return $output_set;
 }
 
