@@ -62,9 +62,17 @@ $lang['l_wrong_pass']                   =   'Wrong password';
 /* #############
  * # ADMIN.PHP #
  */#############
+$lang['a_movies']                       =   'Movies';
 $lang['a_all']                          =   'All';
 $lang['a_watched']                      =   'Watched';
 $lang['a_unwatched']                    =   'Unwatched';
+$lang['a_cache']                        =   'Cache';
+$lang['a_cached_posters']               =   'Cached posters';
+$lang['a_not_cached_posters']           =   'Not cached posters';
+$lang['a_create_cache_info']            =   'Create cache for all posters that do not have them';
+$lang['a_create_cache']                 =   'Create Cache';
+$lang['a_rebuild_cache_info']           =   'Rebuild all cache for all movies';
+$lang['a_rebuild_cache']                =   'Rebuild Cache';
 $lang['a_mode']                         =   'Mode';
 $lang['a_site_name']                    =   'Site title';
 $lang['a_language']                     =   'Language';
@@ -84,12 +92,35 @@ $lang['a_mysql_port_xbmc']              =   'XBMC port';
 $lang['a_mysql_login_xbmc']             =   'XBMC login';
 $lang['a_mysql_pass_xbmc']              =   'XBMC pass';
 $lang['a_mysql_database_xbmc']          =   'XBMC database';
+$lang['a_radio_on']                     =   'On';
+$lang['a_radio_off']                    =   'Off';
+$lang['a_user']                         =   'User';
+$lang['a_admin']                        =   'Admin';
+$lang['a_new_password']                 =   'New password';
+$lang['a_new_password_re']              =   'Re-type Password';
 $lang['a_html_main_site']               =   'Main Site';
 $lang['a_html_movie_list']              =   'Movie List';
 $lang['a_html_create_cache']            =   'Create Cache';
 $lang['a_html_rebuild_cahce']           =   'Rebuild Cache';
 $lang['a_html_settings']                =   'Settings';
+$lang['a_html_change_password']         =   'Change Password';
 $lang['a_html_logout']                  =   'Logout';
+
+/* ###############
+ * # INSTALL.PHP #
+ */###############
+$lang['ins_db_exist']                   =   'Database configuration file alerdy exists. Continue will overwrite the existing settings. If you successfull configured database please delete install.php file';
+$lang['ins_delete_file']                =   'DELETE INSTALL FILE';
+$lang['ins_could_connect']              =   'Could not connect to database';
+$lang['ins_table']                      =   'Table';
+$lang['ins_not_exist']                  =   'Not exist';
+$lang['ins_success']                    =   'Instalation successfull, delete install.php file, and go to admin panel to change default password';
+$lang['inst_conn_db']                   =   'Connection to database';
+$lang['inst_server']                    =   'Server';
+$lang['inst_port']                      =   'Port';
+$lang['inst_login']                     =   'Login';
+$lang['inst_pass']                      =   'Password';
+$lang['ints_database']                  =   'Database';
 
 /* ####################
  * # ENGLISH LANGUAGE #

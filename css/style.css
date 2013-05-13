@@ -240,12 +240,15 @@ table#movie_info {
  *# LOGIN #*
  *#########*/
 #pass {
-    width: 180px;
+    width: 300px;
     margin: auto;
-    margin-top: 30px;
+    background-color: #111;
+    border: 1px solid #222;
+    margin-top: 10px;
+    padding-bottom: 10px;
     text-align: center;
 }
-input {
+#pass input {
     background-color:#111;
     color:#fff;
     border: 1px solid #222;
@@ -258,6 +261,7 @@ input {
  *# ADMIN #*
  *#########*/
 #admin_container {
+    text-align: center;
     background-color: #111;
     border: 1px solid #333;
     width: 800px;
@@ -280,7 +284,7 @@ input {
     padding: 5px;
     float: right;
 }
-.admin {
+.admin_menu_box {
     width: 158px;
     text-align: center;
     display: block;
@@ -290,26 +294,25 @@ input {
     border: 1px solid #222;
 }
 #admin_table_movie {
-    border: 0px;
-    border-collapse: collapse;
-    background-color: #222;
+    text-align: left;
     width: 100%;
 }
 #admin_table_movie td {
-    background-color: #000;
+    background-color: #111;
     padding: 2px 5px 2px 5px;
 }
 #admin_table_movie img {
     width: 12px;
     height: 12px;
 }
-#admin_panel_right input, select {
-    background-color:#111;
-    color:#fff;
+#admin_panel_right input, #admin_panel_right select {
+    background-color: #000;
+    color: #FFF;
     border: 1px solid #222;
-    font-size:11px;
-    width:160px;
-    margin-top: 10px;
+    font-size: 11px;
+}
+.disabled {
+    opacity: .5;
 }
 
 /*###########*
@@ -324,7 +327,7 @@ input {
     padding-bottom: 10px;
     text-align: center;
 }
-#install_database input {
+#install_database input, #install_database select {
     background-color: #222;
     color: #DDD;
     border: 1px solid #444;

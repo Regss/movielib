@@ -62,9 +62,17 @@ $lang['l_wrong_pass']                   =   'Błędne hasło';
 /* #############
  * # ADMIN.PHP #
  */#############
+$lang['a_movies']                       =   'Filmy';
 $lang['a_all']                          =   'Wszystkie';
 $lang['a_watched']                      =   'Oglądane';
 $lang['a_unwatched']                    =   'Nieoglądane';
+$lang['a_cache']                        =   'Cache';
+$lang['a_cached_posters']               =   'Okładki posiadające cache';
+$lang['a_not_cached_posters']           =   'Okładki nie posiadające cache';
+$lang['a_create_cache_info']            =   'Utwórz cache dla wszystkich filmow które go nie posaidają';
+$lang['a_create_cache']                 =   'Utwórz Cache';
+$lang['a_rebuild_cache_info']           =   'Odbuduj cache dla wszystkich filmów';
+$lang['a_rebuild_cache']                =   'Odbuduj Cache';
 $lang['a_mode']                         =   'Synchronizuj z bazą XBMC';
 $lang['a_site_name']                    =   'Tytuł strony';
 $lang['a_language']                     =   'Język';
@@ -84,12 +92,35 @@ $lang['a_mysql_port_xbmc']              =   'XBMC port';
 $lang['a_mysql_login_xbmc']             =   'XBMC użytkownik';
 $lang['a_mysql_pass_xbmc']              =   'XBMC hasło';
 $lang['a_mysql_database_xbmc']          =   'XBMC baza danych';
+$lang['a_radio_on']                     =   'Wł';
+$lang['a_radio_off']                    =   'Wył';
+$lang['a_user']                         =   'Użytkownik';
+$lang['a_admin']                        =   'Administrator';
+$lang['a_new_password']                 =   'Nowe hasło';
+$lang['a_new_password_re']              =   'Powtórz hasło';
 $lang['a_html_main_site']               =   'Strona Główna';
 $lang['a_html_movie_list']              =   'Lista Filmów';
 $lang['a_html_create_cache']            =   'Utwórz Cache';
 $lang['a_html_rebuild_cahce']           =   'Przebuduj Cache';
 $lang['a_html_settings']                =   'Ustawienia';
+$lang['a_html_change_password']         =   'Zmień Hasło';
 $lang['a_html_logout']                  =   'Wyloguj';
+
+/* ###############
+ * # INSTALL.PHP #
+ */###############
+$lang['ins_db_exist']                   =   'Plik konfiguracyjny bazy danych już istnieje. Kontynuując nadpiszesz poprzednie ustawienia. Jeśli poprawnie zainstalowałeś usuń plik install.php';
+$lang['ins_delete_file']                =   'USUŃ PLIK INSTALACJI';
+$lang['ins_could_connect']              =   'Nie można połączyć z bazą danych';
+$lang['ins_table']                      =   'Tabela';
+$lang['ins_not_exist']                  =   'Nie istnieje';
+$lang['ins_success']                    =   'Poprawnie zainstalowano, usuń plik install.php';
+$lang['inst_conn_db']                   =   'Połączenie bazy danych';
+$lang['inst_server']                    =   'Serwer';
+$lang['inst_port']                      =   'Port';
+$lang['inst_login']                     =   'Użytkownik';
+$lang['inst_pass']                      =   'Hasło';
+$lang['ints_database']                  =   'Baza Danych';
 
 /* ###################
  * # POLISH LANGUAGE #
