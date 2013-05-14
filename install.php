@@ -13,12 +13,28 @@ if (isset($_POST['install_lang'])) {
     $_SESSION['install_lang'] = $_POST['install_lang'];
 }
 $install_lang = (isset($_SESSION['install_lang']) ? $_SESSION['install_lang'] : 'lang_en.php');
+if (!isset($_SESSION['install_lang'])) {
+    $get_lang = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
+    echo $get_lang;
+    if (file_exists('lang/lang_' . $get_lang . '.php')) {
+        $install_lang = 'lang_' . $get_lang . '.php';
+    } else {
+        $install_lang = 'lang_en.php';
+    }
+} else {
+    $install_lang = $_SESSION['install_lang'];
+}
+$line = '';
 include_once 'lang/' . $install_lang;
 $output_install_lang = '';
 $option_install_language = scandir('lang/');
 foreach ($option_install_language as $val) {
     if ($val !== '.' && $val !== '..') {
-        $output_install_lang.= '<option' . ($install_lang == $val ? ' selected="selected"' : '') . '>' . $val . '</option>';
+        $fp = fopen('lang/' . $val, 'r');
+            $line.= fgets($fp, 9999);
+            echo $line;
+        preg_match('/lang_([a-zA-Z]+)\.php$/', $val, $file_lang);
+        $output_install_lang.= '<option' . ($install_lang == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . $val . '</option>';
     }
 }
 
@@ -67,8 +83,8 @@ if (isset($_POST['host'])) {
         
         <div id="install_database">
             <form action="install.php" method="post">
-                Language file:<BR />
-                <select onchange="this.form.submit()" name="install_lang"><?PHP echo $output_install_lang ?></select>
+                <?PHP echo $lang['ins_lang_file'] ?>:<BR /><BR />
+                <select onchange="this.form.submit()" name="install_lang"><?PHP echo $output_install_lang ?></select><BR /><BR />
             </form>
             <?PHP echo $install_delete ?>
             <?PHP echo $lang['inst_conn_db'] ?>:
