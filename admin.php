@@ -303,9 +303,10 @@ if (isset($_GET['option']) && $_GET['option'] === 'password_save') {
     <head>
         <title><?PHP echo $set['site_name'] ?> - Admin Panel</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
         <link href="css/style.css" rel="stylesheet" type="text/css">
         <script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
-        <script type="text/javascript" src="js/jquery.site.js"></script>
+        <script type="text/javascript" src="js/jquery.script.js"></script>
     </head>
     <body>
         <div id="admin_container">

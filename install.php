@@ -15,7 +15,6 @@ if (isset($_POST['install_lang'])) {
 $install_lang = (isset($_SESSION['install_lang']) ? $_SESSION['install_lang'] : 'lang_en.php');
 if (!isset($_SESSION['install_lang'])) {
     $get_lang = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
-    echo $get_lang;
     if (file_exists('lang/lang_' . $get_lang . '.php')) {
         $install_lang = 'lang_' . $get_lang . '.php';
     } else {
@@ -49,7 +48,7 @@ $database   = (isset($_POST['database']) ? $_POST['database'] : 'movielib');
 
 if (!isset($_POST['host']) && file_exists('db.php')) {
         $output_install.= $lang['ins_db_exist'];
-        $install_delete = '<div id="install_delete"><a href="admin.php?option=delete_install">' . $lang['ins_delete_file'] . '</a></div>';
+        $install_delete = '<a id="install_delete" href="admin.php?option=delete_install">' . $lang['ins_delete_file'] . '</a><br /><br />';
 } 
 if (isset($_POST['host'])) {
     $conn_install = @mysql_connect($_POST['host'] . ':' . $_POST['port'], $_POST['login'], $_POST['pass']);
@@ -70,19 +69,24 @@ if (isset($_POST['host'])) {
         $install_delete = '<div id="install_delete"><a href="admin.php?option=delete_install">' . $lang['ins_delete_file'] . '</a></div>';
     }
 }
+if ($output_install !== '') {
+    $output_install = '<div id="panel_info">' . $output_install . '</div>';
+}
 ?>
 <!DOCTYPE HTML>
 <html>
     <head>
         <title>MovieLib - Install</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
         <link href="css/style.css" rel="stylesheet" type="text/css">
         <script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
-        <script type="text/javascript" src="js/jquery.site.js"></script>
+        <script type="text/javascript" src="js/jquery.script.js"></script>
     </head>
     <body>
-        <div id="panel_info"><?PHP echo $output_install ?></div>
-        <div id="install_database">
+        <div id="background"></div>
+        <?PHP echo $output_install ?>
+        <div id="install_container">
             <form action="install.php" method="post">
                 <?PHP echo $lang['ins_lang_file'] ?>:<BR /><BR />
                 <select onchange="this.form.submit()" name="install_lang"><?PHP echo $output_install_lang ?></select><BR /><BR />

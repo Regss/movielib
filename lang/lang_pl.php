@@ -109,7 +109,7 @@ $lang['a_html_logout']                  =   'Wyloguj';
 /* ###############
  * # INSTALL.PHP #
  */###############
-$lang['ins_lang_file']                  =   'Wybierz plik języka';
+$lang['ins_lang_file']                  =   'Wybierz język';
 $lang['ins_db_exist']                   =   'Plik konfiguracyjny bazy danych już istnieje. Kontynuując nadpiszesz poprzednie ustawienia. Jeśli poprawnie zainstalowałeś usuń plik install.php';
 $lang['ins_delete_file']                =   'USUŃ PLIK INSTALACJI';
 $lang['ins_could_connect']              =   'Nie można połączyć z bazą danych';

@@ -54,4 +54,12 @@ $(document).ready(function() {
         $('.xbmc').removeAttr('disabled');
         $('.xbmc').attr('class', 'xbmc');
     });
+    
+    $('body').click(function(){
+        $('#background').fadeOut(4000, function() {
+css('background-image', 'url(\'img/bg2.jpg\')')
+}).fadeIn(4000);
+    });
+    
+    
 });

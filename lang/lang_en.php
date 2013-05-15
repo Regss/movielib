@@ -109,7 +109,7 @@ $lang['a_html_logout']                  =   'Logout';
 /* ###############
  * # INSTALL.PHP #
  */###############
-$lang['ins_lang_file']                  =   'Choose language file';
+$lang['ins_lang_file']                  =   'Choose language';
 $lang['ins_db_exist']                   =   'Database configuration file alerdy exists. Continue will overwrite the existing settings. If you successfull configured database please delete install.php file';
 $lang['ins_delete_file']                =   'DELETE INSTALL FILE';
 $lang['ins_could_connect']              =   'Could not connect to database';

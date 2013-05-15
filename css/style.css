@@ -13,6 +13,15 @@ body {
     margin: 0px;
     outline: none;
 }
+#background {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    background-image: url('../img/bg.jpg');
+    z-index: -10;
+}
 img {
     vertical-align: middle;
     border: 0px;
@@ -43,10 +52,7 @@ a:active {
 }
 
 /* panel info */
-#panel_info {
-    position: absolute;
-    top: 5px;
-    right: 5px;
+#panel_info {    
     border: 3px solid #00cc00;
     background-color: #66ff33;
     font-weight: bold;
@@ -315,35 +321,24 @@ table#movie_info {
 /*###########*
  *# INSTALL #*
  *###########*/
-.info {
-    color: #000;
-    background-color: #00cc00;
-    border: 2px solid #009933;
-    padding: 5px;
-}
-#install_database {
+#install_container {
     width: 300px;
     margin: auto;
     background-color: #111;
     border: 1px solid #222;
     margin-top: 10px;
     padding-bottom: 10px;
+    padding-top: 10px;
     text-align: center;
 }
-#install_database input, #install_database select {
+#install_container input, #install_container select {
+    font-family: sans-serif; /* IE fix input pass width */
     background-color: #222;
     color: #DDD;
     border: 1px solid #444;
-    margin: 0px;
-    padding-left: 5px;
-    height: 20px;
 }
 #install_delete {
     background-color: #000;
-    border: 1px solid #444;
-    margin: 10px;
-}
-#install_delete a {
     font-weight: bold;
     display: inline-block;
     border: 1px solid #444;
@@ -358,6 +353,6 @@ table#movie_info {
     margin: 10px;
 }
 #install_table td {
-    padding: 5px 5px 5px 15px;
+    padding: 5px 5px 5px 5px;
     text-align: right;
 }
