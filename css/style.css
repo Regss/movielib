@@ -45,14 +45,11 @@ a:active {
 /* panel info */
 #panel_info {
     position: absolute;
-    display: none;
     top: 5px;
     right: 5px;
-    width: 200px;
     border: 3px solid #00cc00;
     background-color: #66ff33;
     font-weight: bold;
-    text-align: center;
     color: #000;
     padding: 5px;
 }
@@ -318,6 +315,12 @@ table#movie_info {
 /*###########*
  *# INSTALL #*
  *###########*/
+.info {
+    color: #000;
+    background-color: #00cc00;
+    border: 2px solid #009933;
+    padding: 5px;
+}
 #install_database {
     width: 300px;
     margin: auto;
@@ -331,7 +334,6 @@ table#movie_info {
     background-color: #222;
     color: #DDD;
     border: 1px solid #444;
-    font-size: 11px;
     margin: 0px;
     padding-left: 5px;
     height: 20px;

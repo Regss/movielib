@@ -333,7 +333,7 @@ while ($list = mysql_fetch_array($list_result)) {
         <link type="text/css" href="css/style.css" rel="stylesheet" media="all" />
         <script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
         <script type="text/javascript" src="js/jquery.cycle.lite.js"></script>
-        <script type="text/javascript" src="js/jquery.index.js"></script>
+        <script type="text/javascript" src="js/jquery.site.js"></script>
     </head>
     <body>
         <?PHP echo $output_panel_info ?>

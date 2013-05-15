@@ -24,8 +24,8 @@ $(document).ready(function() {
         $('#panel_'+id).slideToggle();
     });
 
-    // show info panel when database synchronized
-    $('#panel_info').fadeIn(5000).delay(3000).fadeOut(5000);
+    // hide info panel
+    $('#panel_info').delay(4000).fadeOut(4000);
 
     // show panels in loop
     $(function() {
@@ -45,5 +45,13 @@ $(document).ready(function() {
 		$(this).val($(this).attr('title'));
 	}
     });  
-
+    
+    $('#mode_0').click(function(){
+        $('.xbmc').attr('disabled', 'disabled');
+        $('.xbmc').attr('class', 'xbmc disabled');
+    });
+    $('#mode_1').click(function(){
+        $('.xbmc').removeAttr('disabled');
+        $('.xbmc').attr('class', 'xbmc');
+    });
 });

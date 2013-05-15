@@ -24,17 +24,17 @@ if (!isset($_SESSION['install_lang'])) {
 } else {
     $install_lang = $_SESSION['install_lang'];
 }
-$line = '';
 include_once 'lang/' . $install_lang;
 $output_install_lang = '';
 $option_install_language = scandir('lang/');
 foreach ($option_install_language as $val) {
     if ($val !== '.' && $val !== '..') {
         $fp = fopen('lang/' . $val, 'r');
-            $line.= fgets($fp, 9999);
-            echo $line;
-        preg_match('/lang_([a-zA-Z]+)\.php$/', $val, $file_lang);
-        $output_install_lang.= '<option' . ($install_lang == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . $val . '</option>';
+        for ($i=0;$i<3;$i++) {
+        $line = fgets($fp);
+        }
+        preg_match('/([a-zA-Z]+)/', $line, $file_lang);
+        $output_install_lang.= '<option' . ($install_lang == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ucfirst(strtolower($file_lang[1])) . '</option>';
     }
 }
 
@@ -77,10 +77,11 @@ if (isset($_POST['host'])) {
         <title>MovieLib - Install</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <link href="css/style.css" rel="stylesheet" type="text/css">
+        <script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="js/jquery.site.js"></script>
     </head>
     <body>
-        <?PHP echo $output_install ?>
-        
+        <div id="panel_info"><?PHP echo $output_install ?></div>
         <div id="install_database">
             <form action="install.php" method="post">
                 <?PHP echo $lang['ins_lang_file'] ?>:<BR /><BR />
