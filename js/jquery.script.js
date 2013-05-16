@@ -44,8 +44,7 @@ $(document).ready(function() {
 	if ($(this).val() == '') {
 		$(this).val($(this).attr('title'));
 	}
-    });  
-    
+    });
     $('#mode_0').click(function(){
         $('.xbmc').attr('disabled', 'disabled');
         $('.xbmc').attr('class', 'xbmc disabled');
@@ -55,15 +54,19 @@ $(document).ready(function() {
         $('.xbmc').attr('class', 'xbmc');
     });
     
-    
     // change background
-    $('.movie').mouseover(function(){
+    $('.movie').mouseenter(function(){
         var movie_id = $(this).attr('id');
-        $.ajax({url: "create_cache.php?id="+movie_id});
+        $.ajax({url: "function.js.php?id="+movie_id});
         $('#background').fadeOut(500, function(){
-            $(this).attr('src', 'cache/'+movie_id+'_f.jpg');
+            $(this).delay(100).attr('src', 'cache/'+movie_id+'_f.jpg');
             $(this).fadeIn(500);
         });
     });
-    
+    $('.movie').mouseleave(function(){
+        $('#background').fadeOut(500, function(){
+            $(this).delay(100).attr('src', 'img/bg.jpg');
+            $(this).fadeIn(500);
+        });
+    });
 });

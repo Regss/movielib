@@ -14,7 +14,7 @@ body {
     outline: none;
 }
 #background {
-    position: fixed; 
+    position: fixed;
     top: 0; 
     left: 0; 
     z-index:-10;
@@ -68,6 +68,7 @@ a:active {
     margin: auto;
     padding-bottom: 20px;
     padding-top: 10px;
+    opacity: 0.9;
 }
 
 /* panel top */

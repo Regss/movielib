@@ -442,21 +442,18 @@ function import_xml($col, $mysql_ml, $mysql_table_ml, $lang) {
     return $output;
 }
 
-/* ######################################
- * # GD conversion, create poster cache #
- */######################################
-function gd_convert($id, $poster) {
-    $cache_poster = 'cache/' . $id . '.jpg';
-    if (!file_exists($cache_poster) and !empty($poster)) {
-        $img = @imagecreatefromjpeg($poster);
+/* #################
+ * # GD conversion #
+ */#################
+function gd_convert($cache_path, $img_link, $new_width, $new_height) {
+    if (!file_exists($cache_path) and !empty($img_link)) {
+        $img = @imagecreatefromjpeg($img_link);
         if ($img) {
             $width = imagesx($img);
             $height = imagesy($img);
-            $new_width = 140;
-            $new_height = 198;
             $img_temp = imagecreatetruecolor($new_width, $new_height);
             imagecopyresampled($img_temp, $img, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
-            imagejpeg($img_temp, $cache_poster, 80);
+            imagejpeg($img_temp, $cache_path, 80);
         }
     }
 }
