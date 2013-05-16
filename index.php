@@ -9,6 +9,8 @@ if (file_exists('install.php') or !file_exists('db.php')) {
     // die();
 }
 
+$output_sync = '';
+
 // connect to database
 connect($mysql_ml);
 
@@ -48,7 +50,7 @@ if (!isset($_COOKIE['sync']) && $set['mode'] == 1) {
  * # CHECK FILE videodb.xml #
  */##########################
 if (file_exists('import/videodb.xml') && $set['mode'] == 0) {
-    $output_sync.= import_xml($col, $mysql_ml, $conn_ml, $mysql_tables[0], $lang);
+    $output_sync.= import_xml($col, $mysql_ml, $mysql_tables[0], $lang);
 }
 
 /* ################################
@@ -59,7 +61,7 @@ connect($mysql_ml);
 /* ##############
  * # INFO PANEL #
  */##############
-if (!isset($output_sync) or $output_sync == '') {
+if ($output_sync == '') {
     $output_panel_info ='';
 } else {
     $output_panel_info = '<div id="panel_info">' . $output_sync . '</div>';
@@ -280,7 +282,7 @@ while ($list = mysql_fetch_array($list_result)) {
     }
     
     $output_panel_list.= '
-<div id="movie_' . $list['id'] . '" class="movie">
+<div id="' . $list['id'] . '" class="movie">
     <div class="title">' . $list['title'] . '</div>
     <div class="title_org">' . $list['originaltitle'] . '</div>'
     . $watched 
@@ -331,11 +333,12 @@ while ($list = mysql_fetch_array($list_result)) {
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
         <link type="text/css" href="css/style.css" rel="stylesheet" media="all" />
-        <script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="js/jquery-1.9.1.js"></script>
         <script type="text/javascript" src="js/jquery.cycle.lite.js"></script>
         <script type="text/javascript" src="js/jquery.script.js"></script>
     </head>
     <body>
+        <img src="img/bg.jpg" id="background" alt="">
         <?PHP echo $output_panel_info ?>
         <div id="container">
             <?PHP echo $output_panel_top . $output_panel_top_title ?>

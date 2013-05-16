@@ -61,6 +61,7 @@ function create_table($mysql_table) {
                 `rating` text,
                 `year` text,
                 `poster` text,
+                `fanart` text,
                 `runtime` text,
                 `genre` text,
                 `director` text,
@@ -195,6 +196,7 @@ function sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysq
             ' . $col['genre'] . ',
             ' . $col['director'] . ',
             ' . $col['originaltitle'] . ',
+            ' . $col['fanart'] . ',
             ' . $col['country'] . ' 
             FROM movie WHERE ' . $col['title'] . ' = "' . addslashes($val) . '"';
         mysql_select_db($mysql_xbmc[4], $conn_xbmc);
@@ -233,6 +235,10 @@ function sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysq
         preg_match_all('/>(http:[^<]+)</', $movie[$col['poster']], $poster_path);
         $poster_url =  (isset($poster_path[1][0]) ? $poster_path[1][0] : '');
         
+        // Get fanart URL
+        preg_match_all('/>(http:[^<]+)</', $movie[$col['fanart']], $fanart_path);
+        $fanart_url =  (isset($fanart_path[1][0]) ? $fanart_path[1][0] : '');
+        
         // Insert to MovieLib table
         $insert_sql = 'INSERT INTO `' . $mysql_table_ml . '` (
             `title`,
@@ -240,6 +246,7 @@ function sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysq
             `rating`,
             `year`,
             `poster`,
+            `fanart`,
             `runtime`,
             `genre`,
             `director`,
@@ -260,7 +267,8 @@ function sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysq
             "' . addslashes($movie[$col['plot']]) . '",
             "' . $movie[$col['rating']] . '",
             "' . $movie[$col['year']] . '",
-            "' . addslashes($poster_url) . '", '
+            "' . addslashes($poster_url) . '",
+            "' . addslashes($fanart_url) . '", '
             . ($movie[$col['runtime']] == 0 ? '"' . round($stream_assoc[0]['iVideoDuration'] / 60, 0) . '", ' : '"' . $movie[$col['runtime']] . '", ') . '
             "' . addslashes($movie[$col['genre']]) . '",
             "' . addslashes($movie[$col['director']]) . '",
@@ -300,8 +308,10 @@ function sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysq
 /* #########################
  * # Sync with videodb.xml #
  */#########################
-function import_xml($col, $mysql_ml, $conn_ml, $mysql_table_ml, $lang) {
-        
+function import_xml($col, $mysql_ml, $mysql_table_ml, $lang) {
+    
+    connect($mysql_ml);
+    
     // Load XML file
     $xml = simplexml_load_file('import/videodb.xml');
     $xml_movie = $xml->movie;
@@ -316,8 +326,8 @@ function import_xml($col, $mysql_ml, $conn_ml, $mysql_table_ml, $lang) {
 
     // Check movie from MovieLib
     $ml_sql = 'SELECT id, title FROM ' . $mysql_table_ml;
-    mysql_select_db($mysql_ml[4], $conn_ml);
-    $ml_result = mysql_query($ml_sql, $conn_ml);
+    mysql_select_db($mysql_ml[4]);
+    $ml_result = mysql_query($ml_sql);
     $ml_assoc = array();
     while ($ml = mysql_fetch_assoc($ml_result)) {
         $ml_assoc[$ml['id']] = $ml['title'];
@@ -334,8 +344,8 @@ function import_xml($col, $mysql_ml, $conn_ml, $mysql_table_ml, $lang) {
     // Delete a no exist movies
     foreach ($to_remove as $key => $val) {
         $delete_movie_sql = 'DELETE FROM ' . $mysql_table_ml . ' WHERE title = "' . addslashes($val) . '"';
-        mysql_select_db($mysql_ml[4], $conn_ml);
-        mysql_query($delete_movie_sql, $conn_ml);
+        mysql_select_db($mysql_ml[4]);
+        mysql_query($delete_movie_sql);
         if (file_exists('cache/' . $key . '.jpg')) {
             unlink('cache/' . $key . '.jpg');
         }
@@ -372,6 +382,7 @@ function import_xml($col, $mysql_ml, $conn_ml, $mysql_table_ml, $lang) {
             `rating`,
             `year`,
             `poster`,
+            `fanart`,
             `runtime`,
             `genre`,
             `director`,
@@ -393,6 +404,7 @@ function import_xml($col, $mysql_ml, $conn_ml, $mysql_table_ml, $lang) {
             "' . addslashes($movie->rating) . '",
             "' . addslashes($movie->year) . '",
             "' . addslashes($movie->thumb) . '",
+            "' . addslashes($movie->fanart->thumb) . '",
             "' . addslashes($movie->runtime) . '",
             "' . addslashes(implode(' / ', $genre)) . '",
             "' . addslashes($movie->director) . '",
@@ -409,12 +421,12 @@ function import_xml($col, $mysql_ml, $conn_ml, $mysql_table_ml, $lang) {
             . ($movie->lastplayed == '1601-01-01' ? 'NULL,' : '"' . $movie->lastplayed . '", ') . '
             "' . $movie->dateadded . '"
       )';
-        mysql_select_db($mysql_ml[4], $conn_ml);
-        mysql_query('SET CHARACTER SET utf8', $conn_ml);
-        mysql_query('SET NAMES utf8', $conn_ml);
-        $insert_xml = mysql_query($insert_xml_sql, $conn_ml);
+        mysql_select_db($mysql_ml[4]);
+        mysql_query('SET CHARACTER SET utf8');
+        mysql_query('SET NAMES utf8');
+        $insert_xml = mysql_query($insert_xml_sql);
         if (!$insert_xml) {
-            echo '<br />' . $lang['f_synch_error'] . ': ' . mysql_error($conn_ml);
+            echo '<br />' . $lang['f_synch_error'] . ': ' . mysql_error();
             exit;
         }
     }

@@ -56,15 +56,14 @@ $(document).ready(function() {
     });
     
     
-    
-    $('#install_container').mouseover(function(){
-        $('#background').fadeOut(2000);
-    });
-    
-    $('#background').css('background-image', 'url(\'img/bg2.jpg\')');
-    
-    $('#install_container').mouseleave(function(){
-        $('#background').fadeIn(2000);
+    // change background
+    $('.movie').mouseover(function(){
+        var movie_id = $(this).attr('id');
+        $.ajax({url: "create_cache.php?id="+movie_id});
+        $('#background').fadeOut(500, function(){
+            $(this).attr('src', 'cache/'+movie_id+'_f.jpg');
+            $(this).fadeIn(500);
+        });
     });
     
 });
