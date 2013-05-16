@@ -55,11 +55,16 @@ $(document).ready(function() {
         $('.xbmc').attr('class', 'xbmc');
     });
     
-    $('body').click(function(){
-        $('#background').fadeOut(4000, function() {
-css('background-image', 'url(\'img/bg2.jpg\')')
-}).fadeIn(4000);
+    
+    
+    $('#install_container').mouseover(function(){
+        $('#background').fadeOut(2000);
     });
     
+    $('#background').css('background-image', 'url(\'img/bg2.jpg\')');
+    
+    $('#install_container').mouseleave(function(){
+        $('#background').fadeIn(2000);
+    });
     
 });
