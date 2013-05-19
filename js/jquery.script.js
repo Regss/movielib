@@ -55,18 +55,20 @@ $(document).ready(function() {
     });
     
     // change background
-    $('.movie').mouseenter(function(){
-        var movie_id = $(this).attr('id');
-        $.ajax({url: "function.js.php?id="+movie_id});
-        $('#background').fadeOut(500, function(){
-            $(this).delay(100).attr('src', 'cache/'+movie_id+'_f.jpg');
-            $(this).fadeIn(500);
+    if ($('#background').attr('alt') == 1) {
+        $('.movie').mouseenter(function(){
+            var movie_id = $(this).attr('id');
+            $.ajax({url: "function.js.php?id="+movie_id});
+            $('#background').fadeOut(500, function(){
+                $(this).delay(100).attr('src', 'cache/'+movie_id+'_f.jpg');
+                $(this).fadeIn(500);
+            });
         });
-    });
-    $('.movie').mouseleave(function(){
-        $('#background').fadeOut(500, function(){
-            $(this).delay(100).attr('src', 'img/bg.jpg');
-            $(this).fadeIn(500);
+        $('.movie').mouseleave(function(){
+            $('#background').fadeOut(500, function(){
+                $(this).delay(100).attr('src', 'img/bg.jpg');
+                $(this).fadeIn(500);
+            });
         });
-    });
+    }
 });

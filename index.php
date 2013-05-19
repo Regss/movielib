@@ -35,14 +35,9 @@ if (!isset($_COOKIE['sync']) && $set['mode'] == 1) {
     $fp = fsockopen($set['mysql_host_xbmc'], $set['mysql_port_xbmc'], $errno, $errstr, 3);
     if ($fp) {
         fclose($fp);
-        $conn_xbmc = mysql_connect($set['mysql_host_xbmc'] . ':' . $set['mysql_port_xbmc'], $set['mysql_login_xbmc'], $set['mysql_pass_xbmc']);
-        if ($conn_xbmc) {
-            $sel_xbmc = @mysql_select_db($set['mysql_database_xbmc']);
-            if ($sel_xbmc) {
-                $output_sync.= sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysql_tables[0], $lang);
-                setcookie('sync', true, time()+$set['sync_time']*60);
-            }
-        }
+        connect_xbmc($set);
+        $output_sync.= sync_database($col, $mysql_ml, $set, $mysql_tables[0], $lang);
+        // setcookie('sync', true, time()+$set['sync_time']*60);
     }
 }
 
@@ -78,7 +73,7 @@ if ($set['panel_top'] == 1) {
     $recently_result = mysql_query($recently_sql);
     while ($recently = mysql_fetch_array($recently_result)) {
         if (!file_exists('cache/' . $recently['id'] . '.jpg')) {
-            gd_convert($recently['id'], $recently['poster'], '');
+            gd_convert($recently['id'], $recently['poster'], 140, 198);
         }
         $output_recently.= '<a href="index.php?id=' . $recently['id'] . '"><img src="cache/' . $recently['id'] . '.jpg" title="' . $recently['title'] . '" alt=""></a>';
     }
@@ -102,7 +97,7 @@ if ($set['panel_top'] == 1) {
     $last_played_result = mysql_query($last_played_sql);
     while ($last_played = mysql_fetch_array($last_played_result)) {
         if (!file_exists('cache/' . $last_played['id'] . '.jpg')) {
-            gd_convert('cache/' . $last_played['id'] . '.jpg', $last_played['poster'], 130, 198);
+            gd_convert('cache/' . $last_played['id'] . '.jpg', $last_played['poster'], 140, 198);
         }
         $output_last_played.= '<a href="index.php?id=' . $last_played['id'] . '"><img src="cache/' . $last_played['id'] . '.jpg" title="' . $last_played['title'] . '" alt=""></a>';
     }
@@ -114,7 +109,7 @@ if ($set['panel_top'] == 1) {
     $top_rated_result = mysql_query($top_rated_sql);
     while ($top_rated = mysql_fetch_array($top_rated_result)) {
         if (!file_exists('cache/' . $last_played['id'] . '.jpg')) {
-            gd_convert('cache/' . $top_rated['id'] . '.jpg', $top_rated['poster'], 130, 198);
+            gd_convert('cache/' . $top_rated['id'] . '.jpg', $top_rated['poster'], 140, 198);
         }
         $output_top_rated.= '<a href="index.php?id=' . $top_rated['id'] . '"><img src="cache/' . $top_rated['id'] . '.jpg" title="' . $top_rated['title'] . '" alt=""></a>';
     }
@@ -324,7 +319,6 @@ while ($list = mysql_fetch_array($list_result)) {
     </div>
 </div>';
 }
-
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -338,7 +332,7 @@ while ($list = mysql_fetch_array($list_result)) {
         <script type="text/javascript" src="js/jquery.script.js"></script>
     </head>
     <body>
-        <img src="img/bg.jpg" id="background" alt="">
+        <img src="img/bg.jpg" id="background" alt="<?PHP echo ($set['show_fanart'] == 1 ? '1' : '') ?>">
         <?PHP echo $output_panel_info ?>
         <div id="container">
             <?PHP echo $output_panel_top . $output_panel_top_title ?>

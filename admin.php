@@ -57,8 +57,17 @@ if (!isset($_GET['option'])) {
     
     // Cached
     $cached_dir = scandir('cache/');
-    $cached = count($cached_dir) - 2;
-    $not_cached = $overall_all - $cached;
+    $all_cached = count($cached_dir) - 2;
+    $poster_cached = 0;
+    $fanart_cached = 0;
+    foreach ($cached_dir as $val) {
+        if (preg_match_all('/[0-9]+\.jpg/', $val, $res) == 1) {
+            $poster_cached++;
+        }
+        if (preg_match_all('/[0-9]+_f\.jpg/', $val, $res) == 1) {
+            $fanart_cached++;
+        }
+    }
     
     $output_panel = '
         <table id="admin_table_movie">
@@ -67,8 +76,8 @@ if (!isset($_GET['option'])) {
             <tr><td>' . $lang['a_watched'] . '</td><td>' . $overall_watched . '</td></tr>
             <tr><td>' . $lang['a_unwatched'] . '</td><td>' . $overall_unwatched . '</td></tr>
             <tr><td class="bold orange">' . $lang['a_cache'] . '</td><td></td></tr>
-            <tr><td>' . $lang['a_cached_posters'] . '</td><td>' . $cached . '</td></tr>
-            <tr><td>' . $lang['a_not_cached_posters'] . '</td><td>' . $not_cached . '</td></tr>
+            <tr><td>' . $lang['a_cached_posters'] . '</td><td>' . $poster_cached . '</td></tr>
+            <tr><td>' . $lang['a_cached_fanarts'] . '</td><td>' . $fanart_cached . '</td></tr>
         </table>';
 }
 
@@ -107,7 +116,7 @@ if (isset($_SESSION['id_to_create']) && count($_SESSION['id_to_create']) > 0) {
         $list_sql = 'SELECT id, poster FROM ' . $mysql_tables[0] . ' WHERE id = ' . $id;
         $list_result = mysql_query($list_sql);
         while ($list = mysql_fetch_array($list_result)) {
-            gd_convert($list['id'], $list['poster']);
+            gd_convert($recently['id'], $recently['poster'], 140, 198);
             unset($_SESSION['id_to_create'][$key]);
             header('Location:admin.php');
         }
@@ -155,6 +164,7 @@ if (isset($_GET['option']) && $_GET['option'] == 'settings') {
     $output_panel_top = '';
     $output_watched_status = '';
     $output_overall_panel = '';
+    $output_show_fanart = '';
     $output_protect_site = '';
     $output_per_page = '';
     $output_recently_limit = '';
@@ -172,6 +182,8 @@ if (isset($_GET['option']) && $_GET['option'] == 'settings') {
             $output_watched_status.= ($val == 0 ? $lang['a_radio_off'] : $lang['a_radio_on']) . '<input type="radio" name="watched_status" value="' . $val . '" ' . ($set['watched_status'] == $val ? ' checked="checked"' : '') . ' /> ';
             // set overall panel input
             $output_overall_panel.= ($val == 0 ? $lang['a_radio_off'] : $lang['a_radio_on']) . '<input type="radio" name="overall_panel" value="' . $val . '" ' . ($set['overall_panel'] == $val ? ' checked="checked"' : '') . ' /> ';
+            // set show fanart input
+            $output_show_fanart.= ($val == 0 ? $lang['a_radio_off'] : $lang['a_radio_on']) . '<input type="radio" name="show_fanart" value="' . $val . '" ' . ($set['show_fanart'] == $val ? ' checked="checked"' : '') . ' /> ';
             // set protect site input
             $output_protect_site.= ($val == 0 ? $lang['a_radio_off'] : $lang['a_radio_on']) . '<input type="radio" name="protect_site" value="' . $val . '" ' . ($set['protect_site'] == $val ? ' checked="checked"' : '') . ' /> ';
     }
@@ -207,6 +219,7 @@ if (isset($_GET['option']) && $_GET['option'] == 'settings') {
                 <tr><td>' . $lang['a_panel_top'] . ':</td><td>' . $output_panel_top . '</td></tr>
                 <tr><td>' . $lang['a_watched_status'] . ':</td><td>' . $output_watched_status . '</td></tr>
                 <tr><td>' . $lang['a_overall_panel'] . ':</td><td>' . $output_overall_panel . '</td></tr>
+                <tr><td>' . $lang['a_show_fanart'] . ':</td><td>' . $output_show_fanart . '</td></tr>
                 <tr><td>' . $lang['a_protect_site']  . ':</td><td>' . $output_protect_site . '</td></tr>
                 <tr><td>' . $lang['a_mysql_host_xbmc'] . ':</td><td><input class="xbmc' . ($set['mode'] == 0 ? ' disabled' : '') . '" type="text" name="mysql_host_xbmc" value="' . $set['mysql_host_xbmc'] . '"' . ($set['mode'] == 0 ? ' disabled="disabled"' : '') . ' /></td></tr>
                 <tr><td>' . $lang['a_mysql_port_xbmc'] . ':</td><td><input class="xbmc' . ($set['mode'] == 0 ? ' disabled' : '') . '" type="text" name="mysql_port_xbmc" value="' . $set['mysql_port_xbmc'] . '"' . ($set['mode'] == 0 ? ' disabled="disabled"' : '') . ' /></td></tr>
@@ -234,6 +247,7 @@ if (isset($_GET['option']) && $_GET['option'] === 'settings_save') {
         panel_top = "' . $_POST['panel_top'] . '",
         watched_status = "' . $_POST['watched_status'] . '",
         overall_panel = "' . $_POST['overall_panel'] . '",
+        show_fanart = "' . $_POST['show_fanart'] . '",
         protect_site = "' . $_POST['protect_site'] . '",
         mysql_host_xbmc = ' . (isset($_POST['mysql_host_xbmc']) ? '"' . $_POST['mysql_host_xbmc'] . '"' : 'NULL') . ',
         mysql_port_xbmc = ' . (isset($_POST['mysql_port_xbmc']) ? '"' . $_POST['mysql_port_xbmc'] . '"' : 'NULL') . ',

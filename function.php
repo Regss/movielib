@@ -21,6 +21,24 @@ function connect($mysql_ml) {
     mysql_query('SET NAMES utf8');
 }
 
+/* #############################
+ * # Connect to XBMC databaase #
+ */#############################
+function connect_xbmc($set) {
+    $conn_xbmc = @mysql_connect($set['mysql_host_xbmc'] . ':' . $set['mysql_port_xbmc'], $set['mysql_login_xbmc'], $set['mysql_pass_xbmc']);
+    if (!$conn_xbmc) {
+        die(mysql_error());
+    }
+    $sel_xbmc = mysql_select_db($set['mysql_database_xbmc']);
+    if (!$sel_xbmc) {
+        die(mysql_error());
+    }
+
+    // Sets utf8 connections
+    mysql_query('SET CHARACTER SET utf8');
+    mysql_query('SET NAMES utf8');
+}
+
 /* ##############################
  * # Get settings from database #
  */##############################
@@ -98,6 +116,7 @@ function create_table($mysql_table) {
                 `panel_top` int(1) DEFAULT 1,
                 `watched_status` int(1) DEFAULT 1,
                 `overall_panel` int(1) DEFAULT 1,
+                `show_fanart` int(1) DEFAULT 1,
                 `protect_site` int(1) DEFAULT 0,
                 `mysql_host_xbmc` text DEFAULT NULL,
                 `mysql_port_xbmc` text DEFAULT NULL,
@@ -136,26 +155,27 @@ function create_table($mysql_table) {
 /* ###########################
  * # Sync with XBMC database #
  */###########################
-function sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysql_table_ml, $lang) {
+function sync_database($col, $mysql_ml, $set, $mysql_table_ml, $lang) {
     
     // Check movie from XBMC
+    connect_xbmc($set);
     $xbmc_sql = 'SELECT ' . $col['title'] . ' FROM movie';
-    mysql_select_db($mysql_xbmc[4], $conn_xbmc);
-    $xbmc_result = mysql_query($xbmc_sql, $conn_xbmc);
+    $xbmc_result = mysql_query($xbmc_sql);
     $xbmc_assoc = array();
     while ($xbmc = mysql_fetch_assoc($xbmc_result)) {
         $xbmc_assoc[] = $xbmc[$col['title']];
     }
-
+    mysql_close();
+    
     // Check movie from MovieLib
+    connect($mysql_ml);
     $ml_sql = 'SELECT id, title FROM ' . $mysql_table_ml;
-    mysql_select_db($mysql_ml[4], $conn_ml);
-    $ml_result = mysql_query($ml_sql, $conn_ml);
+    $ml_result = mysql_query($ml_sql);
     $ml_assoc = array();
     while ($ml = mysql_fetch_assoc($ml_result)) {
         $ml_assoc[$ml['id']] = $ml['title'];
     }
-
+    
     // Set movie to remove
     $to_remove = array();
     foreach ($ml_assoc as $key => $val) {
@@ -167,8 +187,8 @@ function sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysq
     // Delete a no exist movies
     foreach ($to_remove as $key => $val) {
         $delete_movie_sql = 'DELETE FROM ' . $mysql_table_ml . ' WHERE title = "' . addslashes($val) . '"';
-        mysql_select_db($mysql_ml[4], $conn_ml);
-        mysql_query($delete_movie_sql, $conn_ml);
+        mysql_select_db($mysql_ml[4]);
+        mysql_query($delete_movie_sql);
         if (file_exists('cache/' . $key . '.jpg')) {
             unlink('cache/' . $key . '.jpg');
         }
@@ -181,9 +201,11 @@ function sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysq
             $to_add[] = $val;
         }
     }
+    mysql_close();
 
     // Add new movies
     // Select from movie table
+    connect_xbmc($set);
     foreach ($to_add as $key => $val) {
         $select_sql = 'SELECT 
             ' . $col['id_file'] . ',
@@ -199,10 +221,10 @@ function sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysq
             ' . $col['fanart'] . ',
             ' . $col['country'] . ' 
             FROM movie WHERE ' . $col['title'] . ' = "' . addslashes($val) . '"';
-        mysql_select_db($mysql_xbmc[4], $conn_xbmc);
-        mysql_query('SET CHARACTER SET utf8', $conn_xbmc);
-        mysql_query('SET NAMES utf8', $conn_xbmc);
-        $select_result = mysql_query($select_sql, $conn_xbmc);
+        mysql_select_db($set['mysql_database_xbmc']);
+        mysql_query('SET CHARACTER SET utf8');
+        mysql_query('SET NAMES utf8');
+        $select_result = mysql_query($select_sql);
         $movie = mysql_fetch_assoc($select_result);
         
         // Select from streamdetails table
@@ -216,7 +238,7 @@ function sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysq
             iAudioChannels,
             iVideoDuration
             FROM streamdetails WHERE ' . $col['id_file'] . ' = "' . $movie['idFile'] . '" ORDER BY iStreamType';
-        $select_stream_result = mysql_query($select_stream_sql, $conn_xbmc);
+        $select_stream_result = mysql_query($select_stream_sql);
         $stream_assoc = array();
         while ($stream = mysql_fetch_assoc($select_stream_result)) {
             $stream_assoc[] = $stream;
@@ -228,8 +250,9 @@ function sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysq
             lastPlayed,
             dateAdded
             FROM files WHERE ' . $col['id_file'] . ' = "' . $movie['idFile'] . '"';
-        $select_files_result = mysql_query($select_files_sql, $conn_xbmc);
+        $select_files_result = mysql_query($select_files_sql);
         $files = mysql_fetch_assoc($select_files_result);
+        mysql_close();
         
         // Get poster URL
         preg_match_all('/>(http:[^<]+)</', $movie[$col['poster']], $poster_path);
@@ -240,6 +263,7 @@ function sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysq
         $fanart_url =  (isset($fanart_path[1][0]) ? $fanart_path[1][0] : '');
         
         // Insert to MovieLib table
+        connect($mysql_ml);
         $insert_sql = 'INSERT INTO `' . $mysql_table_ml . '` (
             `title`,
             `plot`,
@@ -286,10 +310,10 @@ function sync_database($col, $mysql_ml, $mysql_xbmc, $conn_ml, $conn_xbmc, $mysq
             "' . $files['dateAdded'] . '"
       )';
 
-        mysql_select_db($mysql_ml[4], $conn_ml);
-        mysql_query('SET CHARACTER SET utf8', $conn_ml);
-        mysql_query('SET NAMES utf8', $conn_ml);
-        $insert = mysql_query($insert_sql, $conn_ml);
+        mysql_select_db($mysql_ml[4]);
+        mysql_query('SET CHARACTER SET utf8');
+        mysql_query('SET NAMES utf8');
+        $insert = mysql_query($insert_sql);
         if (!$insert) {
             echo '<br />' . $lang['f_synch_error'] . ': ' . mysql_error($conn_ml);
             exit;

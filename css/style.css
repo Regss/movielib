@@ -252,10 +252,9 @@ table#movie_info {
     text-align: center;
 }
 #pass input {
-    background-color:#111;
+    background-color:#000;
     color:#fff;
     border: 1px solid #222;
-    font-size:11px;
     width:160px;
     margin-top: 10px;
 }
@@ -312,7 +311,6 @@ table#movie_info {
     background-color: #000;
     color: #FFF;
     border: 1px solid #222;
-    font-size: 11px;
 }
 .disabled {
     opacity: .5;
