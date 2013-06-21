@@ -56,6 +56,7 @@ $(document).ready(function() {
     
     // change background
     if ($('#background').attr('alt') == 1) {
+        var bg = $('#background').attr('src');
         $('.movie').mouseenter(function(){
             var movie_id = $(this).attr('id');
             $.ajax({url: "function.js.php?id="+movie_id});
@@ -66,7 +67,7 @@ $(document).ready(function() {
         });
         $('.movie').mouseleave(function(){
             $('#background').fadeOut(500, function(){
-                $(this).delay(100).attr('src', 'img/bg.jpg');
+                $(this).delay(100).attr('src', bg);
                 $(this).fadeIn(500);
             });
         });

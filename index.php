@@ -5,18 +5,16 @@ require_once 'config.php';
 require_once 'function.php';
 
 if (file_exists('install.php') or !file_exists('db.php')) {
-    // header('Location:install.php');
-    // die();
+    header('Location:install.php');
+    die();
 }
-
-$output_sync = '';
 
 // connect to database
 connect($mysql_ml);
 
 // get settings from db
 $set = get_settings($mysql_ml, $mysql_tables, $settings_name);
-require_once 'lang/' . $set['language'];
+require_once 'lang/lang_' . $set['language'] . '.php';
 
 /* ##################
  * # CHECK PASSWORD #
@@ -36,8 +34,8 @@ if (!isset($_COOKIE['sync']) && $set['mode'] == 1) {
     if ($fp) {
         fclose($fp);
         connect_xbmc($set);
-        $output_sync.= sync_database($col, $mysql_ml, $set, $mysql_tables[0], $lang);
-        // setcookie('sync', true, time()+$set['sync_time']*60);
+        $output_panel_info.= sync_database($col, $mysql_ml, $set, $mysql_tables[0], $lang);
+        setcookie('sync', true, time()+$set['sync_time']*60);
     }
 }
 
@@ -45,22 +43,13 @@ if (!isset($_COOKIE['sync']) && $set['mode'] == 1) {
  * # CHECK FILE videodb.xml #
  */##########################
 if (file_exists('import/videodb.xml') && $set['mode'] == 0) {
-    $output_sync.= import_xml($col, $mysql_ml, $mysql_tables[0], $lang);
+    $output_panel_info.= import_xml($col, $mysql_ml, $mysql_tables[0], $lang);
 }
 
 /* ################################
  * # CONNECT TO MOVIELIB DATABASE #
  */################################
 connect($mysql_ml);
-
-/* ##############
- * # INFO PANEL #
- */##############
-if ($output_sync == '') {
-    $output_panel_info ='';
-} else {
-    $output_panel_info = '<div id="panel_info">' . $output_sync . '</div>';
-}
 
 /* ##############
  * # TOP PANELS #
@@ -73,9 +62,11 @@ if ($set['panel_top'] == 1) {
     $recently_result = mysql_query($recently_sql);
     while ($recently = mysql_fetch_array($recently_result)) {
         if (!file_exists('cache/' . $recently['id'] . '.jpg')) {
-            gd_convert($recently['id'], $recently['poster'], 140, 198);
+            gd_convert('cache/' . $recently['id'] . '.jpg', $recently['poster'], 140, 198);
         }
-        $output_recently.= '<a href="index.php?id=' . $recently['id'] . '"><img src="cache/' . $recently['id'] . '.jpg" title="' . $recently['title'] . '" alt=""></a>';
+        if (file_exists('cache/' . $recently['id'] . '.jpg')) {
+            $output_recently.= '<a href="index.php?id=' . $recently['id'] . '"><img src="cache/' . $recently['id'] . '.jpg" title="' . $recently['title'] . '" alt=""></a>';
+        }
     }
     $output_recently.= '</div>';
 
@@ -87,7 +78,9 @@ if ($set['panel_top'] == 1) {
         if (!file_exists('cache/' . $random['id'] . '.jpg')) {
             gd_convert('cache/' . $random['id'] . '.jpg', $random['poster'], 140, 198);
         }
-        $output_random.= '<a href="index.php?id=' . $random['id'] . '"><img src="cache/' . $random['id'] . '.jpg" title="' . $random['title'] . '" alt=""></a>';
+        if (file_exists('cache/' . $random['id'] . '.jpg')) {
+            $output_random.= '<a href="index.php?id=' . $random['id'] . '"><img src="cache/' . $random['id'] . '.jpg" title="' . $random['title'] . '" alt=""></a>';
+        }
     }
     $output_random.= '</div>';
 
@@ -99,7 +92,9 @@ if ($set['panel_top'] == 1) {
         if (!file_exists('cache/' . $last_played['id'] . '.jpg')) {
             gd_convert('cache/' . $last_played['id'] . '.jpg', $last_played['poster'], 140, 198);
         }
-        $output_last_played.= '<a href="index.php?id=' . $last_played['id'] . '"><img src="cache/' . $last_played['id'] . '.jpg" title="' . $last_played['title'] . '" alt=""></a>';
+        if (file_exists('cache/' . $last_played['id'] . '.jpg')) {
+            $output_last_played.= '<a href="index.php?id=' . $last_played['id'] . '"><img src="cache/' . $last_played['id'] . '.jpg" title="' . $last_played['title'] . '" alt=""></a>';
+        }
     }
     $output_last_played.= '</div>';
 
@@ -108,10 +103,12 @@ if ($set['panel_top'] == 1) {
     $top_rated_sql = 'SELECT id, title, poster, rating FROM ' . $mysql_tables[0] . ' ORDER BY rating DESC LIMIT ' . $set['top_rated_limit'];
     $top_rated_result = mysql_query($top_rated_sql);
     while ($top_rated = mysql_fetch_array($top_rated_result)) {
-        if (!file_exists('cache/' . $last_played['id'] . '.jpg')) {
+        if (!file_exists('cache/' . $top_rated['id'] . '.jpg')) {
             gd_convert('cache/' . $top_rated['id'] . '.jpg', $top_rated['poster'], 140, 198);
         }
-        $output_top_rated.= '<a href="index.php?id=' . $top_rated['id'] . '"><img src="cache/' . $top_rated['id'] . '.jpg" title="' . $top_rated['title'] . '" alt=""></a>';
+        if (file_exists('cache/' . $top_rated['id'] . '.jpg')) {
+            $output_top_rated.= '<a href="index.php?id=' . $top_rated['id'] . '"><img src="cache/' . $top_rated['id'] . '.jpg" title="' . $top_rated['title'] . '" alt=""></a>';
+        }
     }
     $output_top_rated.= '</div>';
     
@@ -136,7 +133,7 @@ if ($set['overall_panel'] == 1) {
         }
     }
     $overall_w = $overall_all - $overall_nw;
-    $output_panel_overall = '<div id="overall" class="panel_box_title">' . $lang['i_overall_title'] . ':</div><div id="panel_overall" class="panel_box"><ul><li><span class="orange">' . $lang['i_overall_all'] . ':</span> ' . $overall_all . '</li><li><span class="orange">' . $lang['i_overall_watched'] . ':</span> ' . $overall_w . '</li><li><span class="orange">' . $lang['i_overall_notwatched'] . ':</span> ' . $overall_nw . '</li></ul></div>';
+    $output_panel_overall = '<div id="overall" class="panel_box_title">' . $lang['i_overall_title'] . ':</div><div id="panel_overall" class="panel_box"><ul><li><span class="des">' . $lang['i_overall_all'] . ':</span> ' . $overall_all . '</li><li><span class="des">' . $lang['i_overall_watched'] . ':</span> ' . $overall_w . '</li><li><span class="des">' . $lang['i_overall_notwatched'] . ':</span> ' . $overall_nw . '</li></ul></div>';
 } else {
     $output_panel_overall = '';
 }
@@ -184,7 +181,7 @@ if ($search == '') {
     $output_search_text = '<input type="text" name="search" value="' . $lang['i_search'] . '..." title="' . $lang['i_search'] . '...">';
     $search_mysql = '%';
 } else {
-    $output_search_text = $lang['i_result'] . ': ' . $search . ' <a href="index.php"><img src="img/delete.png" title="' . $lang['i_search_del'] . '" alt=""></a> <input type="text" name="search" value="' . $lang['i_search'] . '..." title="' . $lang['i_search'] . '...">';
+    $output_search_text = $lang['i_result'] . ': ' . $search . ' <a href="index.php"><img src="css/' . $set['theme'] . '/img/delete.png" title="' . $lang['i_search_del'] . '" alt=""></a> <input type="text" name="search" value="' . $lang['i_search'] . '..." title="' . $lang['i_search'] . '...">';
     $search_mysql = $search;
 }
 
@@ -228,52 +225,54 @@ while ($list = mysql_fetch_array($list_result)) {
         gd_convert($poster, $list['poster'], 140, 198);
     }
     if (!file_exists($poster)) {
-        $poster = 'img/d_poster.jpg';
+        $poster = 'css/' . $set['theme'] . '/img/d_poster.jpg';
     }
 
     // hd flag
-    if ($list['v_width'] > 1279) {
-        $flag_hd = '<img class="img_flag_hd" src="img/hd.png" alt="">';
-    } else {
-        $flag_hd = '';
+    $flag_hd = '';
+    if ($list['v_width'] >= 1280) {
+        $flag_hd = '<img class="img_flag_hd" src="css/' . $set['theme'] . '/img/hd.png" alt="">';
     }
-
+    
     // video resolution
-    $i = 0;
-    foreach ($width_height as $key => $val) {
-        if ($list['v_width'] >= $key or $list['v_height'] >= $val) {
-            $img_flag_vres = '<img id="vres" src="img/flags/vres_' . $vres_array[$i] . '.png" alt="">';
+    $img_flag_vres = '';
+    foreach ($vres_assoc as $val) {
+        if (is_numeric($list['v_width']) && $list['v_width'] >= $val) {
+            $img_flag_vres = '<img id="vres" src="css/' . $set['theme'] . '/img/flags/vres_' . $val . '.png" alt="">';
         }
-        $i++;
     }
 
     // video codec
-    if (isset($vtype[$list['v_codec']])) {
-        $img_flag_vtype = '<img id="vtype" src="img/flags/vcodec_' . $vtype[$list['v_codec']] . '.png" alt="">';
-    } else {
-        $img_flag_vtype = '<img id="vtype" src="img/flags/vcodec_defaultscreen.png" alt="">';
+    $img_flag_vtype = '';
+    foreach ($vtype_assoc as $key => $val) {
+        if (in_array($list['v_codec'], $vtype_assoc[$key])) {
+            $img_flag_vtype = '<img id="vtype" src="css/' . $set['theme'] . '/img/flags/vcodec_' . $key . '.png" alt="">';
+        }
     }
 
-    // audio codec 
-    if (isset($atype[$list['a_codec']])) {
-        $img_flag_atype = '<img id="atype" src="img/flags/acodec_' . $atype[$list['a_codec']] . '.png" alt="">';
-    } else {
-        $img_flag_atype = '<img id="atype" src="img/flags/acodec_defaultsound.png" alt="">';
+    // audio codec
+    $img_flag_atype = '';
+    foreach ($atype_assoc as $key => $val) {
+        if(in_array($list['a_codec'], $atype_assoc[$key])) {
+            $img_flag_atype = '<img id="atype" src="css/' . $set['theme'] . '/img/flags/acodec_' . $key . '.png" alt="">';
+        }
     }
 
     // audio channel
-    if (isset($achan[$list['a_channels']])) {
-        $img_flag_achan = '<img id="achan" src="img/flags/achan_' . $achan[$list['a_channels']] . '.png" alt="">';
-    } else {
-        $img_flag_achan = '<img id="achan" src="img/flags/achan_defaultsound.png" alt="">';
+    $img_flag_achan = '';
+    foreach ($achan_assoc as $val) {
+        if (is_numeric($list['a_channels']) && $list['a_channels'] >= $val) {
+            $img_flag_achan = '<img id="vres" src="css/' . $set['theme'] . '/img/flags/achan_' . $val . '.png" alt="">';
+        }
     }
+
+    // panel flags
     $img_flag = $img_flag_vres . $img_flag_vtype . $img_flag_atype . $img_flag_achan;
 
     // wached status
+    $watched = '';
     if ($set['watched_status'] == 1 && $list['play_count'] > 0) {
-        $watched = '<img class="watched" src="img/watched.png" alt="" title="' . $lang['i_last_played'] . ': ' . $list['last_played'] . '">';
-    } else {
-        $watched = '';
+        $watched = '<img class="watched" src="css/' . $set['theme'] . '/img/watched.png" alt="" title="' . $lang['i_last_played'] . ': ' . $list['last_played'] . '">';
     }
     
     $output_panel_list.= '
@@ -314,10 +313,17 @@ while ($list = mysql_fetch_array($list_result)) {
                 <td class="movie_right">' . $list['plot'] . '</td>
             </tr>
         </table>
-        <img id="img_space" src="img/space.png">
+        <img id="img_space" src="css/' . $set['theme'] . '/img/space.png">
         ' . $img_flag . '
     </div>
 </div>';
+}
+
+/* ##############
+ * # INFO PANEL #
+ */##############
+if ($output_panel_info !== '') {
+    $output_panel_info = '<div id="panel_info">' . $output_panel_info . '</div>';
 }
 ?>
 <!DOCTYPE HTML>
@@ -326,13 +332,13 @@ while ($list = mysql_fetch_array($list_result)) {
         <title><?PHP echo $set['site_name'] ?></title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-        <link type="text/css" href="css/style.css" rel="stylesheet" media="all" />
+        <link type="text/css" href="css/<?PHP echo $set['theme'] ?>/style.css" rel="stylesheet" media="all" />
         <script type="text/javascript" src="js/jquery-1.9.1.js"></script>
         <script type="text/javascript" src="js/jquery.cycle.lite.js"></script>
         <script type="text/javascript" src="js/jquery.script.js"></script>
     </head>
     <body>
-        <img src="img/bg.jpg" id="background" alt="<?PHP echo ($set['show_fanart'] == 1 ? '1' : '') ?>">
+        <img src="css/<?PHP echo $set['theme'] ?>/img/bg.jpg" id="background" alt="<?PHP echo ($set['show_fanart'] == 1 ? '1' : '') ?>">
         <?PHP echo $output_panel_info ?>
         <div id="container">
             <?PHP echo $output_panel_top . $output_panel_top_title ?>
@@ -348,6 +354,9 @@ while ($list = mysql_fetch_array($list_result)) {
                 <?PHP echo $output_panel_list ?>
                 <div class="panel_nav"><?PHP echo $output_nav ?></div>
             </div>
+        </div>
+        <div id="panel_bottom">
+            Created by <a href="mailto:regss84@gmail.com">Regss</a> - <a href="http://github.com/Regss/movielib">MovieLib</a> v. 0.9.0
         </div>
     </body>
 </html>

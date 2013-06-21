@@ -7,7 +7,7 @@ require_once 'function.php';
 connect($mysql_ml);
 
 $set = get_settings($mysql_ml, $mysql_tables, $settings_name);
-require_once 'lang/' . $set['language'];
+require_once 'lang/lang_' . $set['language'] . '.php';
 
 if (!isset($_GET['login'])) {
     header('Location:login.php?login=user');
@@ -69,7 +69,7 @@ if ($_GET['login'] === 'user') {
         <title><?PHP echo $set['site_name'] ?> - <?PHP echo $lang['l_html_login'] ?></title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-        <link href="css/style.css" rel="stylesheet" type="text/css">
+        <link href="css/<?PHP echo $set['theme'] ?>/style.css" rel="stylesheet" type="text/css">
     </head>
     <body>
         <div id="pass">

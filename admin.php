@@ -8,17 +8,17 @@ connect($mysql_ml);
 
 // get settings from db
 $set = get_settings($mysql_ml, $mysql_tables, $settings_name);
-require_once 'lang/' . $set['language'];
+require_once 'lang/lang_' . $set['language'] . '.php';
 
 if (isset($_GET['option']) && $_GET['option'] == 'delete_install') {
-    // unlink('install.php');
+    unlink('install.php');
     header('Location:admin.php');
     die();
 }
 
 if (file_exists('install.php') or !file_exists('db.php')) {
-    // header('Location:install.php');
-    // die();
+    header('Location:install.php');
+    die();
 }
 
 // Check admin password
@@ -36,11 +36,10 @@ foreach ($dir_assoc as $dir) {
     }
 }
 
-$output_panel = '';
-
 /* #############
  * # MAIN SITE #
  */#############
+$output_panel = '';
 if (!isset($_GET['option'])) {
     
     // Watched
@@ -71,11 +70,11 @@ if (!isset($_GET['option'])) {
     
     $output_panel = '
         <table id="admin_table_movie">
-            <tr><td class="bold orange">' . $lang['a_movies'] . '</td><td></td></tr>
+            <tr><td class="bold des">' . $lang['a_movies'] . '</td><td></td></tr>
             <tr><td>' . $lang['a_all'] . '</td><td>' . $overall_all . '</td></tr>
             <tr><td>' . $lang['a_watched'] . '</td><td>' . $overall_watched . '</td></tr>
             <tr><td>' . $lang['a_unwatched'] . '</td><td>' . $overall_unwatched . '</td></tr>
-            <tr><td class="bold orange">' . $lang['a_cache'] . '</td><td></td></tr>
+            <tr><td class="bold des">' . $lang['a_cache'] . '</td><td></td></tr>
             <tr><td>' . $lang['a_cached_posters'] . '</td><td>' . $poster_cached . '</td></tr>
             <tr><td>' . $lang['a_cached_fanarts'] . '</td><td>' . $fanart_cached . '</td></tr>
         </table>';
@@ -85,18 +84,45 @@ if (!isset($_GET['option'])) {
  * # MOVIE LIST #
  */##############
 if (isset($_GET['option']) && $_GET['option'] == 'list') {
-    $list_sql = 'SELECT id, title, poster, play_count FROM ' . $mysql_tables[0] . ' ORDER BY title';
+    $list_sql = 'SELECT id, title, poster, fanart, play_count FROM ' . $mysql_tables[0] . ' ORDER BY title';
     $list_result = mysql_query($list_sql);
-    $output_panel = '<table id="admin_table_movie">';
+    $output_panel = '<table id="admin_table_movie"><tr class="bold"><td></td><td>ID</td><td>' . $lang['a_title'] . '</td><td>P</td><td></td><td>F</td><td></td></tr>';
+    $i = 0;
     while ($list = mysql_fetch_array($list_result)) {
         if (file_exists('cache/' . $list['id'] . '.jpg')) {
-            $poster_exist = '<img src="img/watched.png">';
+            $poster_exist = '<img src="css/' . $set['theme'] . '/img/watched.png">';
         } else {
-            $poster_exist = '<img src="img/delete.png">';
+            $poster_exist = '<img src="css/' . $set['theme'] . '/img/delete.png">';
         }
-        $output_panel.= '<tr><td>' . $list['id'] . '</td><td>' . $list['title'] . '</td><td><a href="' . $list['poster'] . '" target="_blank">' . $list['poster'] . '</a></td><td>'  . $poster_exist . '</td></tr>';
+        if (file_exists('cache/' . $list['id'] . '_f.jpg')) {
+            $fanart_exist = '<img src="css/' . $set['theme'] . '/img/watched.png">';
+        } else {
+            $fanart_exist = '<img src="css/' . $set['theme'] . '/img/delete.png">';
+        }
+        $i++;
+        $output_panel.= '<tr><td>' . $i . '</td><td>' . $list['id'] . '</td><td>' . $list['title'] . '</td><td><a href="' . $list['poster'] . '" target="_blank"><img src="css/' . $set['theme'] . '/img/link.png"></a></td><td>'  . $poster_exist . '</td><td><a href="' . $list['fanart'] . '" target="_blank"><img src="css/' . $set['theme'] . '/img/link.png"></a></td><td>'  . $fanart_exist . '</td></tr>';
     }
     $output_panel.= '</table>';
+}
+
+/* ##########
+ * # UPLOAD #
+ */##########
+if (isset($_GET['option']) && $_GET['option'] == 'upload') {
+    $output_panel.= $lang['a_server_size'] . ':<br /> upload_max_filesize: ' . ini_get('upload_max_filesize') . '<br />post_max_size' . ': ' . ini_get('post_max_size');
+    $output_panel.= '<br /><br />' . $lang['a_select_xml_file'] . '<br /><br /><form action="admin.php?option=upload" method="post" enctype="multipart/form-data">
+                        <input type="file" name="file_xml"><br /><br />
+                        <input type="submit" name="submit" value="' . $lang['a_submit_upload'] . '">
+                    </form>';
+    if (isset($_FILES['file_xml'])) {
+        if (is_uploaded_file($_FILES['file_xml']['tmp_name'])) {
+            move_uploaded_file($_FILES['file_xml']['tmp_name'], 'import/' . $_FILES['file_xml']['name']);
+            $output_panel_info.= $lang['a_uploaded'];
+        }
+        if ($_FILES['file_xml']['error'] > 0) {
+            $output_panel_info.= $lang['a_upload_error'];
+        }
+    }
 }
 
 /* #########
@@ -111,27 +137,36 @@ if (isset($_GET['option']) && $_GET['option'] == 'cache') {
 }
 
 // Create cache
-if (isset($_SESSION['id_to_create']) && count($_SESSION['id_to_create']) > 0) {
-    foreach ($_SESSION['id_to_create'] as $key => $id) {
-        $list_sql = 'SELECT id, poster FROM ' . $mysql_tables[0] . ' WHERE id = ' . $id;
+if (isset($_GET['option']) && $_GET['option'] == 'create_cache') {
+    
+    if (!isset($_SESSION['id_to_create'])) {
+        $list_sql = 'SELECT id, poster FROM ' . $mysql_tables[0];
         $list_result = mysql_query($list_sql);
         while ($list = mysql_fetch_array($list_result)) {
-            gd_convert($recently['id'], $recently['poster'], 140, 198);
-            unset($_SESSION['id_to_create'][$key]);
-            header('Location:admin.php');
+            if (!file_exists('cache/' . $list['id'] . '.jpg')) {
+                $id_to_create[] = $list['id'];
+            }
         }
+        $_SESSION['id_to_create'] = $id_to_create;
+        header('Location:admin.php?option=create_cache');
     }
-}
-if (isset($_GET['option']) && $_GET['option'] == 'create_cache') {
-    $list_sql = 'SELECT id, poster FROM ' . $mysql_tables[0];
-    $list_result = mysql_query($list_sql);
-    while ($list = mysql_fetch_array($list_result)) {
-        if (!file_exists('cache/' . $list['id'] . '.jpg')) {
-            $id_to_create[] = $list['id'];
+    
+    if (isset($_SESSION['id_to_create']) && count($_SESSION['id_to_create']) > 0) {
+        foreach ($_SESSION['id_to_create'] as $key => $id) {
+            $list_sql = 'SELECT id, poster FROM ' . $mysql_tables[0] . ' WHERE id = ' . $id;
+            $list_result = mysql_query($list_sql);
+            while ($list = mysql_fetch_array($list_result)) {
+                gd_convert('cache/' . $list['id'] . '.jpg', $list['poster'], 140, 198);
+                unset($_SESSION['id_to_create'][$key]);
+                header('Location:admin.php?option=create_cache');
+            }
         }
-    }
-    $_SESSION['id_to_create'] = $id_to_create;
-    header('Location:admin.php');
+    } else {
+        unset($_SESSION['id_to_create']);
+        $output_panel_info.= $lang['a_cache_created'];
+    } 
+} else {
+    unset($_SESSION['id_to_create']);
 }
 
 // Rebuild cache
@@ -151,15 +186,8 @@ if (isset($_GET['option']) && $_GET['option'] == 'rebuild_cache') {
  */############
 if (isset($_GET['option']) && $_GET['option'] == 'settings') {
     
-    // set lenguage input
     $output_lang = '';
-    $option_language = scandir('lang/');
-    foreach ($option_language as $val) {
-        if ($val !== '.' && $val !== '..') {
-            $output_lang.= '<option' . ($set['language'] == $val ? ' selected="selected"' : '') . '>' . $val . '</option>';
-        }
-    }
-    
+    $output_theme = '';
     $output_mode = '';
     $output_panel_top = '';
     $output_watched_status = '';
@@ -171,6 +199,29 @@ if (isset($_GET['option']) && $_GET['option'] == 'settings') {
     $output_random_limit = '';
     $output_last_played_limit = '';
     $output_top_rated_limit = '';
+    
+    // set language input
+    $option_language = scandir('lang/');
+    foreach ($option_language as $val) {
+        if ((substr($val, 0, 4) == 'lang') && (substr($val, -3) == 'php')) {
+            $fp = fopen('lang/' . $val, 'r');
+            for ($i=0;$i<3;$i++) {
+                $line = fgets($fp);
+            }
+            preg_match('/([a-zA-Z]+)/', $line, $lang_title);
+            preg_match('/_([a-zA-Z]+)\./', $val, $lang_id);
+            $output_lang.= '<option' . ($val == 'lang_' . $set['language'] . '.php' ? ' selected="selected"' : '') . ' value="' . $lang_id[1] . '">' . ucfirst(strtolower($lang_title[1])) . '</option>';
+        }
+    }
+    
+    // set theme input
+    $output_theme = '';
+    $option_theme = scandir('css/');
+    foreach ($option_theme as $val) {
+        if ($val !== '.' && $val !== '..') {
+            $output_theme.= '<option' . ($val == $set['theme'] ? ' selected="selected"' : '') . ' value="' . $val . '">' . $val . '</option>';
+        }
+    }
     
     $mode = array(0, 1);
     foreach ($mode as $val) {
@@ -209,6 +260,7 @@ if (isset($_GET['option']) && $_GET['option'] == 'settings') {
                 <tr><td>' . $lang['a_mode'] . ':</td><td>' . $output_mode . '</td></tr>
                 <tr><td>' . $lang['a_site_name'] . ':</td><td><input type="text" name="site_name" value="' . $set['site_name'] . '" /></td></tr>
                 <tr><td>' . $lang['a_language'] . ':</td><td><select name="language">' . $output_lang . '</select></td></tr>
+                <tr><td>' . $lang['a_theme'] . ':</td><td><select name="theme">' . $output_theme . '</select></td></tr>
                 <tr><td>' . $lang['a_per_page'] . ':</td><td>' . $output_per_page . '</td></tr>
                 <tr><td>' . $lang['a_recently_limit'] . ':</td><td>' . $output_recently_limit . '</td></tr>
                 <tr><td>' . $lang['a_random_limit'] . ':</td><td>' . $output_random_limit . '</td></tr>
@@ -237,6 +289,7 @@ if (isset($_GET['option']) && $_GET['option'] === 'settings_save') {
         mode = "' . $_POST['mode'] . '",
         site_name = "' . $_POST['site_name'] . '",
         language = "' . $_POST['language'] . '",
+        theme = "' . $_POST['theme'] . '",
         per_page = "' . $_POST['per_page'] . '",
         recently_limit = "' . $_POST['recently_limit'] . '",
         random_limit = "' . $_POST['random_limit'] . '",
@@ -260,6 +313,7 @@ if (isset($_GET['option']) && $_GET['option'] === 'settings_save') {
     foreach ($settings_name as $val) {
         unset($_SESSION[$val]);
     }
+    $output_panel_info = $lang['a_saved'];
 }
 
 /* ###################
@@ -269,10 +323,10 @@ if (isset($_GET['option']) && $_GET['option'] == 'password') {
     $output_panel.= '
         <form action="admin.php?option=password_save" method="post">
             <table id="admin_table_movie">
-                <tr><td class="bold orange">' . $lang['a_user'] . '</td><td></td></tr>
+                <tr><td class="bold des">' . $lang['a_user'] . '</td><td></td></tr>
                 <tr><td>' . $lang['a_new_password'] . '</td><td><input type="password" name="password" /></td></tr>
                 <tr><td>' . $lang['a_new_password_re'] . '</td><td><input type="password" name="password_re" /></td></tr>
-                <tr><td class="bold orange">' . $lang['a_admin'] . '</td><td></td></tr>
+                <tr><td class="bold des">' . $lang['a_admin'] . '</td><td></td></tr>
                 <tr><td>' . $lang['a_new_password'] . '</td><td><input type="password" name="password_admin" /></td></tr>
                 <tr><td>' . $lang['a_new_password_re'] . '</td><td><input type="password" name="password_admin_re" /></td></tr>
             </table>
@@ -288,12 +342,12 @@ if (isset($_GET['option']) && $_GET['option'] === 'password_save') {
             if (strlen($_POST['password']) > 3) {
                 $password_update_sql = 'UPDATE ' . $mysql_tables[2] . ' SET password = "' . md5($_POST['password']) . '" WHERE login ="user"';
                 mysql_query($password_update_sql);
-                $output_panel.= 'User Passowrd changed<br />';
+                $output_panel_info.= $lang['a_user_pass_changed'] . '<br />';
             } else {
-                $output_panel.= 'User Password must have minimum 4 letters<br />';
+                $output_panel_info.= $lang['a_user_pass_min'] . '<br />';
             }
         } else {
-            $output_panel.= 'User Password not match<br />';
+            $output_panel_info.= $lang['a_user_pass_n_match'] . '<br />';
         }
     }
     
@@ -302,14 +356,21 @@ if (isset($_GET['option']) && $_GET['option'] === 'password_save') {
             if (strlen($_POST['password_admin']) > 3) {
                 $password_update_sql = 'UPDATE ' . $mysql_tables[2] . ' SET password = "' . md5($_POST['password_admin']) . '" WHERE login ="admin"';
                 mysql_query($password_update_sql);
-                $output_panel.= 'Admin Passowrd changed<br />';
+                $output_panel_info.= $lang['a_admin_pass_changed'] . '<br />';
             } else {
-                $output_panel.= 'Admin Password must have minimum 4 letters<br />';
+                $output_panel_info.= $lang['a_admin_pass_min'] . '<br />';
             }
         } else {
-            $output_panel.= 'Admin Password not match<br />';
+            $output_panel_info.= $lang['a_admin_pass_n_match'] . '<br />';
         }
     }
+}
+
+/* ##############
+ * # PANEL INFO #
+ */##############
+if ($output_panel_info !== '') {
+    $output_panel_info = '<div id="panel_info">' . $output_panel_info . '</div>';
 }
 ?>
 <!DOCTYPE HTML>
@@ -318,15 +379,17 @@ if (isset($_GET['option']) && $_GET['option'] === 'password_save') {
         <title><?PHP echo $set['site_name'] ?> - Admin Panel</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-        <link href="css/style.css" rel="stylesheet" type="text/css">
+        <link href="css/<?PHP echo $set['theme'] ?>/style.css" rel="stylesheet" type="text/css">
         <script type="text/javascript" src="js/jquery-1.9.1.js"></script>
         <script type="text/javascript" src="js/jquery.script.js"></script>
     </head>
     <body>
+        <?PHP echo $output_panel_info ?>
         <div id="admin_container">
             <div id="admin_panel_left">
                 <a class="admin_menu_box" href="admin.php"><?PHP echo $lang['a_html_main_site'] ?></a>
                 <a class="admin_menu_box" href="admin.php?option=list"><?PHP echo $lang['a_html_movie_list'] ?></a>
+                <a class="admin_menu_box" href="admin.php?option=upload"><?PHP echo $lang['a_html_upload_xml'] ?></a>
                 <a class="admin_menu_box" href="admin.php?option=cache">Cache</a>
                 <a class="admin_menu_box" href="admin.php?option=settings"><?PHP echo $lang['a_html_settings'] ?></a>
                 <a class="admin_menu_box" href="admin.php?option=password"><?PHP echo $lang['a_html_change_password'] ?></a>

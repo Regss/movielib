@@ -1,0 +1,9 @@
+Skrypt pozwala wyświetlać bazę filmów z XBMC. Ma możliwość automatycznej synchronizacji z bazą danych XBMC lub za pomocą wyeksportowanych plików xml.
+
+Wymagania:
+- XBMC z bazą danych MySQL
+- Serwer z Apache i MySql 5
+
+Domyślne hasła:
+Dostęp do strony: user
+Dostęp do panelu administratora: admin

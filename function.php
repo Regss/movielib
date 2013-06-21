@@ -66,7 +66,7 @@ return $output_set;
 /* ######################
  * # Create empty table #
  */######################
-function create_table($mysql_table) {
+function create_table($mysql_table, $lang) {
     
     $output_create_table = '';
     
@@ -98,14 +98,15 @@ function create_table($mysql_table) {
                 PRIMARY KEY (`id`)
                 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8';
     if (!@mysql_query($create_movies_sql)) {
-        $output_create_table.= 'Could not create table: ' . $mysql_table[0] . ' - ' . mysql_error() . '<br/>';
+        $output_create_table.= $lang['inst_could_create'] . ': ' . $mysql_table[0] . ' - ' . mysql_error() . '<br/>';
     }
     
     // table config
     $create_config_sql = 'CREATE TABLE IF NOT EXISTS `' . $mysql_table[1] . '` (
                 `mode` int(1) DEFAULT 0,
                 `site_name` varchar(30) DEFAULT "MovieLib",
-                `language` varchar(15) DEFAULT "lang_pl.php",
+                `language` varchar(15) DEFAULT "' . $_SESSION['install_lang'] . '",
+                `theme` varchar(15) DEFAULT "default.css",
                 `per_page` int(5) DEFAULT 50,
                 `recently_limit` int(5) DEFAULT 10,
                 `random_limit` int(5) DEFAULT 10,
@@ -125,7 +126,7 @@ function create_table($mysql_table) {
                 `mysql_database_xbmc` text DEFAULT NULL
                 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8';
     if (!@mysql_query($create_config_sql)) {
-        $output_create_table.= 'Could not create table: ' . $mysql_table[1] . ' - ' . mysql_error() . '<br/>';
+        $output_create_table.= $lang['inst_could_create'] . ': ' . $mysql_table[1] . ' - ' . mysql_error() . '<br/>';
     }
     if (mysql_num_rows(mysql_query('SELECT * FROM ' . $mysql_table[1])) == 0) {
         $insert_config_sql = 'INSERT INTO `' . $mysql_table[1] . '` () VALUES ()';
@@ -141,7 +142,7 @@ function create_table($mysql_table) {
                 PRIMARY KEY (`id`)
                 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8';
     if (!@mysql_query($create_users_sql)) {
-        $output_create_table.= 'Could not create table: ' . $mysql_table[2] . ' - ' . mysql_error() . '<br/>';
+        $output_create_table.= $lang['inst_could_create'] . ': ' . $mysql_table[2] . ' - ' . mysql_error() . '<br/>';
     }
     if (mysql_num_rows(mysql_query('SELECT * FROM ' . $mysql_table[2])) == 0) {
         $insert_users_sql = 'INSERT INTO `' . $mysql_table[2] . '` (`id`, `login`, `password`, `s_id`) VALUES ("", "admin", "21232f297a57a5a743894a0e4a801fc3", "")';

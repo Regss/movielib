@@ -7,7 +7,7 @@ if (file_exists('db.php')) {
 $mysql_tables = array('movies', 'config', 'users');
 
 // Config name to array
-$settings_name = array('mode', 'site_name', 'language', 'per_page', 'recently_limit', 'random_limit', 'last_played_limit', 'top_rated_limit', 'sync_time', 'panel_top_time', 'panel_top', 'watched_status', 'overall_panel', 'show_fanart', 'protect_site', 'mysql_host_xbmc', 'mysql_port_xbmc', 'mysql_login_xbmc', 'mysql_pass_xbmc', 'mysql_database_xbmc');
+$settings_name = array('mode', 'site_name', 'language', 'theme', 'per_page', 'recently_limit', 'random_limit', 'last_played_limit', 'top_rated_limit', 'sync_time', 'panel_top_time', 'panel_top', 'watched_status', 'overall_panel', 'show_fanart', 'protect_site', 'mysql_host_xbmc', 'mysql_port_xbmc', 'mysql_login_xbmc', 'mysql_pass_xbmc', 'mysql_database_xbmc');
 
 // XBMC database column
 $col['id_movie']        =   'idMovie';
@@ -40,93 +40,40 @@ $col['id_path']         =   'c23';
 // Dir
 $dir_assoc = array('import', 'cache');
 
+// Output panel
+$output_panel_info = '';
+
 // Video resolution
-$vres_array = array('sd', 480, 576, 540, 720, 1080);
-$width_height = array(0 => 0, 720 => 480, 768 => 576, 960 => 544, 1280 => 720, 1920 => 1080);
+$vres_assoc = array(0, 480, 576, 540, 720, 768, 1080);
 
 // Video codec
-$vtype = array(
-    '3iv2' => '3ivx',
-    '3ivd' => '3ivx',
-    '3ivx' => '3ivx',
-    '8bps' => 'qt',
-    'advj' => 'qt',
-    'avrn' => 'qt',
-    'rle' => 'qt',
-    'rpza' => 'qt',
-    'smc' => 'qt',
-    'sv10' => 'qt',
-    'svq' => 'qt',
-    'qt' => 'qt',
-    'zygo' => 'qt',
-    'avc' => 'avc',
-    'avc1' => 'avc1',
-    'dca' => 'dts',
-    'div1' => 'divx',
-    'div2' => 'divx',
-    'div3' => 'divx',
-    'div4' => 'divx',
-    'div5' => 'divx',
-    'div6' => 'divx',
-    'divx' => 'divx',
-    'dm4v' => 'mpeg4',
-    'dx50' => 'mpeg4',
-    'geox' => 'mpeg4',
-    'm4s2' => 'mpeg4',
-    'mpeg4' => 'mpeg4',
-    'mpeg-4' => 'mpeg4',
-    'nds' => 'mpeg4',
-    'ndx' => 'mpeg4',
-    'pvmm' => 'mpeg4',
-    'em2v' => 'mpeg2',
-    'lmp2' => 'mpeg2',
-    'mmes' => 'mpeg2',
-    'mpeg-2' => 'mpeg2',
-    'mpeg2' => 'mpeg2',
-    'flv' => 'flv',
-    'h264' => 'h264',
-    'mp4' => 'mp4',
-    'mpeg' => 'mpeg',
-    'pim1' => 'mpeg',
-    'vc1' => 'vc1',
-    'wvc1' => 'vc1',
-    'wmv' => 'wmv',
-    'wmva' => 'wmva',
-    'xvid' => 'xvid',
-    'xvix' => 'xvid'
-);
+$vtype_assoc['3ivx']    =   array('3ivx', '3iv2', '3ivd');
+$vtype_assoc['qt']      =   array('qt', '8bps', 'advj', 'avrn', 'rle', 'rpza', 'smc', 'sv10', 'svq', 'zygo');
+$vtype_assoc['avc']     =   array('avc', 'avc1');
+$vtype_assoc['divx']    =   array('divx', 'div1', 'div2', 'div3', 'div4', 'div5', 'div6');
+$vtype_assoc['mpeg4']   =   array('mpeg4', 'dm4v', 'dx50', 'geox', 'm4s2', 'mpeg-4', 'nds', 'ndx', 'pvmm');
+$vtype_assoc['mpeg2']   =   array('mpeg2', 'em2v', 'lmp2', 'mmes', 'mpeg-2');
+$vtype_assoc['flv']     =   array('flv');
+$vtype_assoc['h264']    =   array('h264');
+$vtype_assoc['mp4']     =   array('mp4');
+$vtype_assoc['mpeg']    =   array('mpeg', 'pim1');
+$vtype_assoc['wmv']     =   array('wmv', 'wma');
+$vtype_assoc['xvid']    =   array('xvid', 'xvix');
 
 // Audio codec
-$atype = array(
-    'a_vorbis' => 'ogg',
-    'ogg' => 'ogg',
-    'vorbis' => 'ogg',
-    'aac' => 'aac',
-    'ac3' => 'ac3',
-    'aif' => 'aif',
-    'aifc' => 'aifc',
-    'aiff' => 'aiff',
-    'ape' => 'ape',
-    'dca' => 'dts',
-    'dts' => 'dts',
-    'dd' => 'dd',
-    'dolbydigital' => 'dd',
-    'dtshr' => 'dtshd',
-    'dtsma' => 'dtshd',
-    'dtshd' => 'dtshd',
-    'flac' => 'flac',
-    'mp1' => 'mp1',
-    'mp2' => 'mp2',
-    'mp3' => 'mp3',
-    'truehd' => 'truehd',
-    'wma' => 'wma',
-    'wmav2' => 'wma',
-    'wmahd' => 'wmahd',
-    'wmapro' => 'wmapro'
-);
+$atype_assoc['ogg']     =   array('ogg', 'a_vorbis', 'vorbis');
+$atype_assoc['aac']     =   array('aac');
+$atype_assoc['ac3']     =   array('ac3');
+$atype_assoc['aif']     =   array('aif', 'aifc', 'aiff');
+$atype_assoc['dts']     =   array('dts', 'dca');
+$atype_assoc['dd']      =   array('dd', 'dtshd', 'dtsma', 'dtshr');
+$atype_assoc['flac']    =   array('flac');
+$atype_assoc['mp3']     =   array('mp3', 'mp2', 'mp1');
+$atype_assoc['truehd']  =   array('truehd');
+$atype_assoc['wma']     =   array('wma', 'wmav2', 'wmahd', 'wmapro');
 
 // Audio channel
-$achan = array(
+$achan_assoc = array(
     '1' => '1',
     '2' => '2',
     '6' => '6',
