@@ -51,9 +51,9 @@ if (file_exists('import/videodb.xml') && $set['mode'] == 0) {
  */################################
 connect($mysql_ml);
 
-/* ##############
- * # TOP PANELS #
- */##############
+/* #############
+ * # TOP PANEL #
+ */#############
 if ($set['panel_top'] == 1) {
     
     // recently added
@@ -112,7 +112,7 @@ if ($set['panel_top'] == 1) {
     }
     $output_top_rated.= '</div>';
     
-    $output_panel_top = '<div id="panel_top" class="' . $set['panel_top_time'] * 100 . '">' . $output_recently . $output_random . $output_last_played . $output_top_rated . '</div>';
+    $output_panel_top = '<div id="panel_top" class="' . $set['panel_top_time'] * 1000 . '">' . $output_recently . $output_random . $output_last_played . $output_top_rated . '</div>';
     $output_panel_top_title = '<div id="panel_title"><div id="panel_recently_title">' . $lang['i_last_added'] . '</div><div id="panel_random_title">' . $lang['i_randomly'] . '</div><div id="panel_last_played_title">' . $lang['i_last_played'] . '</div><div id="panel_top_rated_title">' . $lang['i_top_rated'] . '</div></div>';
 } else {
     $output_panel_top = '';
@@ -246,7 +246,7 @@ while ($list = mysql_fetch_array($list_result)) {
     $img_flag_vtype = '';
     foreach ($vtype_assoc as $key => $val) {
         if (in_array($list['v_codec'], $vtype_assoc[$key])) {
-            $img_flag_vtype = '<img id="vtype" src="css/' . $set['theme'] . '/img/flags/vcodec_' . $key . '.png" alt="">';
+            $img_flag_vtype = '<img id="vtype" src="css/' . $set['theme'] . '/img/flags/vc_' . $key . '.png" alt="">';
         }
     }
 
@@ -254,7 +254,7 @@ while ($list = mysql_fetch_array($list_result)) {
     $img_flag_atype = '';
     foreach ($atype_assoc as $key => $val) {
         if(in_array($list['a_codec'], $atype_assoc[$key])) {
-            $img_flag_atype = '<img id="atype" src="css/' . $set['theme'] . '/img/flags/acodec_' . $key . '.png" alt="">';
+            $img_flag_atype = '<img id="atype" src="css/' . $set['theme'] . '/img/flags/ac_' . $key . '.png" alt="">';
         }
     }
 
@@ -262,7 +262,7 @@ while ($list = mysql_fetch_array($list_result)) {
     $img_flag_achan = '';
     foreach ($achan_assoc as $val) {
         if (is_numeric($list['a_channels']) && $list['a_channels'] >= $val) {
-            $img_flag_achan = '<img id="vres" src="css/' . $set['theme'] . '/img/flags/achan_' . $val . '.png" alt="">';
+            $img_flag_achan = '<img id="vres" src="css/' . $set['theme'] . '/img/flags/ach_' . $val . '.png" alt="">';
         }
     }
 

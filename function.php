@@ -113,7 +113,7 @@ function create_table($mysql_table, $lang) {
                 `last_played_limit` int(5) DEFAULT 10,
                 `top_rated_limit` int(5) DEFAULT 10,
                 `sync_time` int(5) DEFAULT 10,
-                `panel_top_time` int(5) DEFAULT 50,
+                `panel_top_time` int(5) DEFAULT 5,
                 `panel_top` int(1) DEFAULT 1,
                 `watched_status` int(1) DEFAULT 1,
                 `overall_panel` int(1) DEFAULT 1,

@@ -128,6 +128,13 @@ if (isset($_GET['option']) && $_GET['option'] == 'upload') {
 /* #########
  * # CACHE #
  */#########
+if (isset($_GET['option']) && $_GET['option'] == 'sync_now') {
+    setcookie('sync', false);
+}
+
+/* #########
+ * # CACHE #
+ */#########
 if (isset($_GET['option']) && $_GET['option'] == 'cache') {
     $output_panel.= '
         <table id="admin_table_movie">
@@ -279,7 +286,7 @@ if (isset($_GET['option']) && $_GET['option'] == 'settings') {
                 <tr><td>' . $lang['a_mysql_pass_xbmc'] . ':</td><td><input class="xbmc' . ($set['mode'] == 0 ? ' disabled' : '') . '" type="text" name="mysql_pass_xbmc" value="' . $set['mysql_pass_xbmc'] . '"' . ($set['mode'] == 0 ? ' disabled="disabled"' : '') . ' /></td></tr>
                 <tr><td>' . $lang['a_mysql_database_xbmc'] . ':</td><td><input class="xbmc' . ($set['mode'] == 0 ? ' disabled' : '') . '" type="text" name="mysql_database_xbmc" value="' . $set['mysql_database_xbmc'] . '"' . ($set['mode'] == 0 ? ' disabled="disabled"' : '') . ' /></td></tr>
             </table>
-                <input type="submit" value="OK" />
+                <input type="submit" value="' . $lang['a_save'] . '" />
         </form>';
 }
 
@@ -330,7 +337,7 @@ if (isset($_GET['option']) && $_GET['option'] == 'password') {
                 <tr><td>' . $lang['a_new_password'] . '</td><td><input type="password" name="password_admin" /></td></tr>
                 <tr><td>' . $lang['a_new_password_re'] . '</td><td><input type="password" name="password_admin_re" /></td></tr>
             </table>
-                <input type="submit" value="OK" />
+                <input type="submit" value="' . $lang['a_save'] . '" />
         </form>
     ';
 }
@@ -390,6 +397,7 @@ if ($output_panel_info !== '') {
                 <a class="admin_menu_box" href="admin.php"><?PHP echo $lang['a_html_main_site'] ?></a>
                 <a class="admin_menu_box" href="admin.php?option=list"><?PHP echo $lang['a_html_movie_list'] ?></a>
                 <a class="admin_menu_box" href="admin.php?option=upload"><?PHP echo $lang['a_html_upload_xml'] ?></a>
+                <a class="admin_menu_box" href="admin.php?option=sync_now"><?PHP echo $lang['a_html_sync_now'] ?></a>
                 <a class="admin_menu_box" href="admin.php?option=cache">Cache</a>
                 <a class="admin_menu_box" href="admin.php?option=settings"><?PHP echo $lang['a_html_settings'] ?></a>
                 <a class="admin_menu_box" href="admin.php?option=password"><?PHP echo $lang['a_html_change_password'] ?></a>
