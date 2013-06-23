@@ -264,22 +264,24 @@ if (isset($_GET['option']) && $_GET['option'] == 'settings') {
     $output_panel.= '
         <form action="admin.php?option=settings_save" method="post">
             <table id="admin_table_movie">
-                <tr><td>' . $lang['a_mode'] . ':</td><td>' . $output_mode . '</td></tr>
+                <tr><td class="bold des">' . $lang['a_set_main'] . '</td><td></td></tr>
                 <tr><td>' . $lang['a_site_name'] . ':</td><td><input type="text" name="site_name" value="' . $set['site_name'] . '" /></td></tr>
                 <tr><td>' . $lang['a_language'] . ':</td><td><select name="language">' . $output_lang . '</select></td></tr>
                 <tr><td>' . $lang['a_theme'] . ':</td><td><select name="theme">' . $output_theme . '</select></td></tr>
                 <tr><td>' . $lang['a_per_page'] . ':</td><td>' . $output_per_page . '</td></tr>
-                <tr><td>' . $lang['a_recently_limit'] . ':</td><td>' . $output_recently_limit . '</td></tr>
-                <tr><td>' . $lang['a_random_limit'] . ':</td><td>' . $output_random_limit . '</td></tr>
-                <tr><td>' . $lang['a_last_played_limit'] . ':</td><td>' . $output_last_played_limit . '</td></tr>
-                <tr><td>' . $lang['a_top_rated_limit'] . ':</td><td>' . $output_top_rated_limit . '</td></tr>
-                <tr><td>' . $lang['a_sync_time'] . ':</td><td><input type="text" name="sync_time" value="' . $set['sync_time'] . '" /></td></tr>
-                <tr><td>' . $lang['a_panel_top_time'] . ':</td><td><input type="text" name="panel_top_time" value="' . $set['panel_top_time'] . '" /></td></tr>
                 <tr><td>' . $lang['a_panel_top'] . ':</td><td>' . $output_panel_top . '</td></tr>
                 <tr><td>' . $lang['a_watched_status'] . ':</td><td>' . $output_watched_status . '</td></tr>
                 <tr><td>' . $lang['a_overall_panel'] . ':</td><td>' . $output_overall_panel . '</td></tr>
                 <tr><td>' . $lang['a_show_fanart'] . ':</td><td>' . $output_show_fanart . '</td></tr>
-                <tr><td>' . $lang['a_protect_site']  . ':</td><td>' . $output_protect_site . '</td></tr>
+                <tr><td>' . $lang['a_protect_site']  . ':</td><td>' . $output_protect_site . '</td></tr>                <tr><td class="bold des">' . $lang['a_set_panel_top'] . '</td><td></td></tr>
+                <tr><td>' . $lang['a_panel_top_time'] . ':</td><td><input type="text" name="panel_top_time" value="' . $set['panel_top_time'] . '" /></td></tr>
+                <tr><td>' . $lang['a_recently_limit'] . ':</td><td>' . $output_recently_limit . '</td></tr>
+                <tr><td>' . $lang['a_random_limit'] . ':</td><td>' . $output_random_limit . '</td></tr>
+                <tr><td>' . $lang['a_last_played_limit'] . ':</td><td>' . $output_last_played_limit . '</td></tr>
+                <tr><td>' . $lang['a_top_rated_limit'] . ':</td><td>' . $output_top_rated_limit . '</td></tr>
+                <tr><td class="bold des">' . $lang['a_set_sync'] . '</td><td></td></tr>
+                <tr><td>' . $lang['a_mode'] . ':</td><td>' . $output_mode . '</td></tr>
+                <tr><td>' . $lang['a_sync_time'] . ':</td><td><input class="xbmc' . ($set['mode'] == 0 ? ' disabled' : '') . '" type="text" name="sync_time" value="' . $set['sync_time'] . '" /></td></tr>
                 <tr><td>' . $lang['a_mysql_host_xbmc'] . ':</td><td><input class="xbmc' . ($set['mode'] == 0 ? ' disabled' : '') . '" type="text" name="mysql_host_xbmc" value="' . $set['mysql_host_xbmc'] . '"' . ($set['mode'] == 0 ? ' disabled="disabled"' : '') . ' /></td></tr>
                 <tr><td>' . $lang['a_mysql_port_xbmc'] . ':</td><td><input class="xbmc' . ($set['mode'] == 0 ? ' disabled' : '') . '" type="text" name="mysql_port_xbmc" value="' . $set['mysql_port_xbmc'] . '"' . ($set['mode'] == 0 ? ' disabled="disabled"' : '') . ' /></td></tr>
                 <tr><td>' . $lang['a_mysql_login_xbmc'] . ':</td><td><input class="xbmc' . ($set['mode'] == 0 ? ' disabled' : '') . '" type="text" name="mysql_login_xbmc" value="' . $set['mysql_login_xbmc'] . '"' . ($set['mode'] == 0 ? ' disabled="disabled"' : '') . ' /></td></tr>

@@ -356,7 +356,7 @@ if ($output_panel_info !== '') {
             </div>
         </div>
         <div id="panel_bottom">
-            Created by <a href="mailto:regss84@gmail.com">Regss</a> - <a href="http://github.com/Regss/movielib">MovieLib</a> v. 0.9.0
+            <a href="http://github.com/Regss/movielib">MovieLib</a> v. 0.9.0 - Created by <a href="mailto:regss84@gmail.com">Regss</a>
         </div>
     </body>
 </html>
