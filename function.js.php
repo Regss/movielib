@@ -1,4 +1,4 @@
-<?php
+<?PHP
 $fanart_cache = 'cache/' . $_GET['id'] . '_f.jpg';
 if (!file_exists($fanart_cache)) {
     include 'config.php';

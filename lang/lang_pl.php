@@ -116,6 +116,7 @@ $lang['a_html_main_site']               =   'Strona Główna';
 $lang['a_html_movie_list']              =   'Lista Filmów';
 $lang['a_html_upload_xml']              =   'Wgraj XML';
 $lang['a_html_sync_now']                =   'Synchronizuj teraz';
+$lang['a_html_cache']                   =   'Zarządzaj Cache';
 $lang['a_html_settings']                =   'Ustawienia';
 $lang['a_html_change_password']         =   'Zmień Hasło';
 $lang['a_html_logout']                  =   'Wyloguj';

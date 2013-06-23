@@ -1,4 +1,4 @@
-<?php
+<?PHP
 session_start();
 require_once 'config.php';
 require_once 'function.php';
@@ -125,9 +125,13 @@ if (isset($_GET['option']) && $_GET['option'] == 'upload') {
     }
 }
 
-/* #########
- * # CACHE #
- */#########
+/* ############
+ * # SYNC NOW #
+ */############
+$link_sync_now = '';
+if ($set['mode'] == 1) {
+    $link_sync_now = '<a class="admin_menu_box" href="admin.php?option=sync_now">' . $lang['a_html_sync_now'] . '</a>';
+}
 if (isset($_GET['option']) && $_GET['option'] == 'sync_now') {
     setcookie('sync', false);
 }
@@ -304,7 +308,7 @@ if (isset($_GET['option']) && $_GET['option'] === 'settings_save') {
         random_limit = "' . $_POST['random_limit'] . '",
         last_played_limit = "' . $_POST['last_played_limit'] . '",
         top_rated_limit = "' . $_POST['top_rated_limit'] . '",
-        sync_time = "' . $_POST['sync_time'] . '",
+        sync_time = ' . (isset($_POST['sync_time']) ? '"' . $_POST['sync_time'] . '"' : '"10"') . ',
         panel_top_time = "' . $_POST['panel_top_time'] . '",
         panel_top = "' . $_POST['panel_top'] . '",
         watched_status = "' . $_POST['watched_status'] . '",
@@ -399,8 +403,8 @@ if ($output_panel_info !== '') {
                 <a class="admin_menu_box" href="admin.php"><?PHP echo $lang['a_html_main_site'] ?></a>
                 <a class="admin_menu_box" href="admin.php?option=list"><?PHP echo $lang['a_html_movie_list'] ?></a>
                 <a class="admin_menu_box" href="admin.php?option=upload"><?PHP echo $lang['a_html_upload_xml'] ?></a>
-                <a class="admin_menu_box" href="admin.php?option=sync_now"><?PHP echo $lang['a_html_sync_now'] ?></a>
-                <a class="admin_menu_box" href="admin.php?option=cache">Cache</a>
+                <?PHP echo $link_sync_now ?>
+                <a class="admin_menu_box" href="admin.php?option=cache"><?PHP echo $lang['a_html_cache'] ?></a>
                 <a class="admin_menu_box" href="admin.php?option=settings"><?PHP echo $lang['a_html_settings'] ?></a>
                 <a class="admin_menu_box" href="admin.php?option=password"><?PHP echo $lang['a_html_change_password'] ?></a>
                 <a class="admin_menu_box" href="login.php?login=admin_logout"><?PHP echo $lang['a_html_logout'] ?></a>
