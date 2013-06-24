@@ -106,7 +106,7 @@ function create_table($mysql_table, $lang) {
                 `mode` int(1) DEFAULT 0,
                 `site_name` varchar(30) DEFAULT "MovieLib",
                 `language` varchar(15) DEFAULT "' . $_SESSION['install_lang'] . '",
-                `theme` varchar(15) DEFAULT "default.css",
+                `theme` varchar(15) DEFAULT "default",
                 `per_page` int(5) DEFAULT 50,
                 `recently_limit` int(5) DEFAULT 10,
                 `random_limit` int(5) DEFAULT 10,

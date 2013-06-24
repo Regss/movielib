@@ -137,4 +137,6 @@ $lang['inst_login']                     =   'Użytkownik';
 $lang['inst_pass']                      =   'Hasło';
 $lang['inst_database']                  =   'Baza Danych';
 $lang['inst_could_create']              =   'Nie można utworzyć tabeli';
+$lang['inst_redirect_admin']            =   'Przekierowanie do panelu administracyjnego';
+$lang['inst_redirect_sec']              =   'sek.';
 ?>

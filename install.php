@@ -62,7 +62,7 @@ if (isset($_POST['host'])) {
     if (!$sel_install) {
         $output_panel_info.= $lang['ins_could_connect'] . ' - ' . mysql_error() . '<br />';
     } else {
-        $output_panel_info.= create_table($mysql_tables, $lang) . $lang['ins_success'] . '. Redirect to admin on <span id="sec">5</span> sec.<script>$(redirectAdmin);</script>';
+        $output_panel_info.= create_table($mysql_tables, $lang) . $lang['ins_success'] . '. ' . $lang['inst_redirect_admin'] . ' <span id="sec">5</span> ' . $lang['inst_redirect_sec'] . '<script>$(redirectAdmin);</script>';
         $fp = fopen('db.php', 'w');
         $to_write = '<?PHP $mysql_ml = array(\'' . $_POST['host'] . '\', \'' . $_POST['port'] . '\', \'' . $_POST['login'] . '\', \'' . $_POST['pass'] . '\', \'' . $_POST['database'] . '\'); ?>';
         fwrite($fp, $to_write);

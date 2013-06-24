@@ -137,4 +137,6 @@ $lang['inst_login']                     =   'Login';
 $lang['inst_pass']                      =   'Password';
 $lang['inst_database']                  =   'Database';
 $lang['inst_could_create']              =   'Could create table';
+$lang['inst_redirect_admin']            =   'Redirect to admin panel';
+$lang['inst_redirect_sec']              =   'sec.';
 ?>
