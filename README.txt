@@ -8,6 +8,10 @@ Default passwords:
 Access to site: user
 Access to admin panel: admin
 
+v. 0.9.1
+- Better and faster sync with XBMC database
+- Fixed some bugs
+
 v. 0.9.0
 - Automatically create cache for posters while browsing the site
 - View fanarts

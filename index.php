@@ -35,7 +35,6 @@ if (!isset($_COOKIE['sync']) && $set['mode'] == 1) {
         fclose($fp);
         connect_xbmc($set);
         $output_panel_info.= sync_database($col, $mysql_ml, $set, $mysql_tables[0], $lang);
-        setcookie('sync', true, time()+$set['sync_time']*60);
     }
 }
 
@@ -356,7 +355,7 @@ if ($output_panel_info !== '') {
             </div>
         </div>
         <div id="panel_bottom">
-            <a href="http://github.com/Regss/movielib">MovieLib</a> v. 0.9.0 - Created by <a href="mailto:regss84@gmail.com">Regss</a>
+            <a href="http://github.com/Regss/movielib">MovieLib</a> v. 0.9.1 - Created by <a href="mailto:regss84@gmail.com">Regss</a>
         </div>
     </body>
 </html>

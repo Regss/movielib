@@ -136,6 +136,26 @@ if (isset($_GET['option']) && $_GET['option'] == 'sync_now') {
     setcookie('sync', false);
 }
 
+/* ##############
+ * # CHECK CONN #
+ */##############
+$link_check_conn = '';
+if ($set['mode'] == 1) {
+    $link_check_conn = '<a class="admin_menu_box" href="admin.php?option=check_conn">' . $lang['a_html_check_conn'] . '</a>';
+}
+if (isset($_GET['option']) && $_GET['option'] == 'check_conn') {
+    $fp = fsockopen($set['mysql_host_xbmc'], $set['mysql_port_xbmc'], $errno, $errstr, 3);
+    if ($fp) {
+        fclose($fp);
+        connect_xbmc($set);
+        $connected_sql = 'SELECT ' . $col['id_movie'] . ' FROM movie';
+        $connected_result = mysql_query($connected_sql);
+        $rows = mysql_num_rows($connected_result);
+        $output_panel.= $lang['a_connected'] . '.<br />' . $lang['a_found'] . ': <span class="des">' . $rows . '</span>';
+    }
+}
+connect($mysql_ml);
+
 /* #########
  * # CACHE #
  */#########
@@ -286,11 +306,11 @@ if (isset($_GET['option']) && $_GET['option'] == 'settings') {
                 <tr><td class="bold des">' . $lang['a_set_sync'] . '</td><td></td></tr>
                 <tr><td>' . $lang['a_mode'] . ':</td><td>' . $output_mode . '</td></tr>
                 <tr><td>' . $lang['a_sync_time'] . ':</td><td><input class="xbmc' . ($set['mode'] == 0 ? ' disabled' : '') . '" type="text" name="sync_time" value="' . $set['sync_time'] . '" /></td></tr>
-                <tr><td>' . $lang['a_mysql_host_xbmc'] . ':</td><td><input class="xbmc' . ($set['mode'] == 0 ? ' disabled' : '') . '" type="text" name="mysql_host_xbmc" value="' . $set['mysql_host_xbmc'] . '"' . ($set['mode'] == 0 ? ' disabled="disabled"' : '') . ' /></td></tr>
-                <tr><td>' . $lang['a_mysql_port_xbmc'] . ':</td><td><input class="xbmc' . ($set['mode'] == 0 ? ' disabled' : '') . '" type="text" name="mysql_port_xbmc" value="' . $set['mysql_port_xbmc'] . '"' . ($set['mode'] == 0 ? ' disabled="disabled"' : '') . ' /></td></tr>
-                <tr><td>' . $lang['a_mysql_login_xbmc'] . ':</td><td><input class="xbmc' . ($set['mode'] == 0 ? ' disabled' : '') . '" type="text" name="mysql_login_xbmc" value="' . $set['mysql_login_xbmc'] . '"' . ($set['mode'] == 0 ? ' disabled="disabled"' : '') . ' /></td></tr>
-                <tr><td>' . $lang['a_mysql_pass_xbmc'] . ':</td><td><input class="xbmc' . ($set['mode'] == 0 ? ' disabled' : '') . '" type="text" name="mysql_pass_xbmc" value="' . $set['mysql_pass_xbmc'] . '"' . ($set['mode'] == 0 ? ' disabled="disabled"' : '') . ' /></td></tr>
-                <tr><td>' . $lang['a_mysql_database_xbmc'] . ':</td><td><input class="xbmc' . ($set['mode'] == 0 ? ' disabled' : '') . '" type="text" name="mysql_database_xbmc" value="' . $set['mysql_database_xbmc'] . '"' . ($set['mode'] == 0 ? ' disabled="disabled"' : '') . ' /></td></tr>
+                <tr><td>' . $lang['a_mysql_host_xbmc'] . ':</td><td><input class="xbmc' . ($set['mode'] == 0 ? ' disabled' : '') . '" type="text" name="mysql_host_xbmc" value="' . ($set['mysql_host_xbmc'] == '' ? '127.0.0.1' : $set['mysql_host_xbmc']) . '"' . ($set['mode'] == 0 ? ' disabled="disabled"' : '') . ' /></td></tr>
+                <tr><td>' . $lang['a_mysql_port_xbmc'] . ':</td><td><input class="xbmc' . ($set['mode'] == 0 ? ' disabled' : '') . '" type="text" name="mysql_port_xbmc" value="' . ($set['mysql_port_xbmc'] == '' ? '3306' : $set['mysql_port_xbmc']) . '"' . ($set['mode'] == 0 ? ' disabled="disabled"' : '') . ' /></td></tr>
+                <tr><td>' . $lang['a_mysql_login_xbmc'] . ':</td><td><input class="xbmc' . ($set['mode'] == 0 ? ' disabled' : '') . '" type="text" name="mysql_login_xbmc" value="' . ($set['mysql_login_xbmc'] == '' ? 'xbmc' : $set['mysql_login_xbmc']) . '"' . ($set['mode'] == 0 ? ' disabled="disabled"' : '') . ' /></td></tr>
+                <tr><td>' . $lang['a_mysql_pass_xbmc'] . ':</td><td><input class="xbmc' . ($set['mode'] == 0 ? ' disabled' : '') . '" type="text" name="mysql_pass_xbmc" value="' . ($set['mysql_pass_xbmc'] == '' ? 'xbmc' : $set['mysql_pass_xbmc']) . '"' . ($set['mode'] == 0 ? ' disabled="disabled"' : '') . ' /></td></tr>
+                <tr><td>' . $lang['a_mysql_database_xbmc'] . ':</td><td><input class="xbmc' . ($set['mode'] == 0 ? ' disabled' : '') . '" type="text" name="mysql_database_xbmc" value="' . ($set['mysql_database_xbmc'] == 0 ? 'xbmc_video75' : $set['mysql_database_xbmc']) . '"' . ($set['mode'] == 0 ? ' disabled="disabled"' : '') . ' /></td></tr>
             </table>
                 <input type="submit" value="' . $lang['a_save'] . '" />
         </form>';
@@ -404,6 +424,7 @@ if ($output_panel_info !== '') {
                 <a class="admin_menu_box" href="admin.php?option=list"><?PHP echo $lang['a_html_movie_list'] ?></a>
                 <a class="admin_menu_box" href="admin.php?option=upload"><?PHP echo $lang['a_html_upload_xml'] ?></a>
                 <?PHP echo $link_sync_now ?>
+                <?PHP echo $link_check_conn ?>
                 <a class="admin_menu_box" href="admin.php?option=cache"><?PHP echo $lang['a_html_cache'] ?></a>
                 <a class="admin_menu_box" href="admin.php?option=settings"><?PHP echo $lang['a_html_settings'] ?></a>
                 <a class="admin_menu_box" href="admin.php?option=password"><?PHP echo $lang['a_html_change_password'] ?></a>

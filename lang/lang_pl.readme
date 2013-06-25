@@ -8,13 +8,17 @@ Domyślne hasła:
 Dostęp do strony: user
 Dostęp do panelu administratora: admin
 
+v. 0.9.1
+- Lepsza i szybsza synchronizacja z bazą XMBC
+- Poprawiono kilka błędów
+
 v. 0.9.0
-- automatyczne tworzenie cache dla okładek podczas przeglądania strony
-- wyświetlanie fanartów
-- zabezpieczenie treści strony hasłem
-- import z pliku videodb.xml
-- synchronizacja z bazą XBMC (tylko MySql)
-- prosta zmiana wyglądu za pomocą skórek
-- informacja o parametrach filmu
-- status oglądanych filmów
+- Automatyczne tworzenie cache dla okładek podczas przeglądania strony
+- Wyświetlanie fanartów
+- Zabezpieczenie treści strony hasłem
+- Import z pliku videodb.xml
+- Synchronizacja z bazą XBMC (tylko MySql)
+- Prosta zmiana wyglądu za pomocą skórek
+- Informacja o parametrach filmu
+- Status oglądanych filmów
 - PA: zarządzanie cache

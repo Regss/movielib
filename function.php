@@ -112,7 +112,7 @@ function create_table($mysql_table, $lang) {
                 `random_limit` int(5) DEFAULT 10,
                 `last_played_limit` int(5) DEFAULT 10,
                 `top_rated_limit` int(5) DEFAULT 10,
-                `sync_time` int(5) DEFAULT 10,
+                `sync_time` int(5) DEFAULT 1440,
                 `panel_top_time` int(5) DEFAULT 5,
                 `panel_top` int(1) DEFAULT 1,
                 `watched_status` int(1) DEFAULT 1,
@@ -160,14 +160,13 @@ function sync_database($col, $mysql_ml, $set, $mysql_table_ml, $lang) {
     
     // Check movie from XBMC
     connect_xbmc($set);
-    $xbmc_sql = 'SELECT ' . $col['title'] . ' FROM movie';
+    $xbmc_sql = 'SELECT ' . $col['id_file'] . ', ' . $col['title'] . ' FROM movie';
     $xbmc_result = mysql_query($xbmc_sql);
     $xbmc_assoc = array();
     while ($xbmc = mysql_fetch_assoc($xbmc_result)) {
-        $xbmc_assoc[] = $xbmc[$col['title']];
+        $xbmc_assoc[$xbmc[$col['id_file']]] = $xbmc[$col['title']];
     }
-    mysql_close();
-    
+
     // Check movie from MovieLib
     connect($mysql_ml);
     $ml_sql = 'SELECT id, title FROM ' . $mysql_table_ml;
@@ -176,7 +175,7 @@ function sync_database($col, $mysql_ml, $set, $mysql_table_ml, $lang) {
     while ($ml = mysql_fetch_assoc($ml_result)) {
         $ml_assoc[$ml['id']] = $ml['title'];
     }
-    
+
     // Set movie to remove
     $to_remove = array();
     foreach ($ml_assoc as $key => $val) {
@@ -185,29 +184,36 @@ function sync_database($col, $mysql_ml, $set, $mysql_table_ml, $lang) {
         }
     }
     
-    // Delete a no exist movies
-    foreach ($to_remove as $key => $val) {
-        $delete_movie_sql = 'DELETE FROM ' . $mysql_table_ml . ' WHERE title = "' . addslashes($val) . '"';
+    // Remove a no exist movies
+    if (count($to_remove) > 0) {
+        $delete_movie_sql = 'DELETE FROM ' . $mysql_table_ml . ' WHERE ';
+        $i = 0;
+        foreach ($to_remove as $key => $val) {
+            $delete_movie_sql.= ($i > 0 ? ' OR ' : '') . 'title = "' . addslashes($val) . '"';
+            $i++;
+            if (file_exists('cache/' . $key . '.jpg')) {
+                unlink('cache/' . $key . '.jpg');
+            }
+            if (file_exists('cache/' . $key . '_f.jpg')) {
+                unlink('cache/' . $key . '_f.jpg');
+            }
+        }
         mysql_select_db($mysql_ml[4]);
         mysql_query($delete_movie_sql);
-        if (file_exists('cache/' . $key . '.jpg')) {
-            unlink('cache/' . $key . '.jpg');
-        }
     }
 
     // Set movie to add
     $to_add = array();
-    foreach ($xbmc_assoc as $val) {
+    foreach ($xbmc_assoc as $key => $val) {
         if (!in_array($val, $ml_assoc)) {
-            $to_add[] = $val;
+            $to_add[$key] = $val;
         }
     }
-    mysql_close();
 
     // Add new movies
-    // Select from movie table
-    connect_xbmc($set);
-    foreach ($to_add as $key => $val) {
+    if (count($to_add) > 0) {
+
+        // Select from movie table
         $select_sql = 'SELECT 
             ' . $col['id_file'] . ',
             ' . $col['title'] . ',
@@ -221,15 +227,10 @@ function sync_database($col, $mysql_ml, $set, $mysql_table_ml, $lang) {
             ' . $col['originaltitle'] . ',
             ' . $col['fanart'] . ',
             ' . $col['country'] . ' 
-            FROM movie WHERE ' . $col['title'] . ' = "' . addslashes($val) . '"';
-        mysql_select_db($set['mysql_database_xbmc']);
-        mysql_query('SET CHARACTER SET utf8');
-        mysql_query('SET NAMES utf8');
-        $select_result = mysql_query($select_sql);
-        $movie = mysql_fetch_assoc($select_result);
-        
-        // Select from streamdetails table
+            FROM movie WHERE ';
+
         $select_stream_sql = 'SELECT 
+            idFile,
             iStreamType,
             strVideoCodec,
             fVideoAspect,
@@ -238,31 +239,87 @@ function sync_database($col, $mysql_ml, $set, $mysql_table_ml, $lang) {
             strAudioCodec,
             iAudioChannels,
             iVideoDuration
-            FROM streamdetails WHERE ' . $col['id_file'] . ' = "' . $movie['idFile'] . '" ORDER BY iStreamType';
-        $select_stream_result = mysql_query($select_stream_sql);
-        $stream_assoc = array();
-        while ($stream = mysql_fetch_assoc($select_stream_result)) {
-            $stream_assoc[] = $stream;
-        }
-        
-        // Select from files table
+            FROM streamdetails WHERE ';
+
         $select_files_sql = 'SELECT 
+            idFile,
             playCount,
             lastPlayed,
             dateAdded
-            FROM files WHERE ' . $col['id_file'] . ' = "' . $movie['idFile'] . '"';
+            FROM files WHERE ';
+
+        $i = 0;
+        foreach ($to_add as $key => $val) {
+            $select_sql.= ($i > 0 ? ' OR ' : '') . ' ' . $col['title'] . ' = "' . addslashes($val) . '"';
+            $select_stream_sql.= ($i > 0 ? ' OR ' : '') . ' ' . $col['id_file'] . ' = "' . $key . '"';
+            $select_files_sql.= ($i > 0 ? ' OR ' : '') . ' ' . $col['id_file'] . ' = "' . $key . '"';
+            $i++;
+        }
+        connect_xbmc($set);
+        mysql_select_db($set['mysql_database_xbmc']);
+        mysql_query('SET CHARACTER SET utf8');
+        mysql_query('SET NAMES utf8');
+        $select_result = mysql_query($select_sql);
+        $select_stream_result = mysql_query($select_stream_sql);
         $select_files_result = mysql_query($select_files_sql);
-        $files = mysql_fetch_assoc($select_files_result);
-        mysql_close();
         
+        // add movie to assoc
+        while ($movie = mysql_fetch_array($select_result)) {
+            $movie_data[$movie[$col['id_file']]] = array(
+                'title' => $movie[$col['title']], 
+                'plot' => $movie[$col['plot']], 
+                'rating' => $movie[$col['rating']], 
+                'year' => $movie[$col['year']], 
+                'poster' => $movie[$col['poster']], 
+                'runtime' => $movie[$col['runtime']], 
+                'genre' => $movie[$col['genre']], 
+                'director' => $movie[$col['director']], 
+                'originaltitle' => $movie[$col['originaltitle']], 
+                'fanart' => $movie[$col['fanart']], 
+                'country' => $movie[$col['country']]
+            );
+        }
+        
+        // add stremdetails to movie assoc
+        while ($movie = mysql_fetch_array($select_stream_result)) {
+            
+            // video streamdetails
+            if ($movie['iStreamType'] == 0) {
+                $movie_data_stream_v[$movie['idFile']] = array(
+                    'strVideoCodec' => $movie['strVideoCodec'], 
+                    'fVideoAspect' => $movie['fVideoAspect'], 
+                    'iVideoWidth' => $movie['iVideoWidth'], 
+                    'iVideoHeight' => $movie['iVideoHeight'], 
+                    'iVideoDuration' => $movie['iVideoDuration']
+                );
+            }
+            
+            // audio streamdetails
+            if ($movie['iStreamType'] == 1) {
+                $movie_data_stream_a[$movie['idFile']] = array(
+                    'strAudioCodec' => $movie['strAudioCodec'], 
+                    'iAudioChannels' => $movie['iAudioChannels']
+                );
+            }
+        }
+
+        // add files info to movie assoc
+        while ($movie = mysql_fetch_array($select_files_result)) {
+            $movie_data_files[$movie['idFile']] = array(
+                'playCount' => $movie['playCount'],
+                'lastPlayed' => $movie['lastPlayed'],
+                'dateAdded' => $movie['dateAdded']
+            );
+        }
+
         // Get poster URL
         preg_match_all('/>(http:[^<]+)</', $movie[$col['poster']], $poster_path);
         $poster_url =  (isset($poster_path[1][0]) ? $poster_path[1][0] : '');
-        
+
         // Get fanart URL
         preg_match_all('/>(http:[^<]+)</', $movie[$col['fanart']], $fanart_path);
         $fanart_url =  (isset($fanart_path[1][0]) ? $fanart_path[1][0] : '');
-        
+
         // Insert to MovieLib table
         connect($mysql_ml);
         $insert_sql = 'INSERT INTO `' . $mysql_table_ml . '` (
@@ -287,43 +344,62 @@ function sync_database($col, $mysql_ml, $set, $mysql_table_ml, $lang) {
             `play_count`,
             `last_played`,
             `date_added`
-      ) VALUES (
-            "' . addslashes($movie[$col['title']]) . '",
-            "' . addslashes($movie[$col['plot']]) . '",
-            "' . $movie[$col['rating']] . '",
-            "' . $movie[$col['year']] . '",
-            "' . addslashes($poster_url) . '",
-            "' . addslashes($fanart_url) . '", '
-            . ($movie[$col['runtime']] == 0 ? '"' . round($stream_assoc[0]['iVideoDuration'] / 60, 0) . '", ' : '"' . $movie[$col['runtime']] . '", ') . '
-            "' . addslashes($movie[$col['genre']]) . '",
-            "' . addslashes($movie[$col['director']]) . '",
-            "' . addslashes($movie[$col['originaltitle']]) . '",
-            "' . addslashes($movie[$col['country']]) . '", '
-            . (isset($stream_assoc[0]['strVideoCodec']) ? '"' . $stream_assoc[0]['strVideoCodec'] . '", ' : 'NULL, ')
-            . (isset($stream_assoc[0]['fVideoAspect']) ? '"' . $stream_assoc[0]['fVideoAspect'] . '", ' : 'NULL, ')
-            . (isset($stream_assoc[0]['iVideoWidth']) ? '"' . $stream_assoc[0]['iVideoWidth'] . '", ' : 'NULL, ')
-            . (isset($stream_assoc[0]['iVideoHeight']) ? '"' . $stream_assoc[0]['iVideoHeight'] . '", ' : 'NULL, ')
-            . (isset($stream_assoc[0]['iVideoDuration']) ? '"' . $stream_assoc[0]['iVideoDuration'] . '", ' : 'NULL, ')
-            . (isset($stream_assoc[1]['strAudioCodec']) ? '"' . $stream_assoc[1]['strAudioCodec'] . '", ' : 'NULL, ')
-            . (isset($stream_assoc[1]['iAudioChannels']) ? '"' . $stream_assoc[1]['iAudioChannels'] . '", ' : 'NULL, ')
-            . ($files['playCount'] == null ? 'NULL, ' : '"' . $files['playCount'] . '", ')
-            . ($files['lastPlayed'] == null ? 'NULL, ' : '"' . $files['lastPlayed'] . '", ') . '
-            "' . $files['dateAdded'] . '"
-      )';
+          ) VALUES ';
+        $i = 0;
+        foreach ($movie_data as $key => $val) {
+            $insert_sql.= ($i > 0 ? ', ' : '');
+            $i++;
+            
+            // Get poster URL
+            preg_match_all('/>(http:[^<]+)</', $val['poster'], $poster_path);
+            $poster_url =  (isset($poster_path[1][0]) ? $poster_path[1][0] : '');
+
+            // Get fanart URL
+            preg_match_all('/>(http:[^<]+)</', $val['fanart'], $fanart_path);
+            $fanart_url =  (isset($fanart_path[1][0]) ? $fanart_path[1][0] : '');
+
+            $insert_sql.= '(
+                "' . addslashes($val['title']) . '",
+                "' . addslashes($val['plot']) . '",
+                "' . $val['rating'] . '",
+                "' . $val['year'] . '",
+                "' . addslashes($poster_url) . '",
+                "' . addslashes($fanart_url) . '", '
+                . ($val['runtime'] == 0 ? '"' . round($movie_data_stream_v[$key]['iVideoDuration'] / 60, 0) . '", ' : '"' . $val['runtime'] . '", ') . '
+                "' . addslashes($val['genre']) . '",
+                "' . addslashes($val['director']) . '",
+                "' . addslashes($val['originaltitle']) . '",
+                "' . addslashes($val['country']) . '", '
+                . (isset($movie_data_stream_v[$key]['strVideoCodec']) ? '"' . $movie_data_stream_v[$key]['strVideoCodec'] . '", ' : 'NULL, ')
+                . (isset($movie_data_stream_v[$key]['fVideoAspect']) ? '"' . $movie_data_stream_v[$key]['fVideoAspect'] . '", ' : 'NULL, ')
+                . (isset($movie_data_stream_v[$key]['iVideoWidth']) ? '"' . $movie_data_stream_v[$key]['iVideoWidth'] . '", ' : 'NULL, ')
+                . (isset($movie_data_stream_v[$key]['iVideoHeight']) ? '"' . $movie_data_stream_v[$key]['iVideoHeight'] . '", ' : 'NULL, ')
+                . (isset($movie_data_stream_v[$key]['iVideoDuration']) ? '"' . $movie_data_stream_v[$key]['iVideoDuration'] . '", ' : 'NULL, ')
+                . (isset($movie_data_stream_a[$key]['strAudioCodec']) ? '"' . $movie_data_stream_a[$key]['strAudioCodec'] . '", ' : 'NULL, ')
+                . (isset($movie_data_stream_a[$key]['iAudioChannels']) ? '"' . $movie_data_stream_a[$key]['iAudioChannels'] . '", ' : 'NULL, ')
+                . ($movie_data_files[$key]['playCount'] == null ? 'NULL, ' : '"' . $movie_data_files[$key]['playCount'] . '", ')
+                . ($movie_data_files[$key]['lastPlayed'] == null ? 'NULL, ' : '"' . $movie_data_files[$key]['lastPlayed'] . '", ') . '
+                "' . $movie_data_files[$key]['dateAdded'] . '"
+          )';
+        }
 
         mysql_select_db($mysql_ml[4]);
         mysql_query('SET CHARACTER SET utf8');
         mysql_query('SET NAMES utf8');
         $insert = mysql_query($insert_sql);
+        
         if (!$insert) {
             echo '<br />' . $lang['f_synch_error'] . ': ' . mysql_error($conn_ml);
             exit;
         }
     }
+    
+    // create info panel data
     $added = count($to_add);
     $removed = count($to_remove);
     if ($added == 0 && $removed == 0) {
         $output = '';
+        setcookie('sync', true, time()+$set['sync_time']*60);
     } else {
         $output = $lang['f_synchronized'] . '<br />' . $lang['f_added'] . ': ' . $added . ' ' . $lang['f_movies'] . '<br />' . $lang['f_removed'] . ': ' . $removed . ' ' . $lang['f_movies'] . '<br />';
     }
@@ -366,14 +442,22 @@ function import_xml($col, $mysql_ml, $mysql_table_ml, $lang) {
         }
     }
 
-    // Delete a no exist movies
-    foreach ($to_remove as $key => $val) {
-        $delete_movie_sql = 'DELETE FROM ' . $mysql_table_ml . ' WHERE title = "' . addslashes($val) . '"';
+    // Remove a no exist movies
+    if (count($to_remove) > 0) {
+        $delete_movie_sql = 'DELETE FROM ' . $mysql_table_ml . ' WHERE ';
+        $i = 0;
+        foreach ($to_remove as $key => $val) {
+            $delete_movie_sql.= ($i > 0 ? ' OR ' : '') . 'title = "' . addslashes($val) . '"';
+            $i++;
+            if (file_exists('cache/' . $key . '.jpg')) {
+                unlink('cache/' . $key . '.jpg');
+            }
+            if (file_exists('cache/' . $key . '_f.jpg')) {
+                unlink('cache/' . $key . '_f.jpg');
+            }
+        }
         mysql_select_db($mysql_ml[4]);
         mysql_query($delete_movie_sql);
-        if (file_exists('cache/' . $key . '.jpg')) {
-            unlink('cache/' . $key . '.jpg');
-        }
     }
 
     // Set movie to add
@@ -385,22 +469,7 @@ function import_xml($col, $mysql_ml, $mysql_table_ml, $lang) {
     }
     
     // Add new movies
-    // Select from movie table
-    foreach ($to_add as $key => $val) {
-        
-        $movie = $xml_movie[$key];
-
-        // Insert to MovieLib table
-        $genre = array();
-        foreach ($movie->genre as $genre_val) {
-            $genre[] = (string) $genre_val;
-        }
-        
-        $country = array();
-        foreach ($movie->country as $country_val) {
-            $country[] = (string) $country_val;
-        }
-        
+    if (count($to_add) > 0) {
         $insert_xml_sql = 'INSERT INTO `' . $mysql_table_ml . '` (
             `title`,
             `plot`,
@@ -423,29 +492,49 @@ function import_xml($col, $mysql_ml, $mysql_table_ml, $lang) {
             `play_count`,
             `last_played`,
             `date_added`
-      ) VALUES (
-            "' . addslashes($movie->title) . '",
-            "' . addslashes($movie->plot) . '",
-            "' . addslashes($movie->rating) . '",
-            "' . addslashes($movie->year) . '",
-            "' . addslashes($movie->thumb) . '",
-            "' . addslashes($movie->fanart->thumb) . '",
-            "' . addslashes($movie->runtime) . '",
-            "' . addslashes(implode(' / ', $genre)) . '",
-            "' . addslashes($movie->director) . '",
-            "' . addslashes($movie->originaltitle) . '",
-            "' . addslashes(implode(' / ', $country)) . '",
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL,
-            NULL, '
-            . ($movie->playcount == 0 ? 'NULL,' : '"' . $movie->playcount . '",')
-            . ($movie->lastplayed == '1601-01-01' ? 'NULL,' : '"' . $movie->lastplayed . '", ') . '
-            "' . $movie->dateadded . '"
-      )';
+            ) VALUES ';
+        $i = 0;
+        foreach ($to_add as $key => $val) {
+            $insert_xml_sql.= ($i > 0 ? ', ' : '');
+            $i++;
+            
+            $movie = $xml_movie[$key];
+
+            $genre = array();
+            foreach ($movie->genre as $genre_val) {
+                $genre[] = (string) $genre_val;
+            }
+
+            $country = array();
+            foreach ($movie->country as $country_val) {
+                $country[] = (string) $country_val;
+            }
+
+            $insert_xml_sql.='(
+                "' . addslashes($movie->title) . '",
+                "' . addslashes($movie->plot) . '",
+                "' . addslashes($movie->rating) . '",
+                "' . addslashes($movie->year) . '",
+                "' . addslashes($movie->thumb) . '",
+                "' . addslashes($movie->fanart->thumb) . '",
+                "' . addslashes($movie->runtime) . '",
+                "' . addslashes(implode(' / ', $genre)) . '",
+                "' . addslashes($movie->director) . '",
+                "' . addslashes($movie->originaltitle) . '",
+                "' . addslashes(implode(' / ', $country)) . '",
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL,
+                NULL, '
+                . ($movie->playcount == 0 ? 'NULL,' : '"' . $movie->playcount . '",')
+                . ($movie->lastplayed == '1601-01-01' ? 'NULL,' : '"' . $movie->lastplayed . '", ') . '
+                "' . $movie->dateadded . '"
+          )';
+            
+        }
         mysql_select_db($mysql_ml[4]);
         mysql_query('SET CHARACTER SET utf8');
         mysql_query('SET NAMES utf8');
@@ -455,6 +544,8 @@ function import_xml($col, $mysql_ml, $mysql_table_ml, $lang) {
             exit;
         }
     }
+
+    // create info panel data
     $added = count($to_add);
     $removed = count($to_remove);
     if ($added == 0 && $removed == 0) {
@@ -463,7 +554,7 @@ function import_xml($col, $mysql_ml, $mysql_table_ml, $lang) {
         $output = $lang['f_synchronized'] . '<br />' . $lang['f_added'] . ': ' . $added . ' ' . $lang['f_movies'] . '<br />' . $lang['f_removed'] . ': ' . $removed . ' ' . $lang['f_movies'] . '<br />';
         
     }
-    rename('import/videodb.xml', 'import/videodb.bak');
+    unlink('import/videodb.xml');
     return $output;
 }
 
