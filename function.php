@@ -365,7 +365,7 @@ function sync_database($col, $mysql_ml, $set, $mysql_table_ml, $lang) {
                 "' . $val['year'] . '",
                 "' . addslashes($poster_url) . '",
                 "' . addslashes($fanart_url) . '", '
-                . ($val['runtime'] == 0 ? '"' . round($movie_data_stream_v[$key]['iVideoDuration'] / 60, 0) . '", ' : '"' . $val['runtime'] . '", ') . '
+                . ($val['runtime'] == 0 ? '"' . round($movie_data_stream_v[$key]['iVideoDuration'] / 60, 0) . '", ' : '"' . round($val['runtime'] / 60, 0) . '", ') . '
                 "' . addslashes($val['genre']) . '",
                 "' . addslashes($val['director']) . '",
                 "' . addslashes($val['originaltitle']) . '",
