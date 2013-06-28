@@ -30,7 +30,7 @@ if ($set['protect_site'] == 1) {
  * # CHECK XBMC DATABASE #
  */#######################
 if (!isset($_COOKIE['sync']) && $set['mode'] == 1) {
-    $fp = fsockopen($set['mysql_host_xbmc'], $set['mysql_port_xbmc'], $errno, $errstr, 3);
+    $fp = @fsockopen($set['mysql_host_xbmc'], $set['mysql_port_xbmc'], $errno, $errstr, 3);
     if ($fp) {
         fclose($fp);
         connect_xbmc($set);

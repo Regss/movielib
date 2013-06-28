@@ -11,7 +11,7 @@ function connect($mysql_ml) {
     if (!$conn_ml) {
         die(mysql_error());
     }
-    $sel_ml = mysql_select_db($mysql_ml[4]);
+    $sel_ml = @mysql_select_db($mysql_ml[4]);
     if (!$sel_ml) {
         die(mysql_error());
     }
@@ -29,7 +29,7 @@ function connect_xbmc($set) {
     if (!$conn_xbmc) {
         die(mysql_error());
     }
-    $sel_xbmc = mysql_select_db($set['mysql_database_xbmc']);
+    $sel_xbmc = @mysql_select_db($set['mysql_database_xbmc']);
     if (!$sel_xbmc) {
         die(mysql_error());
     }
