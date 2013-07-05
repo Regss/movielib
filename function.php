@@ -362,7 +362,7 @@ function sync_database($col, $mysql_ml, $set, $mysql_table_ml, $lang) {
             if ($val['runtime'] == 0 && isset($movie_data_stream_v[$key])) {
                 $runtime = round($movie_data_stream_v[$key]['iVideoDuration'] / 60, 0);
             } else {
-                $runtime = $val['runtime'];
+                $runtime = round($val['runtime']) / 60;
             }
 
             $insert_sql.= '(
