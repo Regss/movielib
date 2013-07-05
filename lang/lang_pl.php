@@ -11,6 +11,7 @@ $lang['i_title']                        =   'Tytuł';
 $lang['i_year']                         =   'Rok';
 $lang['i_rating']                       =   'Ocena';
 $lang['i_added']                        =   'Ostatnio Dodane';
+$lang['i_last_played']                  =   'Ostatnio Oglądane';
 $lang['i_all']                          =   'Wszystkie';
 $lang['i_page']                         =   'Strona';
 $lang['i_genre']                        =   'Gatunek';

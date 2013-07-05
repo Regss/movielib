@@ -358,6 +358,13 @@ function sync_database($col, $mysql_ml, $set, $mysql_table_ml, $lang) {
             preg_match_all('/>(http:[^<]+)</', $val['fanart'], $fanart_path);
             $fanart_url =  (isset($fanart_path[1][0]) ? $fanart_path[1][0] : '');
 
+            // Get runtime
+            if ($val['runtime'] == 0 && isset($movie_data_stream_v[$key])) {
+                $runtime = round($movie_data_stream_v[$key]['iVideoDuration'] / 60, 0);
+            } else {
+                $runtime = $val['runtime'];
+            }
+
             $insert_sql.= '(
                 "' . addslashes($val['title']) . '",
                 "' . addslashes($val['plot']) . '",
@@ -365,7 +372,7 @@ function sync_database($col, $mysql_ml, $set, $mysql_table_ml, $lang) {
                 "' . $val['year'] . '",
                 "' . addslashes($poster_url) . '",
                 "' . addslashes($fanart_url) . '", '
-                . ($val['runtime'] == 0 ? '"' . round($movie_data_stream_v[$key]['iVideoDuration'] / 60, 0) . '", ' : '"' . round($val['runtime'] / 60, 0) . '", ') . '
+                . $runtime . ',
                 "' . addslashes($val['genre']) . '",
                 "' . addslashes($val['director']) . '",
                 "' . addslashes($val['originaltitle']) . '",

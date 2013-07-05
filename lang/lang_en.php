@@ -11,6 +11,7 @@ $lang['i_title']                        =   'Title';
 $lang['i_year']                         =   'Year';
 $lang['i_rating']                       =   'Rating';
 $lang['i_added']                        =   'Added';
+$lang['i_last_played']                  =   'Last Played';
 $lang['i_all']                          =   'All';
 $lang['i_page']                         =   'Page';
 $lang['i_genre']                        =   'Genre';

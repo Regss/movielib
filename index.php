@@ -166,12 +166,12 @@ $output_genre_menu.= '</ul>';
 /* ########
  * # SORT #
  */########
-$sort_array = array(1 => $lang['i_title'], $lang['i_year'], $lang['i_rating'], $lang['i_added'], $lang['i_runtime']);
+$sort_array = array(1 => $lang['i_title'], $lang['i_year'], $lang['i_rating'], $lang['i_added'], $lang['i_runtime'], $lang['i_last_played']);
 $output_sort_menu = '<span class="bold">' . $lang['i_sort'] . ':</span>';
 foreach ($sort_array as $key => $val) {
     $output_sort_menu.= ($sort == $key ? ' <span>' . $val . '</span> ' : ' <a href="index.php?sort=' . $key . '&amp;genre=' . $genre . '">' . $val . '</a> ');
 }
-$sort_mysql = array(1 => 'title ASC', 'year DESC', 'rating DESC', 'date_added DESC', ' CAST( runtime AS DECIMAL( 10, 2 ) ) DESC');
+$sort_mysql = array(1 => 'title ASC', 'year DESC', 'rating DESC', 'date_added DESC', ' CAST( runtime AS DECIMAL( 10, 2 ) ) DESC', 'last_played DESC');
 
 /* ##########
  * # SEARCH #
