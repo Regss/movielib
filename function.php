@@ -70,8 +70,13 @@ function create_table($mysql_table, $lang) {
     
     $output_create_table = '';
     
+    // drop tables
+    mysql_query('DROP TABLE `' . $mysql_table[0] . '`');
+    mysql_query('DROP TABLE `' . $mysql_table[1] . '`');
+    mysql_query('DROP TABLE `' . $mysql_table[2] . '`');
+    
     // table movie
-    $create_movies_sql = 'CREATE TABLE IF NOT EXISTS `' . $mysql_table[0] . '` (
+    $create_movies_sql = 'CREATE TABLE `' . $mysql_table[0] . '` (
                 `id` int(11) NOT NULL AUTO_INCREMENT,
                 `file` int(11) NOT NULL,
                 `title` varchar(100),
@@ -102,7 +107,7 @@ function create_table($mysql_table, $lang) {
     }
     
     // table config
-    $create_config_sql = 'CREATE TABLE IF NOT EXISTS `' . $mysql_table[1] . '` (
+    $create_config_sql = 'CREATE TABLE `' . $mysql_table[1] . '` (
                 `mode` int(1) DEFAULT 0,
                 `site_name` varchar(30) DEFAULT "MovieLib",
                 `language` varchar(15) DEFAULT "' . $_SESSION['install_lang'] . '",
@@ -134,7 +139,7 @@ function create_table($mysql_table, $lang) {
     }
     
     // table users
-    $create_users_sql = 'CREATE TABLE IF NOT EXISTS `' . $mysql_table[2] . '` (
+    $create_users_sql = 'CREATE TABLE `' . $mysql_table[2] . '` (
                 `id` int(2) NOT NULL AUTO_INCREMENT,
                 `login` varchar(5) DEFAULT NULL,
                 `password` varchar(32) DEFAULT NULL,
@@ -351,11 +356,11 @@ function sync_database($col, $mysql_ml, $set, $mysql_table_ml, $lang) {
             $i++;
             
             // Get poster URL
-            preg_match_all('/>(http:[^<]+)</', $val['poster'], $poster_path);
+            preg_match_all('/<thumb[^>]+>([^<]+)</', $val['poster'], $poster_path);
             $poster_url =  (isset($poster_path[1][0]) ? $poster_path[1][0] : '');
 
             // Get fanart URL
-            preg_match_all('/>(http:[^<]+)</', $val['fanart'], $fanart_path);
+            preg_match_all('/<thumb[^>]+>([^<]+)</', $val['fanart'], $fanart_path);
             $fanart_url =  (isset($fanart_path[1][0]) ? $fanart_path[1][0] : '');
 
             // Get runtime
@@ -394,13 +399,13 @@ function sync_database($col, $mysql_ml, $set, $mysql_table_ml, $lang) {
         mysql_query('SET CHARACTER SET utf8');
         mysql_query('SET NAMES utf8');
         $insert = mysql_query($insert_sql);
-        
+
         if (!$insert) {
-            echo '<br />' . $lang['f_synch_error'] . ': ' . mysql_error($conn_ml);
+            echo '<br />' . $lang['f_synch_error'] . ': ' . mysql_error();
             exit;
         }
     }
-    
+
     // create info panel data
     $added = count($to_add);
     $removed = count($to_remove);
