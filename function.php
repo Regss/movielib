@@ -78,7 +78,7 @@ function create_table($mysql_table, $lang) {
     // table movie
     $create_movies_sql = 'CREATE TABLE `' . $mysql_table[0] . '` (
                 `id` int(11) NOT NULL AUTO_INCREMENT,
-                `file` int(11) NOT NULL,
+                `file` int(11) DEFAULT NULL,
                 `title` varchar(100),
                 `plot` text,
                 `rating` text,
@@ -328,6 +328,7 @@ function sync_database($col, $mysql_ml, $set, $mysql_table_ml, $lang) {
         // Insert to MovieLib table
         connect($mysql_ml);
         $insert_sql = 'INSERT INTO `' . $mysql_table_ml . '` (
+            `file`,
             `title`,
             `plot`,
             `rating`,
@@ -370,7 +371,8 @@ function sync_database($col, $mysql_ml, $set, $mysql_table_ml, $lang) {
                 $runtime = round($val['runtime']) / 60;
             }
 
-            $insert_sql.= '(
+            $insert_sql.= '('
+                 . $key . ',
                 "' . addslashes($val['title']) . '",
                 "' . addslashes($val['plot']) . '",
                 "' . $val['rating'] . '",
