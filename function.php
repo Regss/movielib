@@ -317,14 +317,6 @@ function sync_database($col, $mysql_ml, $set, $mysql_table_ml, $lang) {
             );
         }
 
-        // Get poster URL
-        preg_match_all('/>(http:[^<]+)</', $movie[$col['poster']], $poster_path);
-        $poster_url =  (isset($poster_path[1][0]) ? $poster_path[1][0] : '');
-
-        // Get fanart URL
-        preg_match_all('/>(http:[^<]+)</', $movie[$col['fanart']], $fanart_path);
-        $fanart_url =  (isset($fanart_path[1][0]) ? $fanart_path[1][0] : '');
-
         // Insert to MovieLib table
         connect($mysql_ml);
         $insert_sql = 'INSERT INTO `' . $mysql_table_ml . '` (
@@ -357,11 +349,11 @@ function sync_database($col, $mysql_ml, $set, $mysql_table_ml, $lang) {
             $i++;
             
             // Get poster URL
-            preg_match_all('/<thumb[^>]+>([^<]+)</', $val['poster'], $poster_path);
+            preg_match_all('/<thum[^>]+>([^<]+)</', $val['poster'], $poster_path);
             $poster_url =  (isset($poster_path[1][0]) ? $poster_path[1][0] : '');
 
             // Get fanart URL
-            preg_match_all('/<thumb[^>]+>([^<]+)</', $val['fanart'], $fanart_path);
+            preg_match_all('/<thum[^>]+>([^<]+)</', $val['fanart'], $fanart_path);
             $fanart_url =  (isset($fanart_path[1][0]) ? $fanart_path[1][0] : '');
 
             // Get runtime
