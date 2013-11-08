@@ -13,7 +13,7 @@ if (file_exists('install.php') or !file_exists('db.php')) {
 connect($mysql_ml);
 
 // get settings from db
-$set = get_settings($mysql_ml, $mysql_tables, $settings_name);
+$set = get_settings($mysql_ml, $mysql_tables);
 require_once 'lang/lang_' . $set['language'] . '.php';
 
 /* ##################
@@ -25,30 +25,6 @@ if ($set['protect_site'] == 1) {
         die();
     }
 }
-
-/* #######################
- * # CHECK XBMC DATABASE #
- */#######################
-if (!isset($_COOKIE['sync']) && $set['mode'] == 1) {
-    $fp = @fsockopen($set['mysql_host_xbmc'], $set['mysql_port_xbmc'], $errno, $errstr, 3);
-    if ($fp) {
-        fclose($fp);
-        connect_xbmc($set);
-        $output_panel_info.= sync_database($col, $mysql_ml, $set, $mysql_tables[0], $lang);
-    }
-}
-
-/* ##########################
- * # CHECK FILE videodb.xml #
- */##########################
-if (file_exists('import/videodb.xml') && $set['mode'] == 0) {
-    $output_panel_info.= import_xml($col, $mysql_ml, $mysql_tables[0], $lang);
-}
-
-/* ################################
- * # CONNECT TO MOVIELIB DATABASE #
- */################################
-connect($mysql_ml);
 
 /* #############
  * # TOP PANEL #
@@ -274,13 +250,17 @@ while ($list = mysql_fetch_array($list_result)) {
         $watched = '<img class="watched" src="css/' . $set['theme'] . '/img/watched.png" alt="" title="' . $lang['i_last_played'] . ': ' . $list['last_played'] . '">';
     }
     
+	// filmweb ID
+	$match_id = preg_match('/[^\/]+\/[^\/]+\/[^\/]+\/[^\/]+\/([0-9]+)\//', $list['poster'], $filmweb_id);
+	
+	
     $output_panel_list.= '
 <div id="' . $list['id'] . '" class="movie">
     <div class="title">' . $list['title'] . '</div>
     <div class="title_org">' . $list['originaltitle'] . '</div>'
     . $watched 
     . $flag_hd . '
-    <img id="poster_movie_' . $list['id'] . '" class="poster" src="' . $poster . '">
+    <a href="http://www.filmweb.pl/Film?id=' . $filmweb_id[1] . '" target="_bank"><img id="poster_movie_' . $list['id'] . '" class="poster" src="' . $poster . '"></a>
     <div class="flags">
         <table id="movie_info">
             <tr>
@@ -318,12 +298,6 @@ while ($list = mysql_fetch_array($list_result)) {
 </div>';
 }
 
-/* ##############
- * # INFO PANEL #
- */##############
-if ($output_panel_info !== '') {
-    $output_panel_info = '<div id="panel_info">' . $output_panel_info . '</div>';
-}
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -338,7 +312,6 @@ if ($output_panel_info !== '') {
     </head>
     <body>
         <img src="css/<?PHP echo $set['theme'] ?>/img/bg.jpg" id="background" alt="<?PHP echo ($set['show_fanart'] == 1 ? '1' : '') ?>">
-        <?PHP echo $output_panel_info ?>
         <div id="container">
             <?PHP echo $output_panel_top . $output_panel_top_title ?>
             <div id="panel_left">
@@ -355,7 +328,7 @@ if ($output_panel_info !== '') {
             </div>
         </div>
         <div id="panel_bottom">
-            <a href="http://github.com/Regss/movielib">MovieLib</a> v. 0.9.1 - Created by <a href="mailto:regss84@gmail.com">Regss</a>
+            <a href="http://github.com/Regss/movielib">MovieLib</a> v. 2.0.0 - Created by <a href="mailto:regss84@gmail.com">Regss</a>
         </div>
     </body>
 </html>

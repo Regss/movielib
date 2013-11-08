@@ -115,6 +115,7 @@ $lang['a_user_pass_n_match']            =   'Hasło użytkowika nie zgadza się'
 $lang['a_admin_pass_changed']           =   'Hasło administratora zmienione';
 $lang['a_admin_pass_min']               =   'Hasło administratora musi składać się z conajmniej 4 znaków';
 $lang['a_admin_pass_n_match']           =   'Hasło administratora nie zgadza się';
+$lang['a_token_change']                 =   'Zmień';
 $lang['a_html_main_site']               =   'Strona Główna';
 $lang['a_html_movie_list']              =   'Lista Filmów';
 $lang['a_html_upload_xml']              =   'Wgraj XML';
@@ -123,6 +124,7 @@ $lang['a_html_check_conn']              =   'Sprawdź połączenie XBMC';
 $lang['a_html_cache']                   =   'Zarządzaj Cache';
 $lang['a_html_settings']                =   'Ustawienia';
 $lang['a_html_change_password']         =   'Zmień Hasło';
+$lang['a_html_change_token']            =   'Token';
 $lang['a_html_logout']                  =   'Wyloguj';
 
 /* ###############

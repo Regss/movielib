@@ -1,24 +1,12 @@
-The script displays movie library contained in XBMC. It has the ability to synchronize all content with XBMC database, or use the exported xml files to have library up to date. 
+The script displays movie library contained in XBMC. It has the ability to synchronize all content with XBMC database.
 
 Requirements:
-- XBMC with MySQL database
 - Server with Apache and MySql 5
+- Add-on "Movielib" for XBMC https://raw.github.com/Regss/xbmc-regss-repository/master/repo/repository.regss/repository.regss-1.2.1.zip 
 
 Default passwords:
 Access to site: user
 Access to admin panel: admin
 
-v. 0.9.1
-- Better and faster sync with XBMC database
-- Fixed some bugs
-
-v. 0.9.0
-- Automatically create cache for posters while browsing the site
-- View fanarts
-- Secure password content
-- Import from file videodb.xml
-- Synchronization with XBMC database (only MySQL)
-- Easy to change the appearance using skins
-- Information movie parameters
-- Status of the watched films
-- PA: cache management
+v. 2.0.0
+- init new version

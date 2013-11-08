@@ -202,8 +202,8 @@ a:active {
 }
 .watched {
     position: absolute;
-    padding-left: 104px;
-    padding-top: 162px;
+    margin-left: 104px;
+    margin-top: 162px;
     display: block;
 }
 #vres, #vtype, #atype, #achan {

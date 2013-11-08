@@ -26,7 +26,7 @@ $(document).ready(function() {
 
     // hide info panel
     $('#panel_info').delay(4000).fadeOut(4000);
-
+    
     // show panels in loop
     $(function() {
         var timeout = $('#panel_top').attr('class');

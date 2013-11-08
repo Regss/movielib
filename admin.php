@@ -3,13 +3,6 @@ session_start();
 require_once 'config.php';
 require_once 'function.php';
 
-// connect to database
-connect($mysql_ml);
-
-// get settings from db
-$set = get_settings($mysql_ml, $mysql_tables, $settings_name);
-require_once 'lang/lang_' . $set['language'] . '.php';
-
 if (isset($_GET['option']) && $_GET['option'] == 'delete_install') {
     unlink('install.php');
     header('Location:admin.php');
@@ -21,7 +14,88 @@ if (file_exists('install.php') or !file_exists('db.php')) {
     die();
 }
 
-// Check admin password
+// connect to database
+connect($mysql_ml);
+
+// get settings from db
+$set = get_settings($mysql_ml, $mysql_tables);
+require_once 'lang/lang_' . $set['language'] . '.php';
+
+/* #################
+ * # SYNC DATABASE #
+ */#################
+
+# CHECK TOKEN
+if (isset($_GET['option']) && $_GET['option'] == 'checktoken') {
+    if ($set['token'] == $_GET['token']) {
+        echo 'true';
+    } else {
+        echo 'false';
+    }
+    die();
+}
+ 
+# SHOW MOVIE ID FROM DATABASE
+if (isset($_GET['option']) && $_GET['option'] == 'showid' && $_GET['token'] == $set['token']) {
+    $sql = 'SELECT id FROM movies';
+    $sql_res = mysql_query($sql);
+    while ($id = mysql_fetch_array($sql_res)) {
+        echo $id[0] . ' ';
+    }
+    die();
+}
+
+# SYNC MOVIE
+if (isset($_GET['option']) && $_GET['option'] == 'addmovie' && $_GET['token'] == $set['token']) {
+    sync_add($mysql_ml, $mysql_tables);
+    die();
+}
+if (isset($_GET['option']) && $_GET['option'] == 'removemovie' && $_GET['token'] == $set['token']) {
+    sync_remove($mysql_ml, $mysql_tables);
+    die();
+}
+
+# SHOW MOVIE WATCHED ID FROM DATABASE
+if (isset($_GET['option']) && $_GET['option'] == 'showwatchedid' && $_GET['token'] == $set['token']) {
+    $sql = 'SELECT id FROM movies WHERE play_count > 0';
+    $sql_res = mysql_query($sql);
+    while ($id = mysql_fetch_array($sql_res)) {
+        echo $id[0] . ' ';
+    }
+    die();
+}
+
+# SYNC WATCHED
+if (isset($_GET['option']) && $_GET['option'] == 'watchedmovie' && $_GET['token'] == $set['token']) {
+    sync_watched($mysql_ml, $mysql_tables);
+    die();
+}
+
+# SYNC UNWATCHED
+if (isset($_GET['option']) && $_GET['option'] == 'unwatchedmovie' && $_GET['token'] == $set['token']) {
+    sync_unwatched($mysql_ml, $mysql_tables);
+    die();
+}
+
+# SHOW LASTPLAYED MOVIE ID
+if (isset($_GET['option']) && $_GET['option'] == 'showlastplayed' && $_GET['token'] == $set['token']) {
+    $sql = 'SELECT last_played FROM movies ORDER BY last_played DESC LIMIT 0 , 1';
+    $sql_res = mysql_query($sql);
+    while ($date = mysql_fetch_array($sql_res)) {
+        echo $date[0] . ' ';
+    }
+    die();
+}
+
+# SYNC LASTPLAYED
+if (isset($_GET['option']) && $_GET['option'] == 'lastplayed' && $_GET['token'] == $set['token']) {
+    sync_lastplayed($mysql_ml, $mysql_tables);
+    die();
+}
+
+/* ######################
+ * CHECK ADMIN PASSWORD #
+ */######################
 if ($_SESSION['logged_admin'] !== true) {
     header('Location:login.php?login=admin');
     die();
@@ -105,113 +179,6 @@ if (isset($_GET['option']) && $_GET['option'] == 'list') {
     $output_panel.= '</table>';
 }
 
-/* ##########
- * # UPLOAD #
- */##########
-if (isset($_GET['option']) && $_GET['option'] == 'upload') {
-    $output_panel.= $lang['a_server_size'] . ':<br /> upload_max_filesize: ' . ini_get('upload_max_filesize') . '<br />post_max_size' . ': ' . ini_get('post_max_size');
-    $output_panel.= '<br /><br />' . $lang['a_select_xml_file'] . '<br /><br /><form action="admin.php?option=upload" method="post" enctype="multipart/form-data">
-                        <input type="file" name="file_xml"><br /><br />
-                        <input type="submit" name="submit" value="' . $lang['a_submit_upload'] . '">
-                    </form>';
-    if (isset($_FILES['file_xml'])) {
-        if (is_uploaded_file($_FILES['file_xml']['tmp_name'])) {
-            move_uploaded_file($_FILES['file_xml']['tmp_name'], 'import/' . $_FILES['file_xml']['name']);
-            $output_panel_info.= $lang['a_uploaded'];
-        }
-        if ($_FILES['file_xml']['error'] > 0) {
-            $output_panel_info.= $lang['a_upload_error'];
-        }
-    }
-}
-
-/* ############
- * # SYNC NOW #
- */############
-$link_sync_now = '';
-if ($set['mode'] == 1) {
-    $link_sync_now = '<a class="admin_menu_box" href="admin.php?option=sync_now">' . $lang['a_html_sync_now'] . '</a>';
-}
-if (isset($_GET['option']) && $_GET['option'] == 'sync_now') {
-    setcookie('sync', false);
-}
-
-/* ##############
- * # CHECK CONN #
- */##############
-$link_check_conn = '';
-if ($set['mode'] == 1) {
-    $link_check_conn = '<a class="admin_menu_box" href="admin.php?option=check_conn">' . $lang['a_html_check_conn'] . '</a>';
-}
-if (isset($_GET['option']) && $_GET['option'] == 'check_conn') {
-    $fp = fsockopen($set['mysql_host_xbmc'], $set['mysql_port_xbmc'], $errno, $errstr, 3);
-    if ($fp) {
-        fclose($fp);
-        connect_xbmc($set);
-        $connected_sql = 'SELECT ' . $col['id_movie'] . ' FROM movie';
-        $connected_result = mysql_query($connected_sql);
-        $rows = mysql_num_rows($connected_result);
-        $output_panel.= $lang['a_connected'] . '.<br />' . $lang['a_found'] . ': <span class="des">' . $rows . '</span>';
-    }
-}
-connect($mysql_ml);
-
-/* #########
- * # CACHE #
- */#########
-if (isset($_GET['option']) && $_GET['option'] == 'cache') {
-    $output_panel.= '
-        <table id="admin_table_movie">
-            <tr><td>' . $lang['a_create_cache_info'] . '</td><td><a class="admin_menu_box" href="admin.php?option=create_cache">' . $lang['a_create_cache'] . '</a></td></tr>
-            <tr><td>' . $lang['a_rebuild_cache_info'] . '</td><td><a class="admin_menu_box" href="admin.php?option=rebuild_cache">' . $lang['a_rebuild_cache'] . '</a></td></tr>
-        </table>';
-}
-
-// Create cache
-if (isset($_GET['option']) && $_GET['option'] == 'create_cache') {
-    
-    if (!isset($_SESSION['id_to_create'])) {
-        $list_sql = 'SELECT id, poster FROM ' . $mysql_tables[0];
-        $list_result = mysql_query($list_sql);
-        while ($list = mysql_fetch_array($list_result)) {
-            if (!file_exists('cache/' . $list['id'] . '.jpg')) {
-                $id_to_create[] = $list['id'];
-            }
-        }
-        $_SESSION['id_to_create'] = $id_to_create;
-        header('Location:admin.php?option=create_cache');
-    }
-    
-    if (isset($_SESSION['id_to_create']) && count($_SESSION['id_to_create']) > 0) {
-        foreach ($_SESSION['id_to_create'] as $key => $id) {
-            $list_sql = 'SELECT id, poster FROM ' . $mysql_tables[0] . ' WHERE id = ' . $id;
-            $list_result = mysql_query($list_sql);
-            while ($list = mysql_fetch_array($list_result)) {
-                gd_convert('cache/' . $list['id'] . '.jpg', $list['poster'], 140, 198);
-                unset($_SESSION['id_to_create'][$key]);
-                header('Location:admin.php?option=create_cache');
-            }
-        }
-    } else {
-        unset($_SESSION['id_to_create']);
-        $output_panel_info.= $lang['a_cache_created'];
-    } 
-} else {
-    unset($_SESSION['id_to_create']);
-}
-
-// Rebuild cache
-if (isset($_GET['option']) && $_GET['option'] == 'rebuild_cache') {
-    $dir_path = 'cache/';
-    $dir = opendir($dir_path);
-    while($file = readdir($dir)) {
-        if($file != '.' && $file != '..') {
-            unlink($dir_path.'/'.$file);
-        }
-    }
-    header('Location:admin.php?option=create_cache');
-}
-
 /* ############
  * # SETTINGS #
  */############
@@ -256,18 +223,16 @@ if (isset($_GET['option']) && $_GET['option'] == 'settings') {
     
     $mode = array(0, 1);
     foreach ($mode as $val) {
-            // set mode input
-            $output_mode.= ($val == 0 ? $lang['a_radio_off'] : $lang['a_radio_on']) . '<input id="mode_' . $val . '" type="radio" name="mode" value="' . $val . '"' . ($set['mode'] == $val ? ' checked="checked"' : '') . ' /> ';
-            // set panel_top input
-            $output_panel_top.= ($val == 0 ? $lang['a_radio_off'] : $lang['a_radio_on']) . '<input type="radio" name="panel_top" value="' . $val . '" ' . ($set['panel_top'] == $val ? ' checked="checked"' : '') . ' /> ';
-            // set wached status input
-            $output_watched_status.= ($val == 0 ? $lang['a_radio_off'] : $lang['a_radio_on']) . '<input type="radio" name="watched_status" value="' . $val . '" ' . ($set['watched_status'] == $val ? ' checked="checked"' : '') . ' /> ';
-            // set overall panel input
-            $output_overall_panel.= ($val == 0 ? $lang['a_radio_off'] : $lang['a_radio_on']) . '<input type="radio" name="overall_panel" value="' . $val . '" ' . ($set['overall_panel'] == $val ? ' checked="checked"' : '') . ' /> ';
-            // set show fanart input
-            $output_show_fanart.= ($val == 0 ? $lang['a_radio_off'] : $lang['a_radio_on']) . '<input type="radio" name="show_fanart" value="' . $val . '" ' . ($set['show_fanart'] == $val ? ' checked="checked"' : '') . ' /> ';
-            // set protect site input
-            $output_protect_site.= ($val == 0 ? $lang['a_radio_off'] : $lang['a_radio_on']) . '<input type="radio" name="protect_site" value="' . $val . '" ' . ($set['protect_site'] == $val ? ' checked="checked"' : '') . ' /> ';
+        // set panel_top input
+        $output_panel_top.= ($val == 0 ? $lang['a_radio_off'] : $lang['a_radio_on']) . '<input type="radio" name="panel_top" value="' . $val . '" ' . ($set['panel_top'] == $val ? ' checked="checked"' : '') . ' /> ';
+        // set wached status input
+        $output_watched_status.= ($val == 0 ? $lang['a_radio_off'] : $lang['a_radio_on']) . '<input type="radio" name="watched_status" value="' . $val . '" ' . ($set['watched_status'] == $val ? ' checked="checked"' : '') . ' /> ';
+        // set overall panel input
+        $output_overall_panel.= ($val == 0 ? $lang['a_radio_off'] : $lang['a_radio_on']) . '<input type="radio" name="overall_panel" value="' . $val . '" ' . ($set['overall_panel'] == $val ? ' checked="checked"' : '') . ' /> ';
+        // set show fanart input
+        $output_show_fanart.= ($val == 0 ? $lang['a_radio_off'] : $lang['a_radio_on']) . '<input type="radio" name="show_fanart" value="' . $val . '" ' . ($set['show_fanart'] == $val ? ' checked="checked"' : '') . ' /> ';
+        // set protect site input
+        $output_protect_site.= ($val == 0 ? $lang['a_radio_off'] : $lang['a_radio_on']) . '<input type="radio" name="protect_site" value="' . $val . '" ' . ($set['protect_site'] == $val ? ' checked="checked"' : '') . ' /> ';
     }
     
     $quantity = array(5, 10, 20, 50, 100);
@@ -297,20 +262,13 @@ if (isset($_GET['option']) && $_GET['option'] == 'settings') {
                 <tr><td>' . $lang['a_watched_status'] . ':</td><td>' . $output_watched_status . '</td></tr>
                 <tr><td>' . $lang['a_overall_panel'] . ':</td><td>' . $output_overall_panel . '</td></tr>
                 <tr><td>' . $lang['a_show_fanart'] . ':</td><td>' . $output_show_fanart . '</td></tr>
-                <tr><td>' . $lang['a_protect_site']  . ':</td><td>' . $output_protect_site . '</td></tr>                <tr><td class="bold des">' . $lang['a_set_panel_top'] . '</td><td></td></tr>
+                <tr><td>' . $lang['a_protect_site']  . ':</td><td>' . $output_protect_site . '</td></tr>
+                <tr><td class="bold des">' . $lang['a_set_panel_top'] . '</td><td></td></tr>
                 <tr><td>' . $lang['a_panel_top_time'] . ':</td><td><input type="text" name="panel_top_time" value="' . $set['panel_top_time'] . '" /></td></tr>
                 <tr><td>' . $lang['a_recently_limit'] . ':</td><td>' . $output_recently_limit . '</td></tr>
                 <tr><td>' . $lang['a_random_limit'] . ':</td><td>' . $output_random_limit . '</td></tr>
                 <tr><td>' . $lang['a_last_played_limit'] . ':</td><td>' . $output_last_played_limit . '</td></tr>
                 <tr><td>' . $lang['a_top_rated_limit'] . ':</td><td>' . $output_top_rated_limit . '</td></tr>
-                <tr><td class="bold des">' . $lang['a_set_sync'] . '</td><td></td></tr>
-                <tr><td>' . $lang['a_mode'] . ':</td><td>' . $output_mode . '</td></tr>
-                <tr><td>' . $lang['a_sync_time'] . ':</td><td><input class="xbmc' . ($set['mode'] == 0 ? ' disabled' : '') . '" type="text" name="sync_time" value="' . $set['sync_time'] . '" /></td></tr>
-                <tr><td>' . $lang['a_mysql_host_xbmc'] . ':</td><td><input class="xbmc' . ($set['mode'] == 0 ? ' disabled' : '') . '" type="text" name="mysql_host_xbmc" value="' . ($set['mysql_host_xbmc'] == '' ? '127.0.0.1' : $set['mysql_host_xbmc']) . '"' . ($set['mode'] == 0 ? ' disabled="disabled"' : '') . ' /></td></tr>
-                <tr><td>' . $lang['a_mysql_port_xbmc'] . ':</td><td><input class="xbmc' . ($set['mode'] == 0 ? ' disabled' : '') . '" type="text" name="mysql_port_xbmc" value="' . ($set['mysql_port_xbmc'] == '' ? '3306' : $set['mysql_port_xbmc']) . '"' . ($set['mode'] == 0 ? ' disabled="disabled"' : '') . ' /></td></tr>
-                <tr><td>' . $lang['a_mysql_login_xbmc'] . ':</td><td><input class="xbmc' . ($set['mode'] == 0 ? ' disabled' : '') . '" type="text" name="mysql_login_xbmc" value="' . ($set['mysql_login_xbmc'] == '' ? 'xbmc' : $set['mysql_login_xbmc']) . '"' . ($set['mode'] == 0 ? ' disabled="disabled"' : '') . ' /></td></tr>
-                <tr><td>' . $lang['a_mysql_pass_xbmc'] . ':</td><td><input class="xbmc' . ($set['mode'] == 0 ? ' disabled' : '') . '" type="text" name="mysql_pass_xbmc" value="' . ($set['mysql_pass_xbmc'] == '' ? 'xbmc' : $set['mysql_pass_xbmc']) . '"' . ($set['mode'] == 0 ? ' disabled="disabled"' : '') . ' /></td></tr>
-                <tr><td>' . $lang['a_mysql_database_xbmc'] . ':</td><td><input class="xbmc' . ($set['mode'] == 0 ? ' disabled' : '') . '" type="text" name="mysql_database_xbmc" value="' . ($set['mysql_database_xbmc'] == '' ? 'xbmc_video75' : $set['mysql_database_xbmc']) . '"' . ($set['mode'] == 0 ? ' disabled="disabled"' : '') . ' /></td></tr>
             </table>
                 <input type="submit" value="' . $lang['a_save'] . '" />
         </form>';
@@ -319,7 +277,6 @@ if (isset($_GET['option']) && $_GET['option'] == 'settings') {
 // Saving settings
 if (isset($_GET['option']) && $_GET['option'] === 'settings_save') {
     $settings_update_sql = 'UPDATE ' . $mysql_tables[1] . ' SET 
-        mode = "' . $_POST['mode'] . '",
         site_name = "' . $_POST['site_name'] . '",
         language = "' . $_POST['language'] . '",
         theme = "' . $_POST['theme'] . '",
@@ -328,23 +285,19 @@ if (isset($_GET['option']) && $_GET['option'] === 'settings_save') {
         random_limit = "' . $_POST['random_limit'] . '",
         last_played_limit = "' . $_POST['last_played_limit'] . '",
         top_rated_limit = "' . $_POST['top_rated_limit'] . '",
-        sync_time = ' . (isset($_POST['sync_time']) ? '"' . $_POST['sync_time'] . '"' : '"10"') . ',
         panel_top_time = "' . $_POST['panel_top_time'] . '",
         panel_top = "' . $_POST['panel_top'] . '",
         watched_status = "' . $_POST['watched_status'] . '",
         overall_panel = "' . $_POST['overall_panel'] . '",
         show_fanart = "' . $_POST['show_fanart'] . '",
-        protect_site = "' . $_POST['protect_site'] . '",
-        mysql_host_xbmc = ' . (isset($_POST['mysql_host_xbmc']) ? '"' . $_POST['mysql_host_xbmc'] . '"' : 'NULL') . ',
-        mysql_port_xbmc = ' . (isset($_POST['mysql_port_xbmc']) ? '"' . $_POST['mysql_port_xbmc'] . '"' : 'NULL') . ',
-        mysql_login_xbmc = ' . (isset($_POST['mysql_login_xbmc']) ? '"' . $_POST['mysql_login_xbmc'] . '"' : 'NULL') . ',
-        mysql_pass_xbmc = ' . (isset($_POST['mysql_pass_xbmc']) ? '"' . $_POST['mysql_pass_xbmc'] . '"' : 'NULL') . ',
-        mysql_database_xbmc = ' . (isset($_POST['mysql_database_xbmc']) ? '"' . $_POST['mysql_database_xbmc'] . '"' : 'NULL');
+        protect_site = "' . $_POST['protect_site'] . '"';
     mysql_query($settings_update_sql);
     
     // delete session var
-    foreach ($settings_name as $val) {
-        unset($_SESSION[$val]);
+    foreach ($set as $key => $val) {
+        if ($key != 'logged_admin') {
+            unset($_SESSION[$key]);
+        }
     }
     $output_panel_info = $lang['a_saved'];
 }
@@ -398,6 +351,28 @@ if (isset($_GET['option']) && $_GET['option'] === 'password_save') {
         }
     }
 }
+/* #########
+ * # TOKEN #
+ */#########
+if (isset($_GET['option']) && $_GET['option'] === 'token') {
+    if (isset($_POST['new_token'])) {
+        $token = change_token($mysql_tables);
+        $output_panel_info = 'Token changed';
+    } else {
+        $token = $set['token'];
+    }
+    $output_panel.= '
+        <table id="admin_table_movie">
+            <tr><td></td><td class="bold des"></td></tr>
+            <tr><td>Token:</td><td class="bold des">' . $token . '</td></tr>
+            <tr><td></td><td class="bold des"></td></tr>
+        </table>
+        <form action="admin.php?option=token" method="post">
+        <input type="hidden" name="new_token" />
+        <input type="submit" value="' . $lang['a_token_change'] . '" />
+        </form>
+    ';
+}
 
 /* ##############
  * # PANEL INFO #
@@ -422,12 +397,9 @@ if ($output_panel_info !== '') {
             <div id="admin_panel_left">
                 <a class="admin_menu_box" href="admin.php"><?PHP echo $lang['a_html_main_site'] ?></a>
                 <a class="admin_menu_box" href="admin.php?option=list"><?PHP echo $lang['a_html_movie_list'] ?></a>
-                <a class="admin_menu_box" href="admin.php?option=upload"><?PHP echo $lang['a_html_upload_xml'] ?></a>
-                <?PHP echo $link_sync_now ?>
-                <?PHP echo $link_check_conn ?>
-                <a class="admin_menu_box" href="admin.php?option=cache"><?PHP echo $lang['a_html_cache'] ?></a>
                 <a class="admin_menu_box" href="admin.php?option=settings"><?PHP echo $lang['a_html_settings'] ?></a>
                 <a class="admin_menu_box" href="admin.php?option=password"><?PHP echo $lang['a_html_change_password'] ?></a>
+                <a class="admin_menu_box" href="admin.php?option=token"><?PHP echo $lang['a_html_change_token'] ?></a>
                 <a class="admin_menu_box" href="login.php?login=admin_logout"><?PHP echo $lang['a_html_logout'] ?></a>
             </div>
             <div id="admin_panel_right">

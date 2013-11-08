@@ -115,6 +115,7 @@ $lang['a_user_pass_n_match']            =   'User password not match';
 $lang['a_admin_pass_changed']           =   'Admin password changed';
 $lang['a_admin_pass_min']               =   'Admin password must have minimum 4 letters';
 $lang['a_admin_pass_n_match']           =   'Admin password not match';
+$lang['a_token_change']                 =   'Change';
 $lang['a_html_main_site']               =   'Main Site';
 $lang['a_html_movie_list']              =   'Movie List';
 $lang['a_html_upload_xml']              =   'Upload XML';
@@ -123,6 +124,7 @@ $lang['a_html_check_conn']              =   'Check Connection';
 $lang['a_html_cache']                   =   'Cache';
 $lang['a_html_settings']                =   'Settings';
 $lang['a_html_change_password']         =   'Change Password';
+$lang['a_html_change_token']            =   'Token';
 $lang['a_html_logout']                  =   'Logout';
 
 /* ###############

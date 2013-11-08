@@ -6,7 +6,7 @@ require_once 'function.php';
 // connect to database
 connect($mysql_ml);
 
-$set = get_settings($mysql_ml, $mysql_tables, $settings_name);
+$set = get_settings($mysql_ml, $mysql_tables);
 require_once 'lang/lang_' . $set['language'] . '.php';
 
 if (!isset($_GET['login'])) {

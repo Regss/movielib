@@ -6,37 +6,6 @@ if (file_exists('db.php')) {
 // Tables to array
 $mysql_tables = array('movies', 'config', 'users');
 
-// Config name to array
-$settings_name = array('mode', 'site_name', 'language', 'theme', 'per_page', 'recently_limit', 'random_limit', 'last_played_limit', 'top_rated_limit', 'sync_time', 'panel_top_time', 'panel_top', 'watched_status', 'overall_panel', 'show_fanart', 'protect_site', 'mysql_host_xbmc', 'mysql_port_xbmc', 'mysql_login_xbmc', 'mysql_pass_xbmc', 'mysql_database_xbmc');
-
-// XBMC database column
-$col['id_movie']        =   'idMovie';
-$col['id_file']         =   'idFile';
-$col['title']           =   'c00';
-$col['plot']            =   'c01';
-$col['outline']         =   'c02';
-$col['tagline']         =   'c03';
-$col['votes']           =   'c04';
-$col['rating']          =   'c05';
-$col['credits']         =   'c06';
-$col['year']            =   'c07';
-$col['poster']          =   'c08';
-$col['imdb_id']         =   'c09';
-$col['title_format']    =   'c10';
-$col['runtime']         =   'c11';
-$col['mpaa']            =   'c12';
-$col['top250']          =   'c13';
-$col['genre']           =   'c14';
-$col['director']        =   'c15';
-$col['originaltitle']   =   'c16';
-$col['thumb_url']       =   'c17';
-$col['studio']          =   'c18';
-$col['trailer']         =   'c19';
-$col['fanart']          =   'c20';
-$col['country']         =   'c21';
-$col['file_path']       =   'c22';
-$col['id_path']         =   'c23';
-
 // Dir
 $dir_assoc = array('import', 'cache');
 
@@ -104,6 +73,5 @@ if (!isset($_GET['id'])) {
     $id = $_GET['id'];
     $id_mysql = $_GET['id'];
 }
-
 
 ?>

@@ -4,7 +4,7 @@ require_once ('config.php');
 require_once ('function.php');
 
 // delete session var
-foreach ($settings_name as $val) {
+foreach ($_SESSION as $val) {
     unset($_SESSION[$val]);
 }
 
