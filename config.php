@@ -1,4 +1,7 @@
 <?PHP
+
+$version = '2.1.0';
+
 if (file_exists('db.php')) {
     include_once 'db.php';
 }
@@ -7,7 +10,7 @@ if (file_exists('db.php')) {
 $mysql_tables = array('movies', 'config', 'users');
 
 // Dir
-$dir_assoc = array('import', 'cache');
+$dir_assoc = array('cache');
 
 // Output panel
 $output_panel_info = '';
@@ -51,11 +54,19 @@ $achan_assoc = array(
 
 // Set var
 $var = array(
-    'sort' => 1,
-    'genre' => 'all',
-    'search' => '',
-    'page' => 1,
-    'output' => ''
+    'id'        =>  0,
+    'sort'      =>  1,
+    'genre'     =>  'all',
+    'year'      =>  'all',
+    'country'   =>  'all',
+    'v_codec'   =>  'all',
+    'a_codec'   =>  'all',
+    'a_chan'    =>  'all',
+    'search'    =>  '',
+    'page'      =>  1,
+    'output'    =>  '',
+    'token'     =>  '',
+    'option'    =>  ''
     );
 foreach ($var as $key => $val) {
     if (isset($_GET[$key])) {
@@ -63,15 +74,6 @@ foreach ($var as $key => $val) {
     } else {
         $$key = $val;
     }
-}
-
-// Set id
-if (!isset($_GET['id'])) {
-    $id = 0;
-    $id_mysql = '%';
-} else {
-    $id = $_GET['id'];
-    $id_mysql = $_GET['id'];
 }
 
 ?>

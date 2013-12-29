@@ -18,14 +18,8 @@ $(document).ready(function() {
         });
     });
 
-    // toggle box on left panel
-    $('.panel_box_title').click(function(){
-        var id = $(this).attr('id');
-        $('#panel_'+id).slideToggle();
-    });
-
     // hide info panel
-    $('#panel_info').delay(4000).fadeOut(4000);
+    $('.panel_info').delay(4000).fadeOut(4000);
     
     // show panels in loop
     $(function() {
@@ -45,31 +39,73 @@ $(document).ready(function() {
 		$(this).val($(this).attr('title'));
 	}
     });
-    $('#mode_0').click(function(){
-        $('.xbmc').attr('disabled', 'disabled');
-        $('.xbmc').attr('class', 'xbmc disabled');
-    });
-    $('#mode_1').click(function(){
-        $('.xbmc').removeAttr('disabled');
-        $('.xbmc').attr('class', 'xbmc');
-    });
     
     // change background
     if ($('#background').attr('alt') == 1) {
         var bg = $('#background').attr('src');
+        // mouse enter
         $('.movie').mouseenter(function(){
             var movie_id = $(this).attr('id');
-            $.ajax({url: "function.js.php?id="+movie_id});
-            $('#background').fadeOut(500, function(){
-                $(this).delay(100).attr('src', 'cache/'+movie_id+'_f.jpg');
-                $(this).fadeIn(500);
+            $.ajax({url: "function.js.php?option=bg&id="+movie_id});
+            $.ajax({
+                url: 'cache/'+movie_id+'_f.jpg',
+                success: function(data){
+                    $('#background').fadeOut(500, function(){
+                        $(this).delay(100).attr('src', 'cache/'+movie_id+'_f.jpg');
+                        $(this).fadeIn(500);
+                    });
+                }
             });
         });
+        // mouse leave
         $('.movie').mouseleave(function(){
-            $('#background').fadeOut(500, function(){
-                $(this).delay(100).attr('src', bg);
-                $(this).fadeIn(500);
+            var movie_id = $(this).attr('id');
+            $.ajax({
+                url: 'cache/'+movie_id+'_f.jpg',
+                success: function(data){
+                    $('#background').fadeOut(500, function(){
+                        $(this).delay(100).attr('src', bg);
+                        $(this).fadeIn(500);
+                    });
+                }
             });
         });
     }
+    
+    // toggle panel_box
+    $('.panel_box').each(function(){
+        var opt = $(this).attr('alt');
+        if (opt == 2) {
+            var id = $(this).attr('id');
+            $('#'+id).hide();
+        }
+    });
+    $('.panel_box_title').click(function(){
+        var id = $(this).attr('id');
+        $('#panel_'+id).slideToggle();
+        var opt = $('#panel_'+id).attr('alt');
+        if (opt == 1) {
+            $('#panel_'+id).attr('alt', '2');
+            $.ajax({url: 'function.js.php?option=panel&id=panel_'+id+'&opt=2'});
+        }
+        if (opt == 2) {
+            $('#panel_'+id).attr('alt', '1');
+            $.ajax({url: 'function.js.php?option=panel&id=panel_'+id+'&opt=1'});
+        }
+    });
+    
+    // animate delete button
+    $('.delete_row').mouseenter(function(){
+        $(this).css('opacity', '.7');
+    });
+    $('.delete_row').mouseleave(function(){
+        $(this).css('opacity', '1');
+    });
+    
+    // delete movie
+    $('.delete_row').click(function(){
+        var id = $(this).attr('id');
+        $('#row_'+id).hide();
+        $.ajax({url: 'function.js.php?option=delete&id='+id});
+    });
 });

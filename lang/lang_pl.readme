@@ -1,24 +1,14 @@
-Skrypt pozwala wyświetlać bazę filmów z XBMC. Ma możliwość automatycznej synchronizacji z bazą danych XBMC lub za pomocą wyeksportowanych plików xml.
+Skrypt automatycznie synchronizuje i wyświetla zawartość biblioteki z XBMC.
 
 Wymagania:
-- XBMC z bazą danych MySQL
-- Serwer z Apache i MySql 5
+- XBMC z zainstalowanym dodatkiem "Movielib"
+- Serwer dla skryptu z PHP i MySql 5
 
 Domyślne hasła:
 Dostęp do strony: user
 Dostęp do panelu administratora: admin
 
-v. 0.9.1
-- Lepsza i szybsza synchronizacja z bazą XMBC
-- Poprawiono kilka błędów
+Repozytorium wtyczki Movielib:
+https://raw.github.com/Regss/xbmc-regss-repository/master/repo/repository.regss/repository.regss-1.2.1.zip
 
-v. 0.9.0
-- Automatyczne tworzenie cache dla okładek podczas przeglądania strony
-- Wyświetlanie fanartów
-- Zabezpieczenie treści strony hasłem
-- Import z pliku videodb.xml
-- Synchronizacja z bazą XBMC (tylko MySql)
-- Prosta zmiana wyglądu za pomocą skórek
-- Informacja o parametrach filmu
-- Status oglądanych filmów
-- PA: zarządzanie cache
+W Panelu Admina należy wygenerować token i wpisać go w opcjach wtyczki podając również adres skryptu.

@@ -3,13 +3,13 @@ session_start();
 require_once 'config.php';
 require_once 'function.php';
 
-if (isset($_GET['option']) && $_GET['option'] == 'delete_install') {
+if ($option == 'delete_install') {
     unlink('install.php');
     header('Location:admin.php');
     die();
 }
 
-if (file_exists('install.php') or !file_exists('db.php')) {
+if (!file_exists('db.php')) {
     header('Location:install.php');
     die();
 }
@@ -21,76 +21,9 @@ connect($mysql_ml);
 $set = get_settings($mysql_ml, $mysql_tables);
 require_once 'lang/lang_' . $set['language'] . '.php';
 
-/* #################
- * # SYNC DATABASE #
- */#################
-
-# CHECK TOKEN
-if (isset($_GET['option']) && $_GET['option'] == 'checktoken') {
-    if ($set['token'] == $_GET['token']) {
-        echo 'true';
-    } else {
-        echo 'false';
-    }
-    die();
-}
- 
-# SHOW MOVIE ID FROM DATABASE
-if (isset($_GET['option']) && $_GET['option'] == 'showid' && $_GET['token'] == $set['token']) {
-    $sql = 'SELECT id FROM movies';
-    $sql_res = mysql_query($sql);
-    while ($id = mysql_fetch_array($sql_res)) {
-        echo $id[0] . ' ';
-    }
-    die();
-}
-
-# SYNC MOVIE
-if (isset($_GET['option']) && $_GET['option'] == 'addmovie' && $_GET['token'] == $set['token']) {
-    sync_add($mysql_ml, $mysql_tables);
-    die();
-}
-if (isset($_GET['option']) && $_GET['option'] == 'removemovie' && $_GET['token'] == $set['token']) {
-    sync_remove($mysql_ml, $mysql_tables);
-    die();
-}
-
-# SHOW MOVIE WATCHED ID FROM DATABASE
-if (isset($_GET['option']) && $_GET['option'] == 'showwatchedid' && $_GET['token'] == $set['token']) {
-    $sql = 'SELECT id FROM movies WHERE play_count > 0';
-    $sql_res = mysql_query($sql);
-    while ($id = mysql_fetch_array($sql_res)) {
-        echo $id[0] . ' ';
-    }
-    die();
-}
-
-# SYNC WATCHED
-if (isset($_GET['option']) && $_GET['option'] == 'watchedmovie' && $_GET['token'] == $set['token']) {
-    sync_watched($mysql_ml, $mysql_tables);
-    die();
-}
-
-# SYNC UNWATCHED
-if (isset($_GET['option']) && $_GET['option'] == 'unwatchedmovie' && $_GET['token'] == $set['token']) {
-    sync_unwatched($mysql_ml, $mysql_tables);
-    die();
-}
-
-# SHOW LASTPLAYED MOVIE ID
-if (isset($_GET['option']) && $_GET['option'] == 'showlastplayed' && $_GET['token'] == $set['token']) {
-    $sql = 'SELECT last_played FROM movies ORDER BY last_played DESC LIMIT 0 , 1';
-    $sql_res = mysql_query($sql);
-    while ($date = mysql_fetch_array($sql_res)) {
-        echo $date[0] . ' ';
-    }
-    die();
-}
-
-# SYNC LASTPLAYED
-if (isset($_GET['option']) && $_GET['option'] == 'lastplayed' && $_GET['token'] == $set['token']) {
-    sync_lastplayed($mysql_ml, $mysql_tables);
-    die();
+// check install.php file exist
+if (file_exists('install.php')) {
+    $output_panel_info.= $lang['a_install_exist'] . '<br />';
 }
 
 /* ######################
@@ -114,18 +47,19 @@ foreach ($dir_assoc as $dir) {
  * # MAIN SITE #
  */#############
 $output_panel = '';
-if (!isset($_GET['option'])) {
+if ($option == '') {
     
     // Watched
     $overall_sql = 'SELECT play_count FROM ' . $mysql_tables[0];
     $overall_result = mysql_query($overall_sql);
+    $overall_all = mysql_num_rows($overall_result);
     $overall_watched = 0;
     while ($overall = mysql_fetch_array($overall_result)) {
-        if ($overall['play_count'] !== NULL) {
+        if ($overall['play_count'] > 0) {
             $overall_watched++;
         }
     }
-    $overall_all = mysql_num_rows($overall_result);
+    
     $overall_unwatched = $overall_all - $overall_watched;
     
     // Cached
@@ -143,12 +77,12 @@ if (!isset($_GET['option'])) {
     }
     
     $output_panel = '
-        <table id="admin_table_movie">
-            <tr><td class="bold des">' . $lang['a_movies'] . '</td><td></td></tr>
+        <table class="table">
+            <tr><td class="bold orange">' . $lang['a_movies'] . '</td><td></td></tr>
             <tr><td>' . $lang['a_all'] . '</td><td>' . $overall_all . '</td></tr>
             <tr><td>' . $lang['a_watched'] . '</td><td>' . $overall_watched . '</td></tr>
             <tr><td>' . $lang['a_unwatched'] . '</td><td>' . $overall_unwatched . '</td></tr>
-            <tr><td class="bold des">' . $lang['a_cache'] . '</td><td></td></tr>
+            <tr><td class="bold orange">' . $lang['a_cache'] . '</td><td></td></tr>
             <tr><td>' . $lang['a_cached_posters'] . '</td><td>' . $poster_cached . '</td></tr>
             <tr><td>' . $lang['a_cached_fanarts'] . '</td><td>' . $fanart_cached . '</td></tr>
         </table>';
@@ -157,24 +91,53 @@ if (!isset($_GET['option'])) {
 /* ##############
  * # MOVIE LIST #
  */##############
-if (isset($_GET['option']) && $_GET['option'] == 'list') {
+if ($option == 'list') {
     $list_sql = 'SELECT id, title, poster, fanart, play_count FROM ' . $mysql_tables[0] . ' ORDER BY title';
     $list_result = mysql_query($list_sql);
-    $output_panel = '<table id="admin_table_movie"><tr class="bold"><td></td><td>ID</td><td>' . $lang['a_title'] . '</td><td>P</td><td></td><td>F</td><td></td></tr>';
+    $output_panel = '
+        <table class="table">
+            <tr class="bold"><td>
+                </td><td>ID</td>
+                <td>' . $lang['a_title'] . '</td>
+                <td>P</td>
+                <td></td>
+                <td>F</td>
+                <td></td>
+                <td></td>
+            </tr>';
     $i = 0;
     while ($list = mysql_fetch_array($list_result)) {
         if (file_exists('cache/' . $list['id'] . '.jpg')) {
-            $poster_exist = '<img src="css/' . $set['theme'] . '/img/watched.png">';
+            $poster_exist = '<img src="css/' . $set['theme'] . '/admin/img/exist.png">';
         } else {
-            $poster_exist = '<img src="css/' . $set['theme'] . '/img/delete.png">';
+            $poster_exist = '';
         }
         if (file_exists('cache/' . $list['id'] . '_f.jpg')) {
-            $fanart_exist = '<img src="css/' . $set['theme'] . '/img/watched.png">';
+            $fanart_exist = '<img src="css/' . $set['theme'] . '/admin/img/exist.png">';
         } else {
-            $fanart_exist = '<img src="css/' . $set['theme'] . '/img/delete.png">';
+            $fanart_exist = '';
+        }
+        if (stristr($list['poster'], 'http://')) {
+            $poster_link = '<a href="' . $list['poster'] . '" target="_blank"><img src="css/' . $set['theme'] . '/admin/img/link.png" title="Link"></a>';
+        } else {
+            $poster_link = '';
+        }
+        if (stristr($list['fanart'], 'http://')) {
+            $fanart_link = '<a href="' . $list['fanart'] . '" target="_blank"><img src="css/' . $set['theme'] . '/admin/img/link.png" title="Link"></a>';
+        } else {
+            $fanart_link = '';
         }
         $i++;
-        $output_panel.= '<tr><td>' . $i . '</td><td>' . $list['id'] . '</td><td>' . $list['title'] . '</td><td><a href="' . $list['poster'] . '" target="_blank"><img src="css/' . $set['theme'] . '/img/link.png"></a></td><td>'  . $poster_exist . '</td><td><a href="' . $list['fanart'] . '" target="_blank"><img src="css/' . $set['theme'] . '/img/link.png"></a></td><td>'  . $fanart_exist . '</td></tr>';
+        $output_panel.= '
+            <tr id="row_' . $list['id'] . '">
+                <td>' . $i . '</td><td>' . $list['id'] . '</td>
+                <td>' . $list['title'] . '</td>
+                <td>' . $poster_link . '</td>
+                <td>'  . $poster_exist . '</td>
+                <td>' . $fanart_link . '</td>
+                <td>'  . $fanart_exist . '</td>
+                <td><img id="' . $list['id'] . '" class="delete_row" src="css/' . $set['theme'] . '/admin/img/delete.png" title="' . $lang['a_delete'] . '"></td>
+            </tr>';
     }
     $output_panel.= '</table>';
 }
@@ -182,14 +145,19 @@ if (isset($_GET['option']) && $_GET['option'] == 'list') {
 /* ############
  * # SETTINGS #
  */############
-if (isset($_GET['option']) && $_GET['option'] == 'settings') {
+if ($option == 'settings') {
     
     $output_lang = '';
     $output_theme = '';
-    $output_mode = '';
     $output_panel_top = '';
     $output_watched_status = '';
-    $output_overall_panel = '';
+    $output_panel_overall = '';
+    $output_panel_genre = '';
+    $output_panel_year = '';
+    $output_panel_country = '';
+    $output_panel_v_codec = '';
+    $output_panel_a_codec = '';
+    $output_panel_a_chan = '';
     $output_show_fanart = '';
     $output_protect_site = '';
     $output_per_page = '';
@@ -224,58 +192,81 @@ if (isset($_GET['option']) && $_GET['option'] == 'settings') {
     $mode = array(0, 1);
     foreach ($mode as $val) {
         // set panel_top input
-        $output_panel_top.= ($val == 0 ? $lang['a_radio_off'] : $lang['a_radio_on']) . '<input type="radio" name="panel_top" value="' . $val . '" ' . ($set['panel_top'] == $val ? ' checked="checked"' : '') . ' /> ';
+        $output_panel_top.= '<option' . ($set['panel_top'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         // set wached status input
-        $output_watched_status.= ($val == 0 ? $lang['a_radio_off'] : $lang['a_radio_on']) . '<input type="radio" name="watched_status" value="' . $val . '" ' . ($set['watched_status'] == $val ? ' checked="checked"' : '') . ' /> ';
-        // set overall panel input
-        $output_overall_panel.= ($val == 0 ? $lang['a_radio_off'] : $lang['a_radio_on']) . '<input type="radio" name="overall_panel" value="' . $val . '" ' . ($set['overall_panel'] == $val ? ' checked="checked"' : '') . ' /> ';
+        $output_watched_status.= '<option' . ($set['watched_status'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         // set show fanart input
-        $output_show_fanart.= ($val == 0 ? $lang['a_radio_off'] : $lang['a_radio_on']) . '<input type="radio" name="show_fanart" value="' . $val . '" ' . ($set['show_fanart'] == $val ? ' checked="checked"' : '') . ' /> ';
+        $output_show_fanart.= '<option' . ($set['show_fanart'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         // set protect site input
-        $output_protect_site.= ($val == 0 ? $lang['a_radio_off'] : $lang['a_radio_on']) . '<input type="radio" name="protect_site" value="' . $val . '" ' . ($set['protect_site'] == $val ? ' checked="checked"' : '') . ' /> ';
+        $output_protect_site.= '<option' . ($set['protect_site'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
+    }
+    
+    $mode2 = array(0 => $lang['a_setting_off'], 1 => $lang['a_setting_on_expanded'], 2 => $lang['a_setting_on_collapsed']);
+    foreach ($mode2 as $key => $val) {
+        // set panel overall input
+        $output_panel_overall.= '<option' . ($set['panel_overall'] == $key ? ' selected="selected"' : '') . ' value="' . $key . '">' . $val  . '</option>';
+        // set panel genre input
+        $output_panel_genre.= '<option' . ($set['panel_genre'] == $key ? ' selected="selected"' : '') . ' value="' . $key . '">' . $val . '</option>';
+        // set panel year input
+        $output_panel_year.= '<option' . ($set['panel_year'] == $key ? ' selected="selected"' : '') . ' value="' . $key . '">' . $val . '</option>';
+        // set panel country input
+        $output_panel_country.= '<option' . ($set['panel_country'] == $key ? ' selected="selected"' : '') . ' value="' . $key . '">' . $val . '</option>';
+        // set panel v_codec input
+        $output_panel_v_codec.= '<option' . ($set['panel_v_codec'] == $key ? ' selected="selected"' : '') . ' value="' . $key . '">' . $val . '</option>';
+        // set panel a_codec input
+        $output_panel_a_codec.= '<option' . ($set['panel_a_codec'] == $key ? ' selected="selected"' : '') . ' value="' . $key . '">' . $val . '</option>';
+        // set panel a_chan input
+        $output_panel_a_chan.= '<option' . ($set['panel_a_chan'] == $key ? ' selected="selected"' : '') . ' value="' . $key . '">' . $val . '</option>';
     }
     
     $quantity = array(5, 10, 20, 50, 100);
     foreach ($quantity as $val) {
         // set per page input
-        $output_per_page.= $val . '<input type="radio" name="per_page" value="' . $val . '"' . ($set['per_page'] == $val ? ' checked="checked"' : '') . ' /> ';
+        $output_per_page.= '<option' . ($set['per_page'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . $val . '</option>';
         // set recently limit
-        $output_recently_limit.= $val . '<input type="radio" name="recently_limit" value="' . $val . '"' . ($set['recently_limit'] == $val ? ' checked="checked"' : '') . ' /> ';
+        $output_recently_limit.= '<option' . ($set['recently_limit'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . $val . '</option>';
         // set random limit
-        $output_random_limit.= $val . '<input type="radio" name="random_limit" value="' . $val . '"' . ($set['random_limit'] == $val ? ' checked="checked"' : '') . ' /> ';
+        $output_random_limit.= '<option' . ($set['random_limit'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . $val . '</option>';
         // set last played limit
-        $output_last_played_limit.= $val . '<input type="radio" name="last_played_limit" value="' . $val . '"' . ($set['last_played_limit'] == $val ? ' checked="checked"' : '') . ' /> ';
+        $output_last_played_limit.= '<option' . ($set['last_played_limit'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . $val . '</option>';
         // set top rated limit
-        $output_top_rated_limit.= $val . '<input type="radio" name="top_rated_limit" value="' . $val . '"' . ($set['top_rated_limit'] == $val ? ' checked="checked"' : '') . ' /> ';
+        $output_top_rated_limit.= '<option' . ($set['top_rated_limit'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . $val . '</option>';
     }
 
     // output form
     $output_panel.= '
         <form action="admin.php?option=settings_save" method="post">
-            <table id="admin_table_movie">
-                <tr><td class="bold des">' . $lang['a_set_main'] . '</td><td></td></tr>
+            <table class="table">
+                <tr><td class="bold orange">' . $lang['a_set_main'] . '</td><td></td></tr>
                 <tr><td>' . $lang['a_site_name'] . ':</td><td><input type="text" name="site_name" value="' . $set['site_name'] . '" /></td></tr>
                 <tr><td>' . $lang['a_language'] . ':</td><td><select name="language">' . $output_lang . '</select></td></tr>
                 <tr><td>' . $lang['a_theme'] . ':</td><td><select name="theme">' . $output_theme . '</select></td></tr>
-                <tr><td>' . $lang['a_per_page'] . ':</td><td>' . $output_per_page . '</td></tr>
-                <tr><td>' . $lang['a_panel_top'] . ':</td><td>' . $output_panel_top . '</td></tr>
-                <tr><td>' . $lang['a_watched_status'] . ':</td><td>' . $output_watched_status . '</td></tr>
-                <tr><td>' . $lang['a_overall_panel'] . ':</td><td>' . $output_overall_panel . '</td></tr>
-                <tr><td>' . $lang['a_show_fanart'] . ':</td><td>' . $output_show_fanart . '</td></tr>
-                <tr><td>' . $lang['a_protect_site']  . ':</td><td>' . $output_protect_site . '</td></tr>
-                <tr><td class="bold des">' . $lang['a_set_panel_top'] . '</td><td></td></tr>
+                <tr><td>' . $lang['a_per_page'] . ':</td><td><select name="per_page">' . $output_per_page . '</select></td></tr>
+                <tr><td>' . $lang['a_panel_top'] . ':</td><td><select name="panel_top">' . $output_panel_top . '</select></td></tr>
+                <tr><td>' . $lang['a_watched_status'] . ':</td><td><select name="watched_status">' . $output_watched_status . '</select></td></tr>
+                <tr><td>' . $lang['a_show_fanart'] . ':</td><td><select name="show_fanart">' . $output_show_fanart . '</select></td></tr>
+                <tr><td>' . $lang['a_protect_site']  . ':</td><td><select name="protect_site">' . $output_protect_site . '</select></td></tr>
+                <tr><td class="bold orange">' . $lang['a_set_panel_left'] . '</td><td></td></tr>
+                <tr><td>' . $lang['a_panel_overall'] . ':</td><td><select name="panel_overall">' . $output_panel_overall . '</select></td></tr>
+                <tr><td>' . $lang['a_panel_genre'] . ':</td><td><select name="panel_genre">' . $output_panel_genre . '</select></td></tr>
+                <tr><td>' . $lang['a_panel_year'] . ':</td><td><select name="panel_year">' . $output_panel_year . '</select></td></tr>
+                <tr><td>' . $lang['a_panel_country'] . ':</td><td><select name="panel_country">' . $output_panel_country . '</select></td></tr>
+                <tr><td>' . $lang['a_panel_v_codec'] . ':</td><td><select name="panel_v_codec">' . $output_panel_v_codec . '</select></td></tr>
+                <tr><td>' . $lang['a_panel_a_codec'] . ':</td><td><select name="panel_a_codec">' . $output_panel_a_codec . '</select></td></tr>
+                <tr><td>' . $lang['a_panel_a_chan'] . ':</td><td><select name="panel_a_chan">' . $output_panel_a_chan . '</select></td></tr>
+                <tr><td class="bold orange">' . $lang['a_set_panel_top'] . '</td><td></td></tr>
                 <tr><td>' . $lang['a_panel_top_time'] . ':</td><td><input type="text" name="panel_top_time" value="' . $set['panel_top_time'] . '" /></td></tr>
-                <tr><td>' . $lang['a_recently_limit'] . ':</td><td>' . $output_recently_limit . '</td></tr>
-                <tr><td>' . $lang['a_random_limit'] . ':</td><td>' . $output_random_limit . '</td></tr>
-                <tr><td>' . $lang['a_last_played_limit'] . ':</td><td>' . $output_last_played_limit . '</td></tr>
-                <tr><td>' . $lang['a_top_rated_limit'] . ':</td><td>' . $output_top_rated_limit . '</td></tr>
-            </table>
+                <tr><td>' . $lang['a_recently_limit'] . ':</td><td><select name="recently_limit">' . $output_recently_limit . '</select></td></tr>
+                <tr><td>' . $lang['a_random_limit'] . ':</td><td><select name="random_limit">' . $output_random_limit . '</select></td></tr>
+                <tr><td>' . $lang['a_last_played_limit'] . ':</td><td><select name="last_played_limit">' . $output_last_played_limit . '</select></td></tr>
+                <tr><td>' . $lang['a_top_rated_limit'] . ':</td><td><select name="top_rated_limit">' . $output_top_rated_limit . '</select></td></tr>
+            </table><br />
                 <input type="submit" value="' . $lang['a_save'] . '" />
         </form>';
 }
 
 // Saving settings
-if (isset($_GET['option']) && $_GET['option'] === 'settings_save') {
+if ($option == 'settings_save') {
     $settings_update_sql = 'UPDATE ' . $mysql_tables[1] . ' SET 
         site_name = "' . $_POST['site_name'] . '",
         language = "' . $_POST['language'] . '",
@@ -288,7 +279,13 @@ if (isset($_GET['option']) && $_GET['option'] === 'settings_save') {
         panel_top_time = "' . $_POST['panel_top_time'] . '",
         panel_top = "' . $_POST['panel_top'] . '",
         watched_status = "' . $_POST['watched_status'] . '",
-        overall_panel = "' . $_POST['overall_panel'] . '",
+        panel_overall = "' . $_POST['panel_overall'] . '",
+        panel_genre = "' . $_POST['panel_genre'] . '",
+        panel_year = "' . $_POST['panel_year'] . '",
+        panel_country = "' . $_POST['panel_country'] . '",
+        panel_v_codec = "' . $_POST['panel_v_codec'] . '",
+        panel_a_codec = "' . $_POST['panel_a_codec'] . '",
+        panel_a_chan = "' . $_POST['panel_a_chan'] . '",
         show_fanart = "' . $_POST['show_fanart'] . '",
         protect_site = "' . $_POST['protect_site'] . '"';
     mysql_query($settings_update_sql);
@@ -299,30 +296,30 @@ if (isset($_GET['option']) && $_GET['option'] === 'settings_save') {
             unset($_SESSION[$key]);
         }
     }
-    $output_panel_info = $lang['a_saved'];
+    $output_panel_info.= $lang['a_saved'] . '<br />';
 }
 
 /* ###################
  * # CHANGE PASSWORD #
  */###################
-if (isset($_GET['option']) && $_GET['option'] == 'password') {
+if ($option == 'password') {
     $output_panel.= '
         <form action="admin.php?option=password_save" method="post">
-            <table id="admin_table_movie">
-                <tr><td class="bold des">' . $lang['a_user'] . '</td><td></td></tr>
+            <table class="table">
+                <tr><td class="bold orange">' . $lang['a_user'] . '</td><td></td></tr>
                 <tr><td>' . $lang['a_new_password'] . '</td><td><input type="password" name="password" /></td></tr>
                 <tr><td>' . $lang['a_new_password_re'] . '</td><td><input type="password" name="password_re" /></td></tr>
-                <tr><td class="bold des">' . $lang['a_admin'] . '</td><td></td></tr>
+                <tr><td class="bold orange">' . $lang['a_admin'] . '</td><td></td></tr>
                 <tr><td>' . $lang['a_new_password'] . '</td><td><input type="password" name="password_admin" /></td></tr>
                 <tr><td>' . $lang['a_new_password_re'] . '</td><td><input type="password" name="password_admin_re" /></td></tr>
-            </table>
+            </table><br />
                 <input type="submit" value="' . $lang['a_save'] . '" />
         </form>
     ';
 }
 
 // Save password
-if (isset($_GET['option']) && $_GET['option'] === 'password_save') {
+if ($option == 'password_save') {
     if (strlen($_POST['password']) > 0) {
         if ($_POST['password'] == $_POST['password_re']) {
             if (strlen($_POST['password']) > 3) {
@@ -351,22 +348,28 @@ if (isset($_GET['option']) && $_GET['option'] === 'password_save') {
         }
     }
 }
+// check admin pass is not default
+$pass_check_sql = 'SELECT * FROM ' . $mysql_tables[2] . ' WHERE login = "admin"';
+$pass_check_result = mysql_query($pass_check_sql);
+$pass_check = mysql_fetch_array($pass_check_result);
+if ($pass_check['password'] == '21232f297a57a5a743894a0e4a801fc3') {
+    $output_panel_info.= $lang['a_pass_default'] . '<br />';
+}
+
 /* #########
  * # TOKEN #
  */#########
-if (isset($_GET['option']) && $_GET['option'] === 'token') {
+if ($option == 'token') {
     if (isset($_POST['new_token'])) {
-        $token = change_token($mysql_tables);
-        $output_panel_info = 'Token changed';
+        $new_token = change_token($mysql_tables);
+        $output_panel_info.= $lang['a_token_changed'] . '<br />';
     } else {
-        $token = $set['token'];
+        $new_token = $set['token'];
     }
     $output_panel.= '
-        <table id="admin_table_movie">
-            <tr><td></td><td class="bold des"></td></tr>
-            <tr><td>Token:</td><td class="bold des">' . $token . '</td></tr>
-            <tr><td></td><td class="bold des"></td></tr>
-        </table>
+        <table class="table">
+            <tr><td>Token:</td><td class="bold orange">' . $new_token . '</td></tr>
+        </table><br />
         <form action="admin.php?option=token" method="post">
         <input type="hidden" name="new_token" />
         <input type="submit" value="' . $lang['a_token_change'] . '" />
@@ -378,7 +381,7 @@ if (isset($_GET['option']) && $_GET['option'] === 'token') {
  * # PANEL INFO #
  */##############
 if ($output_panel_info !== '') {
-    $output_panel_info = '<div id="panel_info">' . $output_panel_info . '</div>';
+    $output_panel_info = '<div class="panel_info">' . $output_panel_info . '</div>';
 }
 ?>
 <!DOCTYPE HTML>
@@ -387,22 +390,22 @@ if ($output_panel_info !== '') {
         <title><?PHP echo $set['site_name'] ?> - Admin Panel</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-        <link href="css/<?PHP echo $set['theme'] ?>/style.css" rel="stylesheet" type="text/css">
+        <link href="css/<?PHP echo $set['theme'] ?>/admin/style.css" rel="stylesheet" type="text/css">
         <script type="text/javascript" src="js/jquery-1.9.1.js"></script>
         <script type="text/javascript" src="js/jquery.script.js"></script>
     </head>
     <body>
         <?PHP echo $output_panel_info ?>
-        <div id="admin_container">
-            <div id="admin_panel_left">
-                <a class="admin_menu_box" href="admin.php"><?PHP echo $lang['a_html_main_site'] ?></a>
-                <a class="admin_menu_box" href="admin.php?option=list"><?PHP echo $lang['a_html_movie_list'] ?></a>
-                <a class="admin_menu_box" href="admin.php?option=settings"><?PHP echo $lang['a_html_settings'] ?></a>
-                <a class="admin_menu_box" href="admin.php?option=password"><?PHP echo $lang['a_html_change_password'] ?></a>
-                <a class="admin_menu_box" href="admin.php?option=token"><?PHP echo $lang['a_html_change_token'] ?></a>
-                <a class="admin_menu_box" href="login.php?login=admin_logout"><?PHP echo $lang['a_html_logout'] ?></a>
+        <div class="container">
+            <div id="panel_left">
+                <a class="box" href="admin.php"><?PHP echo $lang['a_html_main_site'] ?></a>
+                <a class="box" href="admin.php?option=list"><?PHP echo $lang['a_html_movie_list'] ?></a>
+                <a class="box" href="admin.php?option=settings"><?PHP echo $lang['a_html_settings'] ?></a>
+                <a class="box" href="admin.php?option=password"><?PHP echo $lang['a_html_change_password'] ?></a>
+                <a class="box" href="admin.php?option=token"><?PHP echo $lang['a_html_change_token'] ?></a>
+                <a class="box" href="login.php?login=admin_logout"><?PHP echo $lang['a_html_logout'] ?></a>
             </div>
-            <div id="admin_panel_right">
+            <div id="panel_right">
                 <?PHP echo $output_panel ?>
             </div>
         </div>
