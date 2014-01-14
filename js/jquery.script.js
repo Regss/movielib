@@ -1,7 +1,7 @@
 $(document).ready(function() {
     // show panel header when site load
-    $('#panel_recently, #panel_random, #panel_last_played, #panel_top_rated, #panel_recently_title, #panel_random_title, #panel_last_played_title, #panel_top_rated_title').hide().fadeIn(3000);
-    $('#panel_recently, #panel_random, #panel_last_played, #panel_top_rated').mouseover(function(){
+    $('.panel_top_item, .panel_top_item_title').hide().fadeIn(3000);
+    $('.panel_top_item').mouseover(function(){
         $(this).animate({
             opacity: '.7'
         }, {
@@ -9,7 +9,7 @@ $(document).ready(function() {
             duration:300
         });
     });
-    $('#panel_recently, #panel_random, #panel_last_played, #panel_top_rated').mouseleave(function(){
+    $('.panel_top_item').mouseleave(function(){
         $(this).animate({
             opacity: '1'
         }, {
@@ -24,7 +24,7 @@ $(document).ready(function() {
     // show panels in loop
     $(function() {
         var timeout = $('#panel_top').attr('class');
-        $('#panel_recently, #panel_random, #panel_last_played, #panel_top_rated').cycle({
+        $('.panel_top_item').cycle({
             timeout: +timeout
         });
     });
@@ -46,7 +46,6 @@ $(document).ready(function() {
         // mouse enter
         $('.movie').mouseenter(function(){
             var movie_id = $(this).attr('id');
-            $.ajax({url: "function.js.php?option=bg&id="+movie_id});
             $.ajax({
                 url: 'cache/'+movie_id+'_f.jpg',
                 success: function(data){
@@ -74,7 +73,7 @@ $(document).ready(function() {
     
     // toggle panel_box
     $('.panel_box').each(function(){
-        var opt = $(this).attr('alt');
+        var opt = $(this).attr('class').replace('panel_box ', '');
         if (opt == 2) {
             var id = $(this).attr('id');
             $('#'+id).hide();
@@ -83,13 +82,13 @@ $(document).ready(function() {
     $('.panel_box_title').click(function(){
         var id = $(this).attr('id');
         $('#panel_'+id).slideToggle();
-        var opt = $('#panel_'+id).attr('alt');
+        var opt = $('#panel_'+id).attr('class').replace('panel_box ', '');
         if (opt == 1) {
-            $('#panel_'+id).attr('alt', '2');
+            $('#panel_'+id).attr('alt', 'panel_box 2');
             $.ajax({url: 'function.js.php?option=panel&id=panel_'+id+'&opt=2'});
         }
         if (opt == 2) {
-            $('#panel_'+id).attr('alt', '1');
+            $('#panel_'+id).attr('alt', 'panel_box 1');
             $.ajax({url: 'function.js.php?option=panel&id=panel_'+id+'&opt=1'});
         }
     });
@@ -100,6 +99,14 @@ $(document).ready(function() {
     });
     $('.delete_row').mouseleave(function(){
         $(this).css('opacity', '1');
+    });
+    
+    // animate trailer button
+    $('.img_trailer').mouseenter(function(){
+        $(this).css('opacity', '1');
+    });
+    $('.img_trailer').mouseleave(function(){
+        $(this).css('opacity', '.8');
     });
     
     // delete movie

@@ -1,13 +1,13 @@
 <?PHP
 session_start();
-require_once 'config.php';
-require_once 'function.php';
+require('config.php');
+require('function.php');
 
 // connect to database
 connect($mysql_ml);
 
 $set = get_settings($mysql_ml, $mysql_tables);
-require_once 'lang/lang_' . $set['language'] . '.php';
+require('lang/' . $set['language'] . '/lang.php');
 
 if (!isset($_GET['login'])) {
     header('Location:login.php?login=user');
@@ -67,15 +67,18 @@ if ($_GET['login'] === 'user') {
 <html>
     <head>
         <title><?PHP echo $set['site_name'] ?> - <?PHP echo $lang['l_html_login'] ?></title>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <!--[if IE]>
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-        <link href="css/<?PHP echo $set['theme'] ?>/style.css" rel="stylesheet" type="text/css">
+        <![endif]-->
+        <link type="image/x-icon" href="css/<?PHP echo $set['theme'] ?>/img/icon.ico" rel="icon" media="all" />
+        <link type="text/css" href="css/<?PHP echo $set['theme'] ?>/style.css" rel="stylesheet" media="all" />
         <script type="text/javascript" src="js/jquery-1.9.1.js"></script>
         <script type="text/javascript" src="js/jquery.script.js"></script>
     </head>
     <body>
         <?PHP echo $output ?>
-        <div class="container2">
+        <div class="container_login">
             <div class="bold orange"><?PHP echo $login_info ?></div>
             <form action="<?PHP echo $input_action ?>" method="post"><br />
                 <input type="password" name="<?PHP echo $input_name ?>"><br /><br />

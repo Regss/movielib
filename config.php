@@ -1,9 +1,9 @@
 <?PHP
 
-$version = '2.1.0';
+$version = '2.2.0';
 
 if (file_exists('db.php')) {
-    include_once 'db.php';
+    require('db.php');
 }
 
 // Tables to array
@@ -51,6 +51,30 @@ $achan_assoc = array(
     '6' => '6',
     '8' => '8'
 );
+
+// Language
+$language = array(
+    'bg' => 'Bulgarian',
+    'cs' => 'Czech',
+    'da' => 'Danish',
+    'de' => 'German',
+    'en' => 'English',
+    'es' => 'Spanish',
+    'fr' => 'French',
+    'hu' => 'Hungarian',
+    'it' => 'Italian',
+    'nl' => 'Dutch',
+    'no' => 'Norwegian',
+    'pl' => 'Polish',
+    'pt' => 'Portuguese',
+    'ru' => 'Russian'
+);
+
+// MimeType
+$mimetype_assoc['video/mp4']            =   array('mp4');
+$mimetype_assoc['video/ogg']            =   array('ogg', 'ogv');
+$mimetype_assoc['video/webm']           =   array('webm');
+$mimetype_assoc['video/flv']            =   array('flv');
 
 // Set var
 $var = array(

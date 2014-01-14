@@ -1,13 +1,13 @@
 <?PHP
-require_once 'config.php';
-require_once 'function.php';
+require('config.php');
+require('function.php');
 
 // connect to database
 connect($mysql_ml);
 
 // get settings from db
 $set = get_settings($mysql_ml, $mysql_tables);
-require_once 'lang/lang_' . $set['language'] . '.php';
+require('lang/' . $set['language'] . '/lang.php');
 
 /* #################
  * # SYNC DATABASE #

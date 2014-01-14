@@ -1,0 +1,14 @@
+Dieses Script synchronisiert automatisch und zeigt die XBMC Library an.
+
+Anforderungen:
+- Server mit Apache, PHP 5, MySql 5
+- Das Addon "Movielib" für XBMC https://raw.github.com/Regss/xbmc-regss-repository/master/repo/repository.regss/repository.regss-1.2.1.zip 
+
+Standard Passwörter:
+Seitenberechtigung: user
+Administrations-Bereich: admin
+
+Movielib XBMC Add-on repository:
+https://raw.github.com/Regss/xbmc-regss-repository/master/repo/repository.regss/repository.regss-1.2.1.zip
+
+Im Admin-Bereich muss ein neuer Token generiert werden, dieser Token muss in den Einstellungen des Addon's inklusive URL angegeben werden.

@@ -1,8 +1,8 @@
 <?PHP
 session_start();
 header('Content-type: text/html; charset=utf-8');
-require_once 'config.php';
-require_once 'function.php';
+require('config.php');
+require('function.php');
 
 if (file_exists('install.php') or !file_exists('db.php')) {
     header('Location:install.php');
@@ -14,7 +14,7 @@ connect($mysql_ml);
 
 // get settings from db
 $set = get_settings($mysql_ml, $mysql_tables);
-require_once 'lang/lang_' . $set['language'] . '.php';
+require('lang/' . $set['language'] . '/lang.php');
 
 /* ##################
  * # CHECK PASSWORD #
@@ -32,41 +32,32 @@ if ($set['protect_site'] == 1) {
 if ($set['panel_top'] == 1) {
     
     // recently added
-    $output_recently = '<div id="panel_recently">';
-    $recently_sql = 'SELECT id, title, poster, date_added FROM ' . $mysql_tables[0] . ' ORDER BY date_added DESC LIMIT ' . $set['recently_limit'];
+    $output_recently = '<div class="panel_top_item">';
+    $recently_sql = 'SELECT id, title, date_added FROM ' . $mysql_tables[0] . ' ORDER BY date_added DESC LIMIT ' . $set['panel_top_limit'];
     $recently_result = mysql_query($recently_sql);
     while ($recently = mysql_fetch_array($recently_result)) {
-        if (!file_exists('cache/' . $recently['id'] . '.jpg')) {
-            gd_convert('cache/' . $recently['id'] . '.jpg', $recently['poster'], 140, 198);
-        }
         if (file_exists('cache/' . $recently['id'] . '.jpg')) {
             $output_recently.= '<a href="index.php?id=' . $recently['id'] . '"><img src="cache/' . $recently['id'] . '.jpg" title="' . $recently['title'] . '" alt=""></a>';
         }
     }
     $output_recently.= '</div>';
 
-    // random
-    $output_random = '<div id="panel_random">';
-    $random_sql = 'SELECT id, title, poster FROM ' . $mysql_tables[0] . ' ORDER BY RAND() LIMIT ' . $set['random_limit'];
-    $random_result = mysql_query($random_sql);
-    while ($random = mysql_fetch_array($random_result)) {
-        if (!file_exists('cache/' . $random['id'] . '.jpg')) {
-            gd_convert('cache/' . $random['id'] . '.jpg', $random['poster'], 140, 198);
-        }
-        if (file_exists('cache/' . $random['id'] . '.jpg')) {
-            $output_random.= '<a href="index.php?id=' . $random['id'] . '"><img src="cache/' . $random['id'] . '.jpg" title="' . $random['title'] . '" alt=""></a>';
+    // most watched
+    $output_most_watched = '<div class="panel_top_item">';
+    $most_watched_sql = 'SELECT id, title FROM ' . $mysql_tables[0] . ' ORDER BY play_count DESC LIMIT ' . $set['panel_top_limit'];
+    $most_watched_result = mysql_query($most_watched_sql);
+    while ($most_watched = mysql_fetch_array($most_watched_result)) {
+        if (file_exists('cache/' . $most_watched['id'] . '.jpg')) {
+            $output_most_watched.= '<a href="index.php?id=' . $most_watched['id'] . '"><img src="cache/' . $most_watched['id'] . '.jpg" title="' . $most_watched['title'] . '" alt=""></a>';
         }
     }
-    $output_random.= '</div>';
+    $output_most_watched.= '</div>';
 
     // last_played
-    $output_last_played = '<div id="panel_last_played">';
-    $last_played_sql = 'SELECT id, title, poster, last_played FROM ' . $mysql_tables[0] . ' WHERE play_count > 0 ORDER BY last_played DESC LIMIT ' . $set['last_played_limit'];
+    $output_last_played = '<div class="panel_top_item">';
+    $last_played_sql = 'SELECT id, title, last_played FROM ' . $mysql_tables[0] . ' WHERE play_count > 0 ORDER BY last_played DESC LIMIT ' . $set['panel_top_limit'];
     $last_played_result = mysql_query($last_played_sql);
     while ($last_played = mysql_fetch_array($last_played_result)) {
-        if (!file_exists('cache/' . $last_played['id'] . '.jpg')) {
-            gd_convert('cache/' . $last_played['id'] . '.jpg', $last_played['poster'], 140, 198);
-        }
         if (file_exists('cache/' . $last_played['id'] . '.jpg')) {
             $output_last_played.= '<a href="index.php?id=' . $last_played['id'] . '"><img src="cache/' . $last_played['id'] . '.jpg" title="' . $last_played['title'] . '" alt=""></a>';
         }
@@ -74,21 +65,18 @@ if ($set['panel_top'] == 1) {
     $output_last_played.= '</div>';
 
     // top_rated
-    $output_top_rated = '<div id="panel_top_rated">';
-    $top_rated_sql = 'SELECT id, title, poster, rating FROM ' . $mysql_tables[0] . ' ORDER BY rating DESC LIMIT ' . $set['top_rated_limit'];
+    $output_top_rated = '<div class="panel_top_item">';
+    $top_rated_sql = 'SELECT id, title, rating FROM ' . $mysql_tables[0] . ' ORDER BY rating DESC LIMIT ' . $set['panel_top_limit'];
     $top_rated_result = mysql_query($top_rated_sql);
     while ($top_rated = mysql_fetch_array($top_rated_result)) {
-        if (!file_exists('cache/' . $top_rated['id'] . '.jpg')) {
-            gd_convert('cache/' . $top_rated['id'] . '.jpg', $top_rated['poster'], 140, 198);
-        }
         if (file_exists('cache/' . $top_rated['id'] . '.jpg')) {
             $output_top_rated.= '<a href="index.php?id=' . $top_rated['id'] . '"><img src="cache/' . $top_rated['id'] . '.jpg" title="' . $top_rated['title'] . '" alt=""></a>';
         }
     }
     $output_top_rated.= '</div>';
     
-    $output_panel_top = '<div id="panel_top" class="' . $set['panel_top_time'] * 1000 . '">' . $output_recently . $output_random . $output_last_played . $output_top_rated . '</div>';
-    $output_panel_top_title = '<div id="panel_title"><div id="panel_recently_title">' . $lang['i_last_added'] . '</div><div id="panel_random_title">' . $lang['i_randomly'] . '</div><div id="panel_last_played_title">' . $lang['i_last_played'] . '</div><div id="panel_top_rated_title">' . $lang['i_top_rated'] . '</div></div>';
+    $output_panel_top = '<div id="panel_top" class="' . $set['panel_top_time'] * 1000 . '">' . $output_recently . $output_most_watched . $output_last_played . $output_top_rated . '</div>';
+    $output_panel_top_title = '<div id="panel_title"><div class="panel_top_item_title">' . $lang['i_last_added'] . '</div><div class="panel_top_item_title">' . $lang['i_most_watched'] . '</div><div class="panel_top_item_title">' . $lang['i_last_played'] . '</div><div class="panel_top_item_title">' . $lang['i_top_rated'] . '</div></div>';
 } else {
     $output_panel_top = '';
     $output_panel_top_title = '';
@@ -108,7 +96,7 @@ if ($set['panel_overall'] > 0) {
         }
     }
     $overall_unwatched = $overall_all - $overall_watched;
-    $output_panel_overall = '<div id="overall" class="panel_box_title">' . $lang['i_overall_title'] . ':</div><div id="panel_overall" class="panel_box" alt="' . $set['panel_overall'] . '"><ul><li><span class="bold orange">' . $lang['i_overall_all'] . ':</span> ' . $overall_all . '</li><li><span class="bold orange">' . $lang['i_overall_watched'] . ':</span> ' . $overall_watched . '</li><li><span class="bold orange">' . $lang['i_overall_notwatched'] . ':</span> ' . $overall_unwatched . '</li></ul></div>';
+    $output_panel_overall = '<div id="overall" class="panel_box_title">' . $lang['i_overall_title'] . ':</div><div id="panel_overall" class="panel_box ' . $set['panel_overall'] . '"><ul><li><span class="bold orange">' . $lang['i_overall_all'] . ':</span> ' . $overall_all . '</li><li><span class="bold orange">' . $lang['i_overall_watched'] . ':</span> ' . $overall_watched . '</li><li><span class="bold orange">' . $lang['i_overall_notwatched'] . ':</span> ' . $overall_unwatched . '</li></ul></div>';
 } else {
     $output_panel_overall = '';
 }
@@ -128,7 +116,7 @@ if ($set['panel_overall'] > 0) {
             }
         }
     }
-    $output_panel_genre = '<div id="genre" class="panel_box_title">' . $lang['i_genre'] . '</div><div id="panel_genre" class="panel_box" alt="' . $set['panel_genre'] . '"><ul><li>' . (($genre == 'all' and $id == 0) ? $lang['i_all'] :
+    $output_panel_genre = '<div id="genre" class="panel_box_title">' . $lang['i_genre'] . '</div><div id="panel_genre" class="panel_box ' . $set['panel_genre'] . '"><ul><li>' . (($genre == 'all' and $id == 0) ? $lang['i_all'] :
         '<a href="index.php?sort=' . $sort . 
         '&amp;genre=all' .
         '&amp;year=' . $year .
@@ -172,7 +160,7 @@ if ($set['panel_year'] > 0) {
             $year_array[] = $year_mysql_array['year'];
         }
     }
-    $output_year_menu = '<div id="year" class="panel_box_title">' . $lang['i_year'] . '</div><div id="panel_year" class="panel_box" alt="' . $set['panel_year'] . '"><ul><li>' . (($year == 'all' and $id == 0) ? $lang['i_all'] : '<a href="index.php?sort=' . $sort . '&amp;year=all">' . $lang['i_all'] . '</a>') . '</li>';
+    $output_year_menu = '<div id="year" class="panel_box_title">' . $lang['i_year'] . '</div><div id="panel_year" class="panel_box ' . $set['panel_year'] . '"><ul><li>' . (($year == 'all' and $id == 0) ? $lang['i_all'] : '<a href="index.php?sort=' . $sort . '&amp;year=all">' . $lang['i_all'] . '</a>') . '</li>';
     foreach ($year_array as $key => $val) {
         if ((string) $key === (string) $year) {
             $output_year_menu.= '<li>' . $val . '</li>';
@@ -201,7 +189,7 @@ if ($set['panel_country'] > 0) {
             }
         }
     }
-    $output_country_menu = '<div id="country" class="panel_box_title">' . $lang['i_country'] . '</div><div id="panel_country" class="panel_box" alt="' . $set['panel_country'] . '"><ul><li>' . (($country == 'all' and $id == 0) ? $lang['i_all'] : '<a href="index.php?sort=' . $sort . '&amp;country=all">' . $lang['i_all'] . '</a>') . '</li>';
+    $output_country_menu = '<div id="country" class="panel_box_title">' . $lang['i_country'] . '</div><div id="panel_country" class="panel_box ' . $set['panel_country'] . '"><ul><li>' . (($country == 'all' and $id == 0) ? $lang['i_all'] : '<a href="index.php?sort=' . $sort . '&amp;country=all">' . $lang['i_all'] . '</a>') . '</li>';
     foreach ($country_array as $key => $val) {
         if ((string) $key === (string) $country) {
             $output_country_menu.= '<li>' . $val . '</li>';
@@ -228,7 +216,7 @@ if ($set['panel_v_codec'] > 0) {
             $v_codec_array[] = $v_codec_mysql_array['v_codec'];
         }
     }
-    $output_v_codec_menu = '<div id="v_codec" class="panel_box_title">' . $lang['i_v_codec'] . '</div><div id="panel_v_codec" class="panel_box" alt="' . $set['panel_v_codec'] . '"><ul><li>' . (($v_codec == 'all' and $id == 0) ? $lang['i_all'] : '<a href="index.php?sort=' . $sort . '&amp;v_codec=all">' . $lang['i_all'] . '</a>') . '</li>';
+    $output_v_codec_menu = '<div id="v_codec" class="panel_box_title">' . $lang['i_v_codec'] . '</div><div id="panel_v_codec" class="panel_box ' . $set['panel_v_codec'] . '"><ul><li>' . (($v_codec == 'all' and $id == 0) ? $lang['i_all'] : '<a href="index.php?sort=' . $sort . '&amp;v_codec=all">' . $lang['i_all'] . '</a>') . '</li>';
     sort($v_codec_array);
     foreach ($v_codec_array as $key => $val) {
         if ((string) $key === (string) $v_codec) {
@@ -256,7 +244,7 @@ if ($set['panel_a_codec'] > 0) {
             $a_codec_array[] = $a_codec_mysql_array['a_codec'];
         }
     }
-    $output_a_codec_menu = '<div id="a_codec" class="panel_box_title">' . $lang['i_a_codec'] . '</div><div id="panel_a_codec" class="panel_box" alt="' . $set['panel_a_codec'] . '"><ul><li>' . (($a_codec == 'all' and $id == 0) ? $lang['i_all'] : '<a href="index.php?sort=' . $sort . '&amp;a_codec=all">' . $lang['i_all'] . '</a>') . '</li>';
+    $output_a_codec_menu = '<div id="a_codec" class="panel_box_title">' . $lang['i_a_codec'] . '</div><div id="panel_a_codec" class="panel_box ' . $set['panel_a_codec'] . '"><ul><li>' . (($a_codec == 'all' and $id == 0) ? $lang['i_all'] : '<a href="index.php?sort=' . $sort . '&amp;a_codec=all">' . $lang['i_all'] . '</a>') . '</li>';
     sort($a_codec_array);
     foreach ($a_codec_array as $key => $val) {
         if ((string) $key === (string) $a_codec) {
@@ -284,7 +272,7 @@ if ($set['panel_a_chan'] > 0) {
             $a_chan_array[] = $a_chan_mysql_array['a_chan'];
         }
     }
-    $output_a_chan_menu = '<div id="a_chan" class="panel_box_title">' . $lang['i_a_chan'] . '</div><div id="panel_a_chan" class="panel_box" alt="' . $set['panel_a_chan'] . '"><ul><li>' . (($a_chan == 'all' and $id == 0) ? $lang['i_all'] : '<a href="index.php?sort=' . $sort . '&amp;a_chan=all">' . $lang['i_all'] . '</a>') . '</li>';
+    $output_a_chan_menu = '<div id="a_chan" class="panel_box_title">' . $lang['i_a_chan'] . '</div><div id="panel_a_chan" class="panel_box ' . $set['panel_a_chan'] . '"><ul><li>' . (($a_chan == 'all' and $id == 0) ? $lang['i_all'] : '<a href="index.php?sort=' . $sort . '&amp;a_chan=all">' . $lang['i_all'] . '</a>') . '</li>';
     sort($a_chan_array);
     foreach ($a_chan_array as $key => $val) {
         if ((string) $key === (string) $a_chan) {
@@ -302,11 +290,11 @@ if ($set['panel_a_chan'] > 0) {
 /* ########
  * # SORT #
  */########
-$sort_array = array(1 => $lang['i_title'], $lang['i_year'], $lang['i_rating'], $lang['i_added'], $lang['i_runtime'], $lang['i_last_played']);
-$output_sort_menu = '<span class="bold">' . $lang['i_sort'] . ':</span>';
+$sort_array = array(1 => $lang['i_title'], $lang['i_year'], $lang['i_rating'], $lang['i_added'], $lang['i_runtime'], $lang['i_last_played'], $lang['i_most_watched']);
+$output_sort_menu = '';
 foreach ($sort_array as $key => $val) {
-    $output_sort_menu.= ($sort == $key ? '
-    <span class="box_inline">' . $val . '</span> ' : 
+    $output_sort_menu.= ($sort == $key ? 
+    '<span class="box_inline">' . $val . '</span>' : 
     '<a class="box_inline" href="index.php?sort=' . $key .
     '&amp;genre=' . $genre .
     '&amp;year=' . $year .
@@ -314,14 +302,10 @@ foreach ($sort_array as $key => $val) {
     '&amp;v_codec=' . $v_codec .
     '&amp;a_codec=' . $a_codec .
     '&amp;a_chan=' . $a_chan .
-    '">' . $val . '</a> ');
+    '" title="' . $lang['i_sort'] . '">' . $val . '</a>');
 }
-$sort_mysql = array(1 => 'title ASC', 'year DESC', 'rating DESC', 'date_added DESC', ' CAST( runtime AS DECIMAL( 10, 2 ) ) DESC', 'last_played DESC');
-if ($sort == 6) {
-    $play_count_mysql = ' > 0';
-} else {
-    $play_count_mysql = 'LIKE "%"';
-}
+$sort_mysql = array(1 => 'title ASC', 'year DESC', 'rating DESC', 'date_added DESC', ' CAST( runtime AS DECIMAL( 10, 2 ) ) DESC', 'last_played DESC', 'play_count DESC');
+$play_count_mysql = ($sort == 6 ? ' > 0' : 'LIKE "%"');
 
 /* ##########
  * # SEARCH #
@@ -393,9 +377,6 @@ while ($list = mysql_fetch_array($list_result)) {
     // poster
     $poster = 'cache/' . $list['id'] . '.jpg';
     if (!file_exists($poster)) {
-        gd_convert($poster, $list['poster'], 140, 198);
-    }
-    if (!file_exists($poster)) {
         $poster = 'css/' . $set['theme'] . '/img/d_poster.jpg';
     }
     
@@ -437,15 +418,53 @@ while ($list = mysql_fetch_array($list_result)) {
     // wached status
     $watched = '';
     if ($set['watched_status'] == 1 && $list['play_count'] > 0) {
-        $watched = '<img class="watched" src="css/' . $set['theme'] . '/img/watched.png" alt="" title="' . $lang['i_last_played'] . ': ' . $list['last_played'] . '">';
+        $watched = '<img class="watched" src="css/' . $set['theme'] . '/img/watched.png" alt="" title="' . $lang['i_last_played'] . ': ' . $list['last_played'] . '" alt="">';
     }
-    	
+
+    // trailer
+    if ($list['trailer'] !== NULL && $set['show_trailer'] == 1) {
+        $trailer = '<a href="?id=' . $list['id'] . '"><img class="img_trailer" src="css/' . $set['theme'] . '/img/trailer.png" alt=""></a>';
+    } else {
+        $trailer = '';
+    }
+    if ($list['trailer'] !== NULL && $set['show_trailer'] == 1 && $id <> 0) {
+        $output_trailer = '<div class="trailer">';
+        if (substr($list['trailer'], 0, 18) == 'http://www.youtube') {
+            $output_trailer.= '
+                <iframe id="player" type="text/html" width="560" height="260" src="' . $list['trailer'] . '" frameborder="0"></iframe>
+            ';
+        } else {
+            $ext = substr($list['trailer'], strrpos($list['trailer'], '.')+1, strlen($list['trailer']));
+            foreach ($mimetype_assoc as $key => $val) {
+                if(in_array($ext, $val)) {
+                    $mimetype = $key;
+                    break;
+                } else {
+                    $mimetype = '';
+                }
+            }
+            
+            if ($ext == 'mov') {
+                $output_trailer.= '
+                    <embed src="' . $list['trailer'] . '" width="560" height="260" cache="false" autoplay="false" scale="tofit" />';
+            } else {
+                $output_trailer.= '
+                <video id="player" class="video-js vjs-default-skin player" controls preload="none" width="560" height="260" data-setup="{}">
+                    <source src="' . $list['trailer'] . '" type="' . $mimetype . '" />
+                </video>';
+            }
+        }
+        $output_trailer.= '</div>';
+    } else {
+        $output_trailer = '';
+    }
+    
     $output_panel_list.= '
 <div id="' . $list['id'] . '" class="movie">
-    <div class="title"><a href="?id=' . $list['id'] . '">' . $list['title'] . '</a></div>
+    <div class="title"><a href="index.php?id=' . $list['id'] . '">' . $list['title'] . '</a></div>
     <div class="title_org">' . $list['originaltitle'] . '</div>'
-    . $watched . '
-    <img id="poster_movie_' . $list['id'] . '" class="poster" src="' . $poster . '">
+    . $watched . $trailer . '
+    <img id="poster_movie_' . $list['id'] . '" class="poster" src="' . $poster . '" alt="">
     <div class="desc">
         <table class="table">
             <tr>
@@ -477,9 +496,10 @@ while ($list = mysql_fetch_array($list_result)) {
                 <td class="right">' . $list['plot'] . '</td>
             </tr>
         </table>
-        <img class="img_space" src="css/' . $set['theme'] . '/img/space.png">
+        <img class="img_space" src="css/' . $set['theme'] . '/img/space.png" alt="">
         ' . $img_flag . '
     </div>
+    ' . $output_trailer . '
 </div>';
 }
 
@@ -489,11 +509,16 @@ while ($list = mysql_fetch_array($list_result)) {
     <head>
         <title><?PHP echo $set['site_name'] ?></title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <!--[if IE]>
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+        <![endif]-->
+        <link type="image/x-icon" href="css/<?PHP echo $set['theme'] ?>/img/icon.ico" rel="icon" media="all" />
         <link type="text/css" href="css/<?PHP echo $set['theme'] ?>/style.css" rel="stylesheet" media="all" />
+        <link type="text/css" href="css/<?PHP echo $set['theme'] ?>/video.css" rel="stylesheet" media="all" />
         <script type="text/javascript" src="js/jquery-1.9.1.js"></script>
         <script type="text/javascript" src="js/jquery.cycle.lite.js"></script>
         <script type="text/javascript" src="js/jquery.script.js"></script>
+        <script type="text/javascript" src="js/video.js"></script>
     </head>
     <body>
         <img src="css/<?PHP echo $set['theme'] ?>/img/bg.jpg" id="background" alt="<?PHP echo ($set['show_fanart'] == 1 ? '1' : '') ?>">

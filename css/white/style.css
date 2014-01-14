@@ -16,14 +16,14 @@ input, select { background-color:#ddd; color:#333; border:1px solid #fff; font-s
 .panel_info { border:3px solid #00cc00; background-color:#66ff33; font-weight:bold; color:#000; padding:5px; }
 
 .container { background-color:#eee; border:1px solid #ccc; width:800px; overflow:hidden; margin:auto; padding-bottom:20px; padding-top:10px; opacity:0.9; }
-.container2 { width:300px; margin:auto; background-color:#ccc; border:1px solid #333; margin-top:20px; padding:10px; text-align:center; }
+.container_login { width:300px; margin:auto; background-color:#ccc; border:1px solid #333; margin-top:20px; padding:10px; text-align:center; }
 
 #panel_top, #panel_title { width:728px; overflow:hidden; margin:auto; }
-#panel_recently_title, #panel_random_title, #panel_last_played_title, #panel_top_rated_title { float:left; color:#414141; font-weight:bold; padding-top:3px; padding-left:4px; background-color:#fff; width:138px; height:17px; margin-left:20px; margin-right:20px; }
-#panel_recently, #panel_random, #panel_last_played, #panel_top_rated { border:1px solid #000; width:140px; height:198px; margin-left:20px; margin-right:20px; overflow:hidden; float:left; }
-#panel_recently img, #panel_random img, #panel_last_played img, #panel_top_rated img { display:block; }
+.panel_top_item_title { float:left; color:#414141; font-weight:bold; padding-top:3px; padding-left:4px; background-color:#fff; width:138px; height:17px; margin-left:20px; margin-right:20px; }
+.panel_top_item { border:1px solid #000; width:140px; height:198px; margin-left:20px; margin-right:20px; overflow:hidden; float:left; }
+.panel_top_item img { display:block; }
 
-#panel_left { float:left; width:140px; margin-left:10px; margin-top:5px; }
+#panel_left { width:140px; float:left; margin-left:10px; margin-top:5px; }
 .panel_box_title { border:1px solid #ddd; font-weight:bold; text-align:center; background-color:#fff; padding:2px; margin-top:5px; }
 .panel_box { padding:5px; border:1px solid #fff; border-top:0px; background-color:#ddd; }
 .panel_box ul, .panel_box li, .panel_box a { display:block; list-style:none; margin:0; padding:0 }
@@ -32,8 +32,7 @@ input, select { background-color:#ddd; color:#333; border:1px solid #fff; font-s
 .panel_right_ex { width: 630px; float:right; }
 
 #panel_sort { text-align:center; background-color:#ddd; border:1px solid #fff; margin-bottom:10px; }
-.box { display:block; width:100px; font-weight:bold; border:1px solid #ccc; background-color:#fff; margin:auto; margin-bottom:10px; padding:3px; padding-left:10px; padding-right:10px; text-align:center; }
-.box_inline{ display:inline-block; font-weight:bold; border:1px solid #ccc; background-color:#fff; margin:3px; padding:3px; padding-left:10px; padding-right:10px; text-align:center; }
+.box_inline{ display:inline-block; font-weight:bold; border:1px solid #ccc; background-color:#fff; margin:5px 3px 5px 3px; padding:3px 10px 3px 10px; text-align:center; }
 
 #panel_search { text-align:right; margin-bottom:10px; }
 
@@ -46,11 +45,13 @@ input, select { background-color:#ddd; color:#333; border:1px solid #fff; font-s
 .title a:hover { font-size:20px; font-weight:bold; color:#414141; text-decoration:underline; }
 .title_org { font-size:11px; font-weight:bold; color:#888; }
 .watched { position:absolute; margin-left:104px; margin-top:162px; display:block; }
+.img_trailer { position:absolute; margin-left:94px; margin-top:8px; display:block; opacity: .8; }
 .flag { margin-left:3px; }
-.desc { text-align:center; margin-left:150px; margin-top:5px; }
+.desc { text-align:center; margin-left:150px; margin-top:5px; min-height: 220px; }
 .table { margin:0px; padding:0px; border:0px; }
 .left { font-weight:bold; color:#414141; text-align:right; width:60px; vertical-align:top; }
 .right { text-align:left; }
+.trailer { border: 1px solid #000; margin:auto; margin-top:10px; margin-bottom:10px; width:560px; }
 .img_space { width:300px; height:1px; display:block; margin:auto; margin-top:5px; margin-bottom:5px; }
 
 #panel_bottom { bottom:0px; text-align:right; color:#999; background-color:#ddd; margin-top:20px; padding:3px; padding-right:20px; }

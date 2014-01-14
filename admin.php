@@ -1,7 +1,7 @@
 <?PHP
 session_start();
-require_once 'config.php';
-require_once 'function.php';
+require('config.php');
+require('function.php');
 
 if ($option == 'delete_install') {
     unlink('install.php');
@@ -19,7 +19,7 @@ connect($mysql_ml);
 
 // get settings from db
 $set = get_settings($mysql_ml, $mysql_tables);
-require_once 'lang/lang_' . $set['language'] . '.php';
+require('lang/' . $set['language'] . '/lang.php');
 
 // check install.php file exist
 if (file_exists('install.php')) {
@@ -64,7 +64,6 @@ if ($option == '') {
     
     // Cached
     $cached_dir = scandir('cache/');
-    $all_cached = count($cached_dir) - 2;
     $poster_cached = 0;
     $fanart_cached = 0;
     foreach ($cached_dir as $val) {
@@ -85,6 +84,9 @@ if ($option == '') {
             <tr><td class="bold orange">' . $lang['a_cache'] . '</td><td></td></tr>
             <tr><td>' . $lang['a_cached_posters'] . '</td><td>' . $poster_cached . '</td></tr>
             <tr><td>' . $lang['a_cached_fanarts'] . '</td><td>' . $fanart_cached . '</td></tr>
+            <tr><td class="bold orange">' . $lang['a_server_settings'] . '</td><td></td></tr>
+            <tr><td>UPLOAD MAX FILESIZE</td><td>' . ini_get('upload_max_filesize') . '</td></tr>
+            <tr><td>POST MAX SIZE</td><td>' . ini_get('post_max_size') . '</td></tr>
         </table>';
 }
 
@@ -92,7 +94,7 @@ if ($option == '') {
  * # MOVIE LIST #
  */##############
 if ($option == 'list') {
-    $list_sql = 'SELECT id, title, poster, fanart, play_count FROM ' . $mysql_tables[0] . ' ORDER BY title';
+    $list_sql = 'SELECT id, title, trailer, play_count FROM ' . $mysql_tables[0] . ' ORDER BY title';
     $list_result = mysql_query($list_sql);
     $output_panel = '
         <table class="table">
@@ -100,43 +102,36 @@ if ($option == 'list') {
                 </td><td>ID</td>
                 <td>' . $lang['a_title'] . '</td>
                 <td>P</td>
-                <td></td>
                 <td>F</td>
-                <td></td>
+                <td>T</td>
                 <td></td>
             </tr>';
     $i = 0;
     while ($list = mysql_fetch_array($list_result)) {
         if (file_exists('cache/' . $list['id'] . '.jpg')) {
-            $poster_exist = '<img src="css/' . $set['theme'] . '/admin/img/exist.png">';
+            $poster_exist = '<img src="css/' . $set['theme'] . '/admin/img/exist.png" alt="">';
         } else {
             $poster_exist = '';
         }
         if (file_exists('cache/' . $list['id'] . '_f.jpg')) {
-            $fanart_exist = '<img src="css/' . $set['theme'] . '/admin/img/exist.png">';
+            $fanart_exist = '<img src="css/' . $set['theme'] . '/admin/img/exist.png" alt="">';
         } else {
             $fanart_exist = '';
         }
-        if (stristr($list['poster'], 'http://')) {
-            $poster_link = '<a href="' . $list['poster'] . '" target="_blank"><img src="css/' . $set['theme'] . '/admin/img/link.png" title="Link"></a>';
+        if (stristr($list['trailer'], 'http://')) {
+            $trailer_link = '<a href="' . $list['trailer'] . '" target="_blank"><img src="css/' . $set['theme'] . '/admin/img/link.png" title="Link" alt=""></a>';
         } else {
-            $poster_link = '';
-        }
-        if (stristr($list['fanart'], 'http://')) {
-            $fanart_link = '<a href="' . $list['fanart'] . '" target="_blank"><img src="css/' . $set['theme'] . '/admin/img/link.png" title="Link"></a>';
-        } else {
-            $fanart_link = '';
+            $trailer_link = '';
         }
         $i++;
         $output_panel.= '
             <tr id="row_' . $list['id'] . '">
                 <td>' . $i . '</td><td>' . $list['id'] . '</td>
                 <td>' . $list['title'] . '</td>
-                <td>' . $poster_link . '</td>
                 <td>'  . $poster_exist . '</td>
-                <td>' . $fanart_link . '</td>
                 <td>'  . $fanart_exist . '</td>
-                <td><img id="' . $list['id'] . '" class="delete_row" src="css/' . $set['theme'] . '/admin/img/delete.png" title="' . $lang['a_delete'] . '"></td>
+                <td>'  . $trailer_link . '</td>
+                <td><img id="' . $list['id'] . '" class="delete_row" src="css/' . $set['theme'] . '/admin/img/delete.png" title="' . $lang['a_delete'] . '" alt=""></td>
             </tr>';
     }
     $output_panel.= '</table>';
@@ -159,24 +154,21 @@ if ($option == 'settings') {
     $output_panel_a_codec = '';
     $output_panel_a_chan = '';
     $output_show_fanart = '';
+    $output_show_trailer = '';
     $output_protect_site = '';
     $output_per_page = '';
-    $output_recently_limit = '';
-    $output_random_limit = '';
-    $output_last_played_limit = '';
-    $output_top_rated_limit = '';
+    $output_panel_top_limit = '';
     
     // set language input
     $option_language = scandir('lang/');
     foreach ($option_language as $val) {
-        if ((substr($val, 0, 4) == 'lang') && (substr($val, -3) == 'php')) {
-            $fp = fopen('lang/' . $val, 'r');
-            for ($i=0;$i<3;$i++) {
-                $line = fgets($fp);
+        if (file_exists('lang/' . $val . '/lang.php')) {
+            if (array_key_exists($val, $language)) {
+                $lang_title = $language[$val];
+            } else {
+                $lang_title = $val;
             }
-            preg_match('/([a-zA-Z]+)/', $line, $lang_title);
-            preg_match('/_([a-zA-Z]+)\./', $val, $lang_id);
-            $output_lang.= '<option' . ($val == 'lang_' . $set['language'] . '.php' ? ' selected="selected"' : '') . ' value="' . $lang_id[1] . '">' . ucfirst(strtolower($lang_title[1])) . '</option>';
+            $output_lang.= '<option' . ($val == $set['language'] ? ' selected="selected"' : '') . ' value="' . $val . '">' . $lang_title . '</option>';
         }
     }
     
@@ -197,6 +189,8 @@ if ($option == 'settings') {
         $output_watched_status.= '<option' . ($set['watched_status'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         // set show fanart input
         $output_show_fanart.= '<option' . ($set['show_fanart'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
+        // set show trailer input
+        $output_show_trailer.= '<option' . ($set['show_trailer'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         // set protect site input
         $output_protect_site.= '<option' . ($set['protect_site'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
     }
@@ -223,14 +217,8 @@ if ($option == 'settings') {
     foreach ($quantity as $val) {
         // set per page input
         $output_per_page.= '<option' . ($set['per_page'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . $val . '</option>';
-        // set recently limit
-        $output_recently_limit.= '<option' . ($set['recently_limit'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . $val . '</option>';
-        // set random limit
-        $output_random_limit.= '<option' . ($set['random_limit'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . $val . '</option>';
-        // set last played limit
-        $output_last_played_limit.= '<option' . ($set['last_played_limit'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . $val . '</option>';
-        // set top rated limit
-        $output_top_rated_limit.= '<option' . ($set['top_rated_limit'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . $val . '</option>';
+        // set panel top limit
+        $output_panel_top_limit.= '<option' . ($set['panel_top_limit'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . $val . '</option>';
     }
 
     // output form
@@ -245,6 +233,7 @@ if ($option == 'settings') {
                 <tr><td>' . $lang['a_panel_top'] . ':</td><td><select name="panel_top">' . $output_panel_top . '</select></td></tr>
                 <tr><td>' . $lang['a_watched_status'] . ':</td><td><select name="watched_status">' . $output_watched_status . '</select></td></tr>
                 <tr><td>' . $lang['a_show_fanart'] . ':</td><td><select name="show_fanart">' . $output_show_fanart . '</select></td></tr>
+                <tr><td>' . $lang['a_show_trailer'] . ':</td><td><select name="show_trailer">' . $output_show_trailer . '</select></td></tr>
                 <tr><td>' . $lang['a_protect_site']  . ':</td><td><select name="protect_site">' . $output_protect_site . '</select></td></tr>
                 <tr><td class="bold orange">' . $lang['a_set_panel_left'] . '</td><td></td></tr>
                 <tr><td>' . $lang['a_panel_overall'] . ':</td><td><select name="panel_overall">' . $output_panel_overall . '</select></td></tr>
@@ -256,10 +245,7 @@ if ($option == 'settings') {
                 <tr><td>' . $lang['a_panel_a_chan'] . ':</td><td><select name="panel_a_chan">' . $output_panel_a_chan . '</select></td></tr>
                 <tr><td class="bold orange">' . $lang['a_set_panel_top'] . '</td><td></td></tr>
                 <tr><td>' . $lang['a_panel_top_time'] . ':</td><td><input type="text" name="panel_top_time" value="' . $set['panel_top_time'] . '" /></td></tr>
-                <tr><td>' . $lang['a_recently_limit'] . ':</td><td><select name="recently_limit">' . $output_recently_limit . '</select></td></tr>
-                <tr><td>' . $lang['a_random_limit'] . ':</td><td><select name="random_limit">' . $output_random_limit . '</select></td></tr>
-                <tr><td>' . $lang['a_last_played_limit'] . ':</td><td><select name="last_played_limit">' . $output_last_played_limit . '</select></td></tr>
-                <tr><td>' . $lang['a_top_rated_limit'] . ':</td><td><select name="top_rated_limit">' . $output_top_rated_limit . '</select></td></tr>
+                <tr><td>' . $lang['a_panel_top_limit'] . ':</td><td><select name="panel_top_limit">' . $output_panel_top_limit . '</select></td></tr>
             </table><br />
                 <input type="submit" value="' . $lang['a_save'] . '" />
         </form>';
@@ -272,10 +258,7 @@ if ($option == 'settings_save') {
         language = "' . $_POST['language'] . '",
         theme = "' . $_POST['theme'] . '",
         per_page = "' . $_POST['per_page'] . '",
-        recently_limit = "' . $_POST['recently_limit'] . '",
-        random_limit = "' . $_POST['random_limit'] . '",
-        last_played_limit = "' . $_POST['last_played_limit'] . '",
-        top_rated_limit = "' . $_POST['top_rated_limit'] . '",
+        panel_top_limit = "' . $_POST['panel_top_limit'] . '",
         panel_top_time = "' . $_POST['panel_top_time'] . '",
         panel_top = "' . $_POST['panel_top'] . '",
         watched_status = "' . $_POST['watched_status'] . '",
@@ -287,6 +270,7 @@ if ($option == 'settings_save') {
         panel_a_codec = "' . $_POST['panel_a_codec'] . '",
         panel_a_chan = "' . $_POST['panel_a_chan'] . '",
         show_fanart = "' . $_POST['show_fanart'] . '",
+        show_trailer = "' . $_POST['show_trailer'] . '",
         protect_site = "' . $_POST['protect_site'] . '"';
     mysql_query($settings_update_sql);
     
@@ -387,10 +371,13 @@ if ($output_panel_info !== '') {
 <!DOCTYPE HTML>
 <html>
     <head>
-        <title><?PHP echo $set['site_name'] ?> - Admin Panel</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title><?PHP echo $set['site_name'] ?> - <?PHP echo $lang['a_html_admin_panel'] ?></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <!--[if IE]>
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-        <link href="css/<?PHP echo $set['theme'] ?>/admin/style.css" rel="stylesheet" type="text/css">
+        <![endif]-->
+        <link type="image/x-icon" href="css/<?PHP echo $set['theme'] ?>/img/icon.ico" rel="icon" media="all" />
+        <link type="text/css" href="css/<?PHP echo $set['theme'] ?>/admin/style.css" rel="stylesheet" media="all" />
         <script type="text/javascript" src="js/jquery-1.9.1.js"></script>
         <script type="text/javascript" src="js/jquery.script.js"></script>
     </head>

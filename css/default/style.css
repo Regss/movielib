@@ -16,12 +16,12 @@ input, select { background-color:#222; color:#dddddd; border:1px solid #000; fon
 .panel_info { border:3px solid #00cc00; background-color:#66ff33; font-weight:bold; color:#000; padding:5px; }
 
 .container { background-color:#111; border:1px solid #333; width:800px; overflow:hidden; margin:auto; padding-bottom:20px; padding-top:10px; opacity:0.9; }
-.container2 { width:300px; margin:auto; background-color:#111; border:1px solid #333; margin-top:20px; padding:10px; text-align:center; }
+.container_login { width:300px; margin:auto; background-color:#111; border:1px solid #333; margin-top:20px; padding:10px; text-align:center; }
 
 #panel_top, #panel_title { width:728px; overflow:hidden; margin:auto; }
-#panel_recently_title, #panel_random_title, #panel_last_played_title, #panel_top_rated_title { float:left; color:#ff7300; font-weight:bold; padding-top:3px; padding-left:4px; background-color:#000; width:138px; height:17px; margin-left:20px; margin-right:20px; }
-#panel_recently, #panel_random, #panel_last_played, #panel_top_rated { border:1px solid #000; width:140px; height:198px; margin-left:20px; margin-right:20px; overflow:hidden; float:left; }
-#panel_recently img, #panel_random img, #panel_last_played img, #panel_top_rated img { display:block; }
+.panel_top_item_title { float:left; color:#ff7300; font-weight:bold; padding-top:3px; padding-left:4px; background-color:#000; width:138px; height:17px; margin-left:20px; margin-right:20px; }
+.panel_top_item { border:1px solid #000; width:140px; height:198px; margin-left:20px; margin-right:20px; overflow:hidden; float:left; }
+.panel_top_item img { display:block; }
 
 #panel_left { width:140px; float:left; margin-left:10px; margin-top:5px; }
 .panel_box_title { border:1px solid #222; font-weight:bold; text-align:center; background-color:#000; padding:2px; margin-top:5px; }
@@ -32,8 +32,7 @@ input, select { background-color:#222; color:#dddddd; border:1px solid #000; fon
 .panel_right_ex { width: 630px; float:right; }
 
 #panel_sort { text-align:center; background-color:#222; border:1px solid #000; margin-bottom:10px; }
-.box { display:block; width:100px; font-weight:bold; border:1px solid #333; background-color:#000; margin:auto; margin-bottom:10px; padding:3px; padding-left:10px; padding-right:10px; text-align:center; }
-.box_inline{ display:inline-block; font-weight:bold; border:1px solid #333; background-color:#000; margin:3px; padding:3px; padding-left:10px; padding-right:10px; text-align:center; }
+.box_inline{ display:inline-block; font-weight:bold; border:1px solid #333; background-color:#000; margin:5px 3px 5px 3px; padding:3px 10px 3px 10px; text-align:center; }
 
 #panel_search { text-align:right; margin-bottom:10px; }
 
@@ -46,11 +45,13 @@ input, select { background-color:#222; color:#dddddd; border:1px solid #000; fon
 .title a:hover { font-size:20px; font-weight:bold; color:#ff7300; text-decoration:underline; }
 .title_org { font-size:11px; font-weight:bold; color:#aaa; }
 .watched { position:absolute; margin-left:104px; margin-top:162px; display:block; }
+.img_trailer { position:absolute; margin-left:94px; margin-top:8px; display:block; opacity: .8; }
 .flag { margin-left:3px; }
-.desc { text-align:center; margin-left:150px; margin-top:5px; }
+.desc { text-align:center; margin-left:150px; margin-top:5px; min-height: 220px; }
 .table { margin:0px; padding:0px; border:0px; }
 .left { font-weight:bold; color:#ff7300; text-align:right; width:60px; vertical-align:top; }
 .right { text-align:left; }
+.trailer { border: 1px solid #fff; margin:auto; margin-top:10px; margin-bottom:10px; width:560px; }
 .img_space { width:300px; height:1px; display:block; margin:auto; margin-top:5px; margin-bottom:5px; }
 
 #panel_bottom { bottom:0px; text-align:right; color:#999; background-color:#111; margin-top:20px; padding:3px; padding-right:20px; }

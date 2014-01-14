@@ -17,7 +17,7 @@ input, select { background-color:#222; color:#dddddd; border:1px solid #000; fon
 .panel_info { border:3px solid #00cc00; background-color:#66ff33; font-weight:bold; color:#000; padding:5px; }
 
 .container { background-color:#111; border:1px solid #333; width:800px; overflow:hidden; margin:auto; padding-bottom:20px; padding-top:10px; opacity:0.9; }
-.container2 { width:300px; margin:auto; background-color:#111; border:1px solid #333; margin-top:20px; padding:10px; text-align:center; }
+.container_install { width:300px; margin:auto; background-color:#111; border:1px solid #333; margin-top:20px; padding:10px; text-align:center; }
 
 #panel_left { float:left; width:140px; margin-left:10px; margin-top:10px; }
 

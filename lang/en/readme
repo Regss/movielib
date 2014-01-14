@@ -12,10 +12,3 @@ Movielib XBMC Add-on repository:
 https://raw.github.com/Regss/xbmc-regss-repository/master/repo/repository.regss/repository.regss-1.2.1.zip
 
 In Panel Admin section you need to generate token and put it to addon settings with URL to script.
-
-v. 2.1.0
-- added more filter options
-- PA: possibility to manualy delete movie option
-
-v. 2.0.0
-- init new version

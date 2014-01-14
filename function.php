@@ -65,8 +65,7 @@ function create_table($mysql_table, $lang) {
                 `plot` text,
                 `rating` text,
                 `year` text,
-                `poster` text,
-                `fanart` text,
+                `trailer` text,
                 `runtime` text,
                 `genre` text,
                 `director` text,
@@ -94,10 +93,7 @@ function create_table($mysql_table, $lang) {
                 `language` varchar(15) DEFAULT "' . $_SESSION['install_lang'] . '",
                 `theme` varchar(15) DEFAULT "default",
                 `per_page` int(5) DEFAULT 50,
-                `recently_limit` int(5) DEFAULT 10,
-                `random_limit` int(5) DEFAULT 10,
-                `last_played_limit` int(5) DEFAULT 10,
-                `top_rated_limit` int(5) DEFAULT 10,
+                `panel_top_limit` int(5) DEFAULT 10,
                 `panel_top_time` int(5) DEFAULT 5,
                 `panel_top` int(1) DEFAULT 1,
                 `watched_status` int(1) DEFAULT 1,
@@ -109,6 +105,7 @@ function create_table($mysql_table, $lang) {
                 `panel_a_codec` int(1) DEFAULT 1,
                 `panel_a_chan` int(1) DEFAULT 1,
                 `show_fanart` int(1) DEFAULT 1,
+                `show_trailer` int(1) DEFAULT 1,
                 `protect_site` int(1) DEFAULT 0,
                 `token` varchar(6) DEFAULT ""
                 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8';
@@ -160,8 +157,7 @@ function sync_add($mysql_ml, $mysql_tables) {
         `plot`,
         `rating`,
         `year`,
-        `poster`,
-        `fanart`,
+        `trailer`,
         `runtime`,
         `genre`,
         `director`,
@@ -185,8 +181,7 @@ function sync_add($mysql_ml, $mysql_tables) {
         "' . addslashes($_POST['plot']) . '",
         "' . round($_POST['rating'], 1) . '",
         "' . $_POST['year'] . '",
-        ' . ($_POST['poster'] == '' ? 'NULL' : '"' . addslashes($_POST['poster']) . '"') . ',
-        ' . ($_POST['fanart'] == '' ? 'NULL' : '"' . addslashes($_POST['fanart']) . '"') . ',
+        ' . ($_POST['trailer'] == '' ? 'NULL' : '"' . addslashes($_POST['trailer']) . '"') . ',
         '  . $_POST['runtime'] . ',
         "' . addslashes($_POST['genre']) . '",
         "' . addslashes($_POST['director']) . '",
@@ -209,7 +204,29 @@ function sync_add($mysql_ml, $mysql_tables) {
     if (!$insert) {
         echo 'ERROR: MySQL - ' . mysql_error();
     } else {
-        gd_convert('cache/' . $_POST['id'] . '.jpg', $_POST['poster'], 140, 198);
+    
+        // poster
+        if (substr($_POST['poster'], 0, 4) == 'http') {
+            gd_convert('cache/' . $_POST['id'] . '.jpg', $_POST['poster'], 140, 198);
+        } else {
+            $fp = fopen('cache/temp_' . $_POST['id'], 'w');
+            fwrite($fp, $_POST['poster']);
+            fclose($fp);
+            gd_convert('cache/' . $_POST['id'] . '.jpg', 'cache/temp_' . $_POST['id'], 140, 198);
+            unlink('cache/temp_' . $_POST['id']);
+        }
+        
+        // fanart
+        if (substr($_POST['fanart'], 0, 4) == 'http') {
+            gd_convert('cache/' . $_POST['id'] . '_f.jpg', $_POST['fanart'], 1280, 720);
+        } else {
+            $fp = fopen('cache/temp_f' . $_POST['id'], 'w');
+            fwrite($fp, $_POST['fanart']);
+            fclose($fp);
+            gd_convert('cache/' . $_POST['id'] . '_f.jpg', 'cache/temp_f' . $_POST['id'], 1280, 720);
+            unlink('cache/temp_f' . $_POST['id']);
+            
+        }
     }
 }
 

@@ -1,0 +1,12 @@
+v. 2.2.0
+- language translation by Transifex
+- rewrite creating cache function
+- added trailer support
+- added support for sync poster and fanart stored localy
+
+v. 2.1.0
+- added more filter options
+- PA: possibility to manualy delete movie option
+
+v. 2.0.0
+- init new version

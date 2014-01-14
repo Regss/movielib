@@ -1,7 +1,7 @@
 <?PHP
 session_start();
-require_once ('config.php');
-require_once ('function.php');
+require('config.php');
+require('function.php');
 
 // delete session var
 foreach ($_SESSION as $val) {
@@ -18,29 +18,29 @@ if (isset($_POST['install_lang'])) {
 // check user language from browser
 if (!isset($_SESSION['install_lang'])) {
     $install_lang = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
-    if (!file_exists('lang/lang_' . $install_lang . '.php')) {
+    if (!file_exists('lang/' . $install_lang . '/lang.php')) {
         $install_lang = 'en';
     }
     $_SESSION['install_lang'] = $install_lang;
 } else {
     $install_lang = $_SESSION['install_lang'];
 }
-include_once 'lang/lang_' . $install_lang . '.php';
 
 // check dir for language file
 $output_install_lang = '';
 $option_install_language = scandir('lang/');
 foreach ($option_install_language as $val) {
-    if ((substr($val, 0, 4) == 'lang') && (substr($val, -3) == 'php')) {
-        $fp = fopen('lang/' . $val, 'r');
-        for ($i=0;$i<3;$i++) {
-            $line = fgets($fp);
+    if (file_exists('lang/' . $val . '/lang.php')) {
+        
+        if (array_key_exists($val, $language)) {
+            $lang_title = $language[$val];
+        } else {
+            $lang_title = $val;
         }
-        preg_match('/([a-zA-Z]+)/', $line, $lang_title);
-        preg_match('/_([a-zA-Z]+)\./', $val, $lang_id);
-        $output_install_lang.= '<option' . ($val == 'lang_' . $install_lang . '.php' ? ' selected="selected"' : '') . ' value="' . $lang_id[1] . '">' . ucfirst(strtolower($lang_title[1])) . '</option>';
+        $output_install_lang.= '<option' . ($val == $install_lang ? ' selected="selected"' : '') . ' value="' . $val . '">' . $lang_title . '</option>';
     }
 }
+require('lang/' . $install_lang . '/lang.php');
 
 if ($option == 'license') {
 
@@ -56,7 +56,7 @@ if ($option == 'license') {
     }
     
     $output_panel = '
-    <div class="container2">
+    <div class="container_install">
         <div class="title">' . $lang['ins_license'] . '</div>
     </div>
     <form>
@@ -77,10 +77,10 @@ if ($option == 'license') {
     }
     
     $output_panel = $db_exist . '
-    <div class="container2">
+    <div class="container_install">
         <div class="title">' . $lang['inst_conn_db'] . '</div>
     </div>
-    <div class="container2">
+    <div class="container_install">
         <form action="install.php?option=success" method="post">
             <table class="table">
                 <tr><td>' . $lang['inst_server'] . ':</td><td><input type="text" name="host" value="localhost"></td></tr>
@@ -100,11 +100,12 @@ if ($option == 'license') {
      */##################
     $conn_install = @mysql_connect($_POST['host'] . ':' . $_POST['port'], $_POST['login'], $_POST['pass']);
     if (!$conn_install) {
-        die($lang['ins_could_connect'] . ' - ' . mysql_error() . '<br />');
+        die($lang['ins_could_connect'] . ' - ' . mysql_error());
     }
+    $create_db = @mysql_query('CREATE DATABASE ' . $_POST['database']);
     $sel_install = @mysql_select_db($_POST['database']);
     if (!$sel_install) {
-        die($lang['ins_could_connect'] . ' - ' . mysql_error() . '<br />');
+        die($lang['ins_could_connect'] . ' - ' . mysql_error());
     }
     create_table($mysql_tables, $lang);
     $fp = fopen('db.php', 'w');
@@ -113,7 +114,7 @@ if ($option == 'license') {
     fclose($fp);
     
     $output_panel = '
-    <div class="container2">
+    <div class="container_install">
         <div class="title">' . $lang['ins_finished'] . '</div>
     </div><br />
     <a class="box" href="admin.php?option=delete_install">' . $lang['ins_admin'] . '</a>';
@@ -123,7 +124,7 @@ if ($option == 'license') {
     /* ##########
      * # README #
      */##########
-    $readme_file = 'lang/lang_' . $_SESSION['install_lang'] . '.readme';
+    $readme_file = 'lang/' . $_SESSION['install_lang'] . '/readme';
     if (!file_exists($readme_file)) {
         $readme_file = 'README.txt';
     }
@@ -131,7 +132,7 @@ if ($option == 'license') {
     $readme = fread($fp, 88192);
     
     $output_panel = '
-    <div class="container2">
+    <div class="container_install">
         <div class="title">' . $lang['ins_lang_file'] . '</div>
         <form action="install.php" method="post"><BR />
             <select onchange="this.form.submit()" name="install_lang">' . $output_install_lang . '</select><BR />
@@ -149,9 +150,12 @@ if ($option == 'license') {
 <html>
     <head>
         <title>MovieLib - <?PHP echo $lang['ins_title'] ?></title>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <!--[if IE]>
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-        <link href="css/default/admin/style.css" rel="stylesheet" type="text/css">
+        <![endif]-->
+        <link type="image/x-icon" href="css/default/img/icon.ico" rel="icon" media="all" />
+        <link type="text/css" href="css/default/admin/style.css" rel="stylesheet" media="all" />
         <script type="text/javascript" src="js/jquery-1.9.1.js"></script>
         <script type="text/javascript" src="js/jquery.script.js"></script>
     </head>

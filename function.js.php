@@ -1,22 +1,6 @@
 <?PHP
 session_start();
-require_once 'config.php';
-
-// create cache for background
-if ($option == 'bg') {
-    $fanart_cache = 'cache/' . $_GET['id'] . '_f.jpg';
-    if (!file_exists($fanart_cache)) {
-        include 'config.php';
-        include 'function.php';
-        connect($mysql_ml);
-        $fanart_sql = 'SELECT id, fanart FROM ' . $mysql_tables[0] . ' WHERE id = "' . $_GET['id'] . '"';
-        $fanart_result = mysql_query($fanart_sql);
-        while ($fanart = mysql_fetch_array($fanart_result)) {
-            $fanart_link = $fanart['fanart'];
-        }
-        gd_convert($fanart_cache, $fanart_link, 1280, 720);
-    }
-}
+require('config.php');
 
 // save panel status
 if ($option == 'panel') {
@@ -32,8 +16,8 @@ if (!isset($_SESSION['logged_admin']) or $_SESSION['logged_admin'] !== true) {
 
 // delete movie
 if ($option  == 'delete') {
-    include 'config.php';
-    include 'function.php';
+    require('config.php');
+    require('function.php');
     connect($mysql_ml);
     $id = $_GET['id'];
     $delete_movie_sql = 'DELETE FROM ' . $mysql_tables[0] . ' WHERE id = "' . $id . '"';

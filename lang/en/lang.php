@@ -1,7 +1,4 @@
 <?PHP
-/* ###########
- * # ENGLISH #
- */###########
 
 /* #############
  * # INDEX.PHP #
@@ -12,6 +9,7 @@ $lang['i_year']                         =   'Year';
 $lang['i_rating']                       =   'Rating';
 $lang['i_added']                        =   'Added';
 $lang['i_last_played']                  =   'Last Played';
+$lang['i_most_watched']                 =   'Most Watched';
 $lang['i_all']                          =   'All';
 $lang['i_page']                         =   'Page';
 $lang['i_genre']                        =   'Genre';
@@ -33,9 +31,7 @@ $lang['i_overall_notwatched']           =   'Unwatched';
 $lang['i_v_codec']                      =   'Video Codec';
 $lang['i_a_codec']                      =   'Audio Codec';
 $lang['i_a_chan']                       =   'Audio Channels';
-$lang['i_last_played']                  =   'Last played';
 $lang['i_last_added']                   =   'Last added';
-$lang['i_randomly']                     =   'Random';
 $lang['i_top_rated']                    =   'Top rated';
 
 /* #############
@@ -50,6 +46,7 @@ $lang['l_wrong_pass']                   =   'Wrong password';
 /* #############
  * # ADMIN.PHP #
  */#############
+
 $lang['a_pass_default']                 =   'Password to Admin Panel is still default. Change it for more safety';
 $lang['a_install_exist']                =   'install.php file still exist. Delete it to for more safety';
 $lang['a_movies']                       =   'Movies';
@@ -60,6 +57,7 @@ $lang['a_title']                        =   'Title';
 $lang['a_cache']                        =   'Cache';
 $lang['a_cached_posters']               =   'Cached posters';
 $lang['a_cached_fanarts']               =   'Cached fanarts';
+$lang['a_server_settings']              =   'Server Settings';
 $lang['a_delete']                       =   'Delete';
 $lang['a_set_main']                     =   'Main';
 $lang['a_set_panel_left']               =   'Left panel';
@@ -68,10 +66,7 @@ $lang['a_site_name']                    =   'Site title';
 $lang['a_language']                     =   'Language';
 $lang['a_theme']                        =   'Theme';
 $lang['a_per_page']                     =   'Item per page';
-$lang['a_recently_limit']               =   'Item in Recently added';
-$lang['a_random_limit']                 =   'Item in Random';
-$lang['a_last_played_limit']            =   'Item in Last played';
-$lang['a_top_rated_limit']              =   'Item in Top rated';
+$lang['a_panel_top_limit']              =   'Item to loop in Top panel';
 $lang['a_panel_top_time']               =   'Panel top changeing time (sec.)';
 $lang['a_panel_top']                    =   'Panel top';
 $lang['a_watched_status']               =   'Watched status';
@@ -83,6 +78,7 @@ $lang['a_panel_v_codec']                =   'Video Codec panel';
 $lang['a_panel_a_codec']                =   'Audio Codec panel';
 $lang['a_panel_a_chan']                 =   'Channel panel';
 $lang['a_show_fanart']                  =   'Show fanart in background';
+$lang['a_show_trailer']                 =   'Show trailer';
 $lang['a_protect_site']                 =   'Protect site';
 $lang['a_save']                         =   'Save';
 $lang['a_setting_on']                   =   'On';
@@ -102,6 +98,7 @@ $lang['a_admin_pass_min']               =   'Admin password must have minimum 4 
 $lang['a_admin_pass_n_match']           =   'Admin password not match';
 $lang['a_token_change']                 =   'Change';
 $lang['a_token_changed']                =   'Token Changed';
+$lang['a_html_admin_panel']             =   'Admin Panel';
 $lang['a_html_main_site']               =   'Main Site';
 $lang['a_html_movie_list']              =   'Movie List';
 $lang['a_html_settings']                =   'Settings';
@@ -112,6 +109,7 @@ $lang['a_html_logout']                  =   'Logout';
 /* ###############
  * # INSTALL.PHP #
  */###############
+
 $lang['ins_title']                      =   'Install';
 $lang['ins_lang_file']                  =   'Choose language';
 $lang['ins_next']                       =   'Next';
@@ -127,4 +125,5 @@ $lang['inst_port']                      =   'Port';
 $lang['inst_login']                     =   'Login';
 $lang['inst_pass']                      =   'Password';
 $lang['inst_database']                  =   'Database';
+
 ?>
