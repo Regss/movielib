@@ -8,7 +8,4 @@ Domyślne hasła:
 Dostęp do strony: user
 Dostęp do panelu administratora: admin
 
-Repozytorium wtyczki Movielib:
-https://raw.github.com/Regss/xbmc-regss-repository/master/repo/repository.regss/repository.regss-1.2.1.zip
-
 W Panelu Admina należy wygenerować token i wpisać go w opcjach wtyczki podając również adres skryptu.

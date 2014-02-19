@@ -31,13 +31,50 @@ $(document).ready(function() {
 
     // Default value for search input
     $('input').focus(function () {
-	if ($(this).val() == $(this).attr('title')) {
-		$(this).val('');
-	}
+        if ($(this).val() == $(this).attr('title')) {
+            $(this).val('');
+        }
     }).blur(function () {
-	if ($(this).val() == '') {
-		$(this).val($(this).attr('title'));
-	}
+        if ($(this).val() == '') {
+            $(this).val($(this).attr('title'));
+        }
+    });
+    
+    // live search
+    var wait;
+    $(document).on('keyup click', '#search', function() {
+        clearTimeout(wait);
+        wait = setTimeout(function() {
+            var search = $('#search').val();
+            if (search.length > 0) {
+                $.getJSON("function.js.php?option=search&search="+search, function(data){
+                    $('#panel_live_search').empty();
+                    for(var m in data) {
+                        var movie = data[m];
+                        $('#panel_live_search').append('\
+                        <a href="index.php?id='+movie['id']+'">\
+                            <div class="live_search_box" title="'+movie['title']+'">\
+                                <img class="img_live_search" src="cache/'+movie['id']+'.jpg">\
+                                <div class="live_search_title">'+movie['title']+'</div>\
+                                <div class="live_search_orig_title">'+movie['originaltitle']+'</div>\
+                                '+movie['year']+' | '+movie['rating']+' | '+movie['runtime']+' min. | '+movie['genre']+' | '+movie['country']+' | '+movie['director']+'\
+                            </div>\
+                        </a>');
+                    }
+                });
+            } else {
+                $('#panel_live_search').empty();
+            }
+            $(document).click(function(){
+                $('#panel_live_search').empty();
+            });
+        }, 500);
+    });
+    $(document).on('mouseenter', '.live_search_box', function(){
+        $(this).addClass('live_hover');
+    });
+    $(document).on('mouseleave', '.live_search_box', function(){
+        $(this).removeClass('live_hover');
     });
     
     // change background
@@ -114,5 +151,18 @@ $(document).ready(function() {
         var id = $(this).attr('id');
         $('#row_'+id).hide();
         $.ajax({url: 'function.js.php?option=delete&id='+id});
+    });
+    
+    // actor thumbnail
+    $('.actor_img').mouseenter(function(){
+        $(this).mousemove(function(event) {
+            var posX = event.pageX;
+            var posY = event.pageY;
+            $(this).children('.actor_thumb').css({'top': posY-110, 'left': posX+10});
+        });
+        $(this).children('.actor_thumb').delay(500).show(0);
+    });
+    $('.actor_img').mouseleave(function(){
+        $('.actor_thumb').dequeue().hide();
     });
 });

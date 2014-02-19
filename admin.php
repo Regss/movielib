@@ -146,6 +146,8 @@ if ($option == 'settings') {
     $output_theme = '';
     $output_panel_top = '';
     $output_watched_status = '';
+    $output_live_search = '';
+    $output_live_search_max_res = '';
     $output_panel_overall = '';
     $output_panel_genre = '';
     $output_panel_year = '';
@@ -187,7 +189,9 @@ if ($option == 'settings') {
         $output_panel_top.= '<option' . ($set['panel_top'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         // set wached status input
         $output_watched_status.= '<option' . ($set['watched_status'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
-        // set show fanart input
+        // set live search input
+        $output_live_search.= '<option' . ($set['live_search'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
+       // set show fanart input
         $output_show_fanart.= '<option' . ($set['show_fanart'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         // set show trailer input
         $output_show_trailer.= '<option' . ($set['show_trailer'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
@@ -219,6 +223,8 @@ if ($option == 'settings') {
         $output_per_page.= '<option' . ($set['per_page'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . $val . '</option>';
         // set panel top limit
         $output_panel_top_limit.= '<option' . ($set['panel_top_limit'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . $val . '</option>';
+        // set live search max res
+        $output_live_search_max_res.= '<option' . ($set['live_search_max_res'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . $val . '</option>';
     }
 
     // output form
@@ -232,6 +238,8 @@ if ($option == 'settings') {
                 <tr><td>' . $lang['a_per_page'] . ':</td><td><select name="per_page">' . $output_per_page . '</select></td></tr>
                 <tr><td>' . $lang['a_panel_top'] . ':</td><td><select name="panel_top">' . $output_panel_top . '</select></td></tr>
                 <tr><td>' . $lang['a_watched_status'] . ':</td><td><select name="watched_status">' . $output_watched_status . '</select></td></tr>
+                <tr><td>' . $lang['a_live_search'] . ':</td><td><select name="live_search">' . $output_live_search . '</select></td></tr>
+                <tr><td>' . $lang['a_live_search_max_res'] . ':</td><td><select name="live_search_max_res">' . $output_live_search_max_res . '</select></td></tr>
                 <tr><td>' . $lang['a_show_fanart'] . ':</td><td><select name="show_fanart">' . $output_show_fanart . '</select></td></tr>
                 <tr><td>' . $lang['a_show_trailer'] . ':</td><td><select name="show_trailer">' . $output_show_trailer . '</select></td></tr>
                 <tr><td>' . $lang['a_protect_site']  . ':</td><td><select name="protect_site">' . $output_protect_site . '</select></td></tr>
@@ -262,6 +270,8 @@ if ($option == 'settings_save') {
         panel_top_time = "' . $_POST['panel_top_time'] . '",
         panel_top = "' . $_POST['panel_top'] . '",
         watched_status = "' . $_POST['watched_status'] . '",
+        live_search = "' . $_POST['live_search'] . '",
+        live_search_max_res = "' . $_POST['live_search_max_res'] . '",
         panel_overall = "' . $_POST['panel_overall'] . '",
         panel_genre = "' . $_POST['panel_genre'] . '",
         panel_year = "' . $_POST['panel_year'] . '",

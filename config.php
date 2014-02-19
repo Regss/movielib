@@ -1,6 +1,6 @@
 <?PHP
 
-$version = '2.2.0';
+$version = '2.3.0';
 
 if (file_exists('db.php')) {
     require('db.php');
@@ -10,7 +10,7 @@ if (file_exists('db.php')) {
 $mysql_tables = array('movies', 'config', 'users');
 
 // Dir
-$dir_assoc = array('cache');
+$dir_assoc = array('cache', 'cache/actors');
 
 // Output panel
 $output_panel_info = '';
@@ -83,6 +83,7 @@ $var = array(
     'genre'     =>  'all',
     'year'      =>  'all',
     'country'   =>  'all',
+    'cast'      =>  'all',    
     'v_codec'   =>  'all',
     'a_codec'   =>  'all',
     'a_chan'    =>  'all',

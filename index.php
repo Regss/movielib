@@ -96,7 +96,7 @@ if ($set['panel_overall'] > 0) {
         }
     }
     $overall_unwatched = $overall_all - $overall_watched;
-    $output_panel_overall = '<div id="overall" class="panel_box_title">' . $lang['i_overall_title'] . ':</div><div id="panel_overall" class="panel_box ' . $set['panel_overall'] . '"><ul><li><span class="bold orange">' . $lang['i_overall_all'] . ':</span> ' . $overall_all . '</li><li><span class="bold orange">' . $lang['i_overall_watched'] . ':</span> ' . $overall_watched . '</li><li><span class="bold orange">' . $lang['i_overall_notwatched'] . ':</span> ' . $overall_unwatched . '</li></ul></div>';
+    $output_panel_overall = '<div id="overall" class="panel_box_title">' . $lang['i_overall_title'] . '</div><div id="panel_overall" class="panel_box ' . $set['panel_overall'] . '"><ul><li><span class="bold orange">' . $lang['i_overall_all'] . ':</span> ' . $overall_all . '</li><li><span class="bold orange">' . $lang['i_overall_watched'] . ':</span> ' . $overall_watched . '</li><li><span class="bold orange">' . $lang['i_overall_notwatched'] . ':</span> ' . $overall_unwatched . '</li></ul></div>';
 } else {
     $output_panel_overall = '';
 }
@@ -203,6 +203,26 @@ if ($set['panel_country'] > 0) {
     $output_country_menu = '';
 }
 
+/* ########
+ * # CAST #
+ */########
+$cast_mysql = '%';
+$cast_sql = 'SELECT cast FROM ' . $mysql_tables[0] . ' ORDER BY cast';
+$cast_result = mysql_query($cast_sql);
+$cast_array = array();
+while ($cast_mysql_array = mysql_fetch_array($cast_result)) {
+    foreach (explode(' / ', $cast_mysql_array['cast']) as $key => $val) {
+        if (!in_array($val, $cast_array) && strlen($val) > 0) {
+            $cast_array[] = $val;
+        }
+    }
+}
+foreach ($cast_array as $key => $val) {
+    if ((string) $key === (string) $cast) {
+        $cast_mysql = $val;
+    }
+}
+
 /* ###############
  * # VIDEO CODEC #
  */###############
@@ -299,6 +319,7 @@ foreach ($sort_array as $key => $val) {
     '&amp;genre=' . $genre .
     '&amp;year=' . $year .
     '&amp;country=' . $country .
+    '&amp;cast=' . $cast .
     '&amp;v_codec=' . $v_codec .
     '&amp;a_codec=' . $a_codec .
     '&amp;a_chan=' . $a_chan .
@@ -307,16 +328,31 @@ foreach ($sort_array as $key => $val) {
 $sort_mysql = array(1 => 'title ASC', 'year DESC', 'rating DESC', 'date_added DESC', ' CAST( runtime AS DECIMAL( 10, 2 ) ) DESC', 'last_played DESC', 'play_count DESC');
 $play_count_mysql = ($sort == 6 ? ' > 0' : 'LIKE "%"');
 
+
+/* ###############
+ * # LIVE SEARCH #
+ */###############
+if ($set['live_search'] == 1) {
+    $output_live_search = '<div id="panel_live_search"></div>';
+} else {
+    $output_live_search = '';
+}
+
 /* ##########
  * # SEARCH #
- */##########
+ */########## 
+$output_search = '<form method="get" action="index.php" autocomplete="off">
+    <div id="panel_input_search">
+        <input id="search" type="text" name="search" value="' . $lang['i_search'] . '..." title="' . $lang['i_search'] . '...">
+        ' . $output_live_search . '
+    </div>';
 if ($search == '') {
-    $output_search_text = '<input type="text" name="search" value="' . $lang['i_search'] . '..." title="' . $lang['i_search'] . '...">';
     $search_mysql = '%';
 } else {
-    $output_search_text = $lang['i_result'] . ': ' . $search . ' <a href="index.php"><img src="css/' . $set['theme'] . '/img/delete.png" title="' . $lang['i_search_del'] . '" alt=""></a> <input type="text" name="search" value="' . $lang['i_search'] . '..." title="' . $lang['i_search'] . '...">';
+    $output_search.= '<div id="search_res">'.$lang['i_result'] . ': ' . $search . '<a id="search_res_img" href="index.php"><img src="css/' . $set['theme'] . '/img/delete.png" title="' . $lang['i_search_del'] . '" alt=""></a></div>';
     $search_mysql = $search;
 }
+$output_search.= '</form>';
 
 /* #############
  * # PANEL NAV #
@@ -326,6 +362,7 @@ $nav_sql = 'SELECT id FROM ' . $mysql_tables[0] . ' WHERE
     genre LIKE "%' . $genre_mysql . '%" AND
     year LIKE "%' . $year_mysql . '%" AND
     country LIKE "%' . $country_mysql . '%" AND
+    cast LIKE "%' . $cast_mysql . '%" AND
     v_codec LIKE "%' . $v_codec_mysql . '%" AND
     a_codec LIKE "%' . $a_codec_mysql . '%" AND
     a_chan LIKE "%' . $a_chan_mysql . '%" AND
@@ -362,6 +399,7 @@ $list_sql = 'SELECT * FROM ' . $mysql_tables[0] . ' WHERE
     genre LIKE "%' . $genre_mysql . '%" AND
     year LIKE "%' . $year_mysql . '%" AND
     country LIKE "%' . $country_mysql . '%" AND
+    cast LIKE "%' . $cast_mysql . '%" AND
     v_codec LIKE "%' . $v_codec_mysql . '%" AND
     a_codec LIKE "%' . $a_codec_mysql . '%" AND
     a_chan LIKE "%' . $a_chan_mysql . '%" AND
@@ -459,6 +497,29 @@ while ($list = mysql_fetch_array($list_result)) {
         $output_trailer = '';
     }
     
+    // genre
+    $output_genre = array();
+    foreach (explode(' / ', $list['genre']) as $val) {
+        $output_genre[] = '<a href="index.php?sort=' . $sort . '&genre=' . array_search($val, $genre_array) . '">' . $val . '</a>';
+    }
+    
+    // country
+    $output_country = array();
+    foreach (explode(' / ', $list['country']) as $val) {
+        $output_country[] = '<a href="index.php?sort=' . $sort . '&country=' . array_search($val, $country_array) . '">' . $val . '</a>';
+    }
+    
+    // cast
+    $output_cast = array();
+    foreach (explode(' / ', $list['cast']) as $val) {
+        if (file_exists('cache/actors/' . substr(md5($val), 0, 10) . '.jpg')) {
+            $actor_thumb = '<img class="actor_thumb" src="cache/actors/' . substr(md5($val), 0, 10) . '.jpg">';
+        } else {
+            $actor_thumb = '';
+        }
+        $output_cast[] = '<a class="actor_img" href="index.php?sort=' . $sort . '&cast=' . array_search($val, $cast_array) . '" alt="' . substr(md5($val), 0, 10) . '">' . $actor_thumb . $val . '</a>';
+    }
+    
     $output_panel_list.= '
 <div id="' . $list['id'] . '" class="movie">
     <div class="title"><a href="index.php?id=' . $list['id'] . '">' . $list['title'] . '</a></div>
@@ -473,7 +534,7 @@ while ($list = mysql_fetch_array($list_result)) {
             </tr>
             <tr>
                 <td class="left">' . $lang['i_genre'] . ':</td>
-                <td class="right">' . $list['genre'] . '</td>
+                <td class="right">' . implode(' / ', $output_genre) . '</td>
             </tr>
             <tr>
                 <td class="left">' . $lang['i_rating'] . ':</td>
@@ -481,7 +542,7 @@ while ($list = mysql_fetch_array($list_result)) {
             </tr>
             <tr>
                 <td class="left">' . $lang['i_country'] . ':</td>
-                <td class="right">' . $list['country'] . '</td>
+                <td class="right">' . implode(' / ', $output_country) . '</td>
             </tr>
             <tr>
                 <td class="left">' . $lang['i_runtime'] . ':</td>
@@ -490,6 +551,10 @@ while ($list = mysql_fetch_array($list_result)) {
             <tr>
                 <td class="left">' . $lang['i_director'] . ':</td>
                 <td class="right">' . $list['director'] . '</td>
+            </tr>
+            <tr>
+                <td class="left">' . $lang['i_cast'] . ':</td>
+                <td class="right">' . implode(' / ', $output_cast) . '</td>
             </tr>
             <tr>
                 <td class="left">' . $lang['i_plot'] . ':</td>
@@ -535,7 +600,7 @@ while ($list = mysql_fetch_array($list_result)) {
             </div>
             <div id="panel_right" class="<?PHP echo ($set['panel_overall'] + $set['panel_genre'] + $set['panel_year'] + $set['panel_country'] + $set['panel_v_codec'] + $set['panel_a_codec'] + $set['panel_a_chan'] == 0 ? '' : 'panel_right_ex') ?>">
                 <div id="panel_sort"><?PHP echo $output_sort_menu ?></div>
-                <div id="panel_search"><form method="get" action="index.php"><?PHP echo $output_search_text ?></form></div>
+                <div id="panel_search"><?PHP echo $output_search ?></div>
                 <?PHP echo $output_nav ?>
                 <?PHP echo $output_panel_list ?>
                 <?PHP echo $output_nav ?>

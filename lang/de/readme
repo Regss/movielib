@@ -8,7 +8,4 @@ Standard Passwörter:
 Seitenberechtigung: user
 Administrations-Bereich: admin
 
-Movielib XBMC Add-on repository:
-https://raw.github.com/Regss/xbmc-regss-repository/master/repo/repository.regss/repository.regss-1.2.1.zip
-
 Im Admin-Bereich muss ein neuer Token generiert werden, dieser Token muss in den Einstellungen des Addon's inklusive URL angegeben werden.

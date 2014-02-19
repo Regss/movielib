@@ -27,31 +27,24 @@ function connect($mysql_ml) {
 function get_settings($mysql_ml, $mysql_tables) {
     
     // if settings in session not exists get it from database
-    if (!isset($_SESSION['site_name'])) {
+    if (!isset($_SESSION) or count($_SESSION) < 10) {
         $set_sql = 'SELECT * FROM ' . $mysql_tables[1];
         $set_result = mysql_query($set_sql);
-        while ($set = mysql_fetch_assoc($set_result)) {
-            foreach($set as $key => $val) {
-                $_SESSION[$key] = $val;
-            }
+        $get_set = mysql_fetch_assoc($set_result);
+        foreach($get_set as $key => $val) {
+            $_SESSION[$key] = $val;
         }
     }
-    
-    // settings from session to var
-    $output_set = array();
-    foreach ($_SESSION as $key => $val) {
-        $output_set[$key] = $val;
-    }
-    return $output_set;
+    return $_SESSION;
 }
 
 /* ######################
  * # Create empty table #
  */######################
-function create_table($mysql_table, $lang) {
+function create_table($mysql_tables, $lang) {
         
     // drop tables
-    foreach ($mysql_table as $table) {
+    foreach ($mysql_tables as $table) {
         $drop_table_sql = 'DROP TABLE IF EXISTS `' . $table . '`';
         if (!@mysql_query($drop_table_sql)) {
             die(mysql_error());
@@ -59,8 +52,8 @@ function create_table($mysql_table, $lang) {
     }
     
     // table movie
-    $create_movies_sql = 'CREATE TABLE `' . $mysql_table[0] . '` (
-                `id` int(11) NOT NULL AUTO_INCREMENT,
+    $create_movies_sql = 'CREATE TABLE `' . $mysql_tables[0] . '` (
+                `id` int(11) NOT NULL,
                 `title` varchar(100),
                 `plot` text,
                 `rating` text,
@@ -71,6 +64,7 @@ function create_table($mysql_table, $lang) {
                 `director` text,
                 `originaltitle` text,
                 `country` text,
+                `cast` text,
                 `v_codec` text,
                 `v_aspect` float DEFAULT NULL,
                 `v_width` int(11) DEFAULT NULL,
@@ -84,19 +78,21 @@ function create_table($mysql_table, $lang) {
                 PRIMARY KEY (`id`)
                 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8';
     if (!@mysql_query($create_movies_sql)) {
-        die($lang['inst_could_create'] . ': ' . $mysql_table[0] . ' - ' . mysql_error() . '<br/>');
+        die($lang['inst_could_create'] . ': ' . $mysql_tables[0] . ' - ' . mysql_error() . '<br/>');
     }
     
     // table config
-    $create_config_sql = 'CREATE TABLE `' . $mysql_table[1] . '` (
+    $create_config_sql = 'CREATE TABLE `' . $mysql_tables[1] . '` (
                 `site_name` varchar(30) DEFAULT "MovieLib",
-                `language` varchar(15) DEFAULT "' . $_SESSION['install_lang'] . '",
+                `language` varchar(2) DEFAULT "' . $_SESSION['install_lang'] . '",
                 `theme` varchar(15) DEFAULT "default",
                 `per_page` int(5) DEFAULT 50,
                 `panel_top_limit` int(5) DEFAULT 10,
                 `panel_top_time` int(5) DEFAULT 5,
                 `panel_top` int(1) DEFAULT 1,
                 `watched_status` int(1) DEFAULT 1,
+                `live_search` int(1) DEFAULT 1,
+                `live_search_max_res int(4) DEFAULT 10,
                 `panel_overall` int(1) DEFAULT 1,
                 `panel_genre` int(1) DEFAULT 1,
                 `panel_year` int(1) DEFAULT 1,
@@ -110,27 +106,27 @@ function create_table($mysql_table, $lang) {
                 `token` varchar(6) DEFAULT ""
                 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8';
     if (!@mysql_query($create_config_sql)) {
-        die($lang['inst_could_create'] . ': ' . $mysql_table[1] . ' - ' . mysql_error() . '<br/>');
+        die($lang['inst_could_create'] . ': ' . $mysql_tables[1] . ' - ' . mysql_error() . '<br/>');
     }
-    if (@mysql_num_rows(mysql_query('SELECT * FROM ' . $mysql_table[1])) == 0) {
-        $insert_config_sql = 'INSERT INTO `' . $mysql_table[1] . '` () VALUES ()';
+    if (@mysql_num_rows(mysql_query('SELECT * FROM ' . $mysql_tables[1])) == 0) {
+        $insert_config_sql = 'INSERT INTO `' . $mysql_tables[1] . '` () VALUES ()';
         mysql_query ($insert_config_sql);
     }
     
     // table users
-    $create_users_sql = 'CREATE TABLE `' . $mysql_table[2] . '` (
+    $create_users_sql = 'CREATE TABLE `' . $mysql_tables[2] . '` (
                 `id` int(2) NOT NULL AUTO_INCREMENT,
                 `login` varchar(5) DEFAULT NULL,
                 `password` varchar(32) DEFAULT NULL,
                 PRIMARY KEY (`id`)
                 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8';
     if (!@mysql_query($create_users_sql)) {
-        die($lang['inst_could_create'] . ': ' . $mysql_table[2] . ' - ' . mysql_error() . '<br/>');
+        die($lang['inst_could_create'] . ': ' . $mysql_tables[2] . ' - ' . mysql_error() . '<br/>');
     }
-    if (@mysql_num_rows(mysql_query('SELECT * FROM ' . $mysql_table[2])) == 0) {
-        $insert_users_sql = 'INSERT INTO `' . $mysql_table[2] . '` (`id`, `login`, `password`) VALUES ("", "admin", "21232f297a57a5a743894a0e4a801fc3")';
+    if (@mysql_num_rows(mysql_query('SELECT * FROM ' . $mysql_tables[2])) == 0) {
+        $insert_users_sql = 'INSERT INTO `' . $mysql_tables[2] . '` (`id`, `login`, `password`) VALUES ("", "admin", "21232f297a57a5a743894a0e4a801fc3")';
         mysql_query($insert_users_sql);
-        $insert_users_sql = 'INSERT INTO `' . $mysql_table[2] . '` (`id`, `login`, `password`) VALUES ("", "user", "ee11cbb19052e40b07aac0ca060c23ee")';
+        $insert_users_sql = 'INSERT INTO `' . $mysql_tables[2] . '` (`id`, `login`, `password`) VALUES ("", "user", "ee11cbb19052e40b07aac0ca060c23ee")';
         mysql_query($insert_users_sql);
     }
 }
@@ -163,6 +159,7 @@ function sync_add($mysql_ml, $mysql_tables) {
         `director`,
         `originaltitle`,
         `country`,
+        `cast`,
         `v_codec`,
         `v_aspect`,
         `v_width`,
@@ -177,26 +174,27 @@ function sync_add($mysql_ml, $mysql_tables) {
 
     $insert_sql.= '(
         "' . $_POST['id'] . '",
-        "' . addslashes($_POST['title']) . '",
-        "' . addslashes($_POST['plot']) . '",
+        "' . add_slash($_POST['title']) . '",
+        "' . add_slash($_POST['plot']) . '",
         "' . round($_POST['rating'], 1) . '",
         "' . $_POST['year'] . '",
-        ' . ($_POST['trailer'] == '' ? 'NULL' : '"' . addslashes($_POST['trailer']) . '"') . ',
+        ' . ($_POST['trailer'] == '' ? 'NULL' : '"' . add_slash($_POST['trailer']) . '"') . ',
         '  . $_POST['runtime'] . ',
-        "' . addslashes($_POST['genre']) . '",
-        "' . addslashes($_POST['director']) . '",
-        "' . addslashes($_POST['originaltitle']) . '",
-        "' . addslashes($_POST['country']) . '",
-        "' . addslashes($_POST['v_codec']) . '",
-        "' . addslashes($_POST['v_aspect']) . '",
-        "' . addslashes($_POST['v_width']) . '",
-        "' . addslashes($_POST['v_height']) . '",
-        "' . addslashes($_POST['v_duration']) . '",
-        "' . addslashes($_POST['a_codec']) . '",
-        "' . addslashes($_POST['a_chan']) . '",
-        "' . addslashes($_POST['playcount']) . '",
-        ' . ($_POST['lastplayed'] == '' ? 'NULL' : '"' . addslashes($_POST['lastplayed']) . '"') . ',
-        "' . addslashes($_POST['dateadded']) . '"
+        "' . add_slash($_POST['genre']) . '",
+        "' . add_slash($_POST['director']) . '",
+        "' . add_slash($_POST['originaltitle']) . '",
+        "' . add_slash($_POST['country']) . '",
+        "' . add_slash($_POST['cast']) . '",
+        "' . add_slash($_POST['v_codec']) . '",
+        "' . add_slash($_POST['v_aspect']) . '",
+        "' . add_slash($_POST['v_width']) . '",
+        "' . add_slash($_POST['v_height']) . '",
+        "' . add_slash($_POST['v_duration']) . '",
+        "' . add_slash($_POST['a_codec']) . '",
+        "' . add_slash($_POST['a_chan']) . '",
+        "' . add_slash($_POST['playcount']) . '",
+        ' . ($_POST['lastplayed'] == '' ? 'NULL' : '"' . add_slash($_POST['lastplayed']) . '"') . ',
+        "' . add_slash($_POST['dateadded']) . '"
     )';
     
     $insert = mysql_query($insert_sql);
@@ -225,8 +223,23 @@ function sync_add($mysql_ml, $mysql_tables) {
             fclose($fp);
             gd_convert('cache/' . $_POST['id'] . '_f.jpg', 'cache/temp_f' . $_POST['id'], 1280, 720);
             unlink('cache/temp_f' . $_POST['id']);
-            
         }
+    }
+}
+
+/* ####################
+ * # SYNC - add actor #
+ */####################
+function add_actor($actor_name, $actor_thumb) {
+    $actor_filename = substr(md5($actor_name), 0, 10);
+    if (substr($actor_thumb, 0, 4) == 'http') {
+        gd_convert('cache/actors/' . $actor_filename . '.jpg', $actor_thumb, 75, 100);
+    } else {
+        $fp = fopen('cache/actors/temp_a_' . $actor_filename, 'w');
+        fwrite($fp, $actor_thumb);
+        fclose($fp);
+        gd_convert('cache/actors/' . $actor_filename . '.jpg', 'cache/actors/temp_a_' . $actor_filename, 75, 100);
+        unlink('cache/actors/temp_a_' . $actor_filename);
     }
 }
 
@@ -257,9 +270,9 @@ function sync_remove($mysql_ml, $mysql_tables) {
 function sync_watched($mysql_ml, $mysql_tables) {
     
     $update_sql = 'UPDATE `' . $mysql_tables[0] . '` SET 
-        play_count = "' . addslashes($_POST['playcount']) . '",
-        last_played = "' . addslashes($_POST['lastplayed']) . '",
-        date_added = "' . addslashes($_POST['dateadded']) . '"
+        play_count = "' . add_slash($_POST['playcount']) . '",
+        last_played = "' . add_slash($_POST['lastplayed']) . '",
+        date_added = "' . add_slash($_POST['dateadded']) . '"
         WHERE id = "' . $_POST['id'] . '"';
 
     $update = mysql_query($update_sql);
@@ -277,7 +290,7 @@ function sync_unwatched($mysql_ml, $mysql_tables) {
     $update_sql = 'UPDATE `' . $mysql_tables[0] . '` SET 
         play_count = NULL,
         last_played = NULL,
-        date_added = "' . addslashes($_POST['dateadded']) . '"
+        date_added = "' . add_slash($_POST['dateadded']) . '"
         WHERE id = "' . $_POST['id'] . '"';
         
     $update = mysql_query($update_sql);
@@ -293,8 +306,8 @@ function sync_unwatched($mysql_ml, $mysql_tables) {
 function sync_lastplayed($mysql_ml, $mysql_tables) {
     
     $update_sql = 'UPDATE `' . $mysql_tables[0] . '` SET 
-        play_count = "' . addslashes($_POST['playcount']) . '",
-        last_played = "' . addslashes($_POST['lastplayed']) . '"
+        play_count = "' . add_slash($_POST['playcount']) . '",
+        last_played = "' . add_slash($_POST['lastplayed']) . '"
         WHERE id = "' . $_POST['id'] . '"';
 
     $update = mysql_query($update_sql);
@@ -332,6 +345,17 @@ function gd_convert($cache_path, $img_link, $new_width, $new_height) {
             imagecopyresampled($img_temp, $img, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
             imagejpeg($img_temp, $cache_path, 80);
         }
+    }
+}
+
+/* ###############
+ * # ADD SLASHES #
+ */###############
+function add_slash($string){
+    if (get_magic_quotes_gpc()) {
+        return $string;
+    } else {
+        return addslashes($string);
     }
 }
 ?>

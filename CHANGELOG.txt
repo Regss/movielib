@@ -1,3 +1,8 @@
+v. 2.3.0
+- added cast field
+- added actors thumbnail
+- added live search
+
 v. 2.2.0
 - language translation by Transifex
 - rewrite creating cache function

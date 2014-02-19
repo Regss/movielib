@@ -17,6 +17,8 @@ require('lang/' . $set['language'] . '/lang.php');
 if ($option == 'checktoken') {
     if ($token == $set['token']) {
         echo 'true';
+    } else {
+        echo 'false';
     }
 }
 
@@ -35,6 +37,9 @@ if ($token == $set['token']) {
             break;
         case 'removemovie':
             sync_remove($mysql_ml, $mysql_tables);
+            break;
+        case 'addactor':
+            add_actor($_POST['name'], $_POST['actor']);
             break;
         
         // show movie watched id from database
