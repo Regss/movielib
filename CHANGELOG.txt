@@ -1,3 +1,7 @@
+v. 2.3.2
+- fix graphics for HD movies
+- fix create tables in install process
+
 v. 2.3.1
 - fix sorting
 

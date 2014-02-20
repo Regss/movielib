@@ -92,7 +92,7 @@ function create_table($mysql_tables, $lang) {
                 `panel_top` int(1) DEFAULT 1,
                 `watched_status` int(1) DEFAULT 1,
                 `live_search` int(1) DEFAULT 1,
-                `live_search_max_res int(4) DEFAULT 10,
+                `live_search_max_res` int(4) DEFAULT 10,
                 `panel_overall` int(1) DEFAULT 1,
                 `panel_genre` int(1) DEFAULT 1,
                 `panel_year` int(1) DEFAULT 1,

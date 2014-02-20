@@ -417,8 +417,8 @@ while ($list = mysql_fetch_array($list_result)) {
     
     // video resolution
     $img_flag_vres = '';
-    foreach ($vres_assoc as $val) {
-        if (is_numeric($list['v_width']) && $list['v_width'] >= $val) {
+    foreach ($vres_assoc as $key => $val) {
+        if (is_numeric($list['v_width']) && $list['v_width'] >= $key) {
             $img_flag_vres = '<img class="flag" src="css/' . $set['theme'] . '/img/flags/vres_' . $val . '.png" alt="">';
         }
     }

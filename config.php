@@ -1,6 +1,6 @@
 <?PHP
 
-$version = '2.3.1';
+$version = '2.3.2';
 
 if (file_exists('db.php')) {
     require('db.php');
@@ -16,7 +16,13 @@ $dir_assoc = array('cache', 'cache/actors');
 $output_panel_info = '';
 
 // Video resolution
-$vres_assoc = array(0, 480, 576, 540, 720, 768, 1080);
+$vres_assoc = array(
+    0 => 0, 
+    640 => 480,
+    768 => 576,
+    1280 => 720,
+    1920 => 1080
+);
 
 // Video codec
 $vtype_assoc['3ivx']    =   array('3ivx', '3iv2', '3ivd');
