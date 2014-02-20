@@ -104,46 +104,45 @@ if ($set['panel_overall'] > 0) {
 /* ##########
  * # GENRES #
  */##########
- $genre_mysql = '%';
- if ($set['panel_genre'] > 0) {
-    $genre_sql = 'SELECT genre FROM ' . $mysql_tables[0];
-    $genre_result = mysql_query($genre_sql);
-    $genre_array = array();
-    while ($genre_mysql_array = mysql_fetch_array($genre_result)) {
-        foreach (explode(' / ', $genre_mysql_array['genre']) as $val) {
-            if (!in_array($val, $genre_array) && strlen($val) > 0) {
-                $genre_array[] = $val;
-            }
+$genre_mysql = '%';
+$genre_sql = 'SELECT genre FROM ' . $mysql_tables[0];
+$genre_result = mysql_query($genre_sql);
+$genre_array = array();
+while ($genre_mysql_array = mysql_fetch_array($genre_result)) {
+    foreach (explode(' / ', $genre_mysql_array['genre']) as $val) {
+        if (!in_array($val, $genre_array) && strlen($val) > 0) {
+            $genre_array[] = $val;
         }
     }
-    $output_panel_genre = '<div id="genre" class="panel_box_title">' . $lang['i_genre'] . '</div><div id="panel_genre" class="panel_box ' . $set['panel_genre'] . '"><ul><li>' . (($genre == 'all' and $id == 0) ? $lang['i_all'] :
-        '<a href="index.php?sort=' . $sort . 
-        '&amp;genre=all' .
+}
+$output_panel_genre = '<div id="genre" class="panel_box_title">' . $lang['i_genre'] . '</div><div id="panel_genre" class="panel_box ' . $set['panel_genre'] . '"><ul><li>' . (($genre == 'all' and $id == 0) ? $lang['i_all'] :
+    '<a href="index.php?sort=' . $sort . 
+    '&amp;genre=all' .
+    '&amp;year=' . $year .
+    '&amp;country=' . $country .
+    '&amp;v_codec=' . $v_codec .
+    '&amp;a_codec=' . $a_codec .
+    '&amp;a_chan=' . $a_chan .
+    '">' . $lang['i_all'] . '</a>') . '</li>';
+sort($genre_array);
+foreach ($genre_array as $key => $val) {
+    if ((string) $key === (string) $genre) {
+        $output_panel_genre.= '<li>' . $val . '</li>';
+        $genre_mysql = $val;
+    } else {
+        $output_panel_genre.= 
+        '<li><a href="index.php?sort=' . $sort . 
+        '&amp;genre=' . $key . 
         '&amp;year=' . $year .
         '&amp;country=' . $country .
         '&amp;v_codec=' . $v_codec .
         '&amp;a_codec=' . $a_codec .
         '&amp;a_chan=' . $a_chan .
-        '">' . $lang['i_all'] . '</a>') . '</li>';
-    sort($genre_array);
-    foreach ($genre_array as $key => $val) {
-        if ((string) $key === (string) $genre) {
-            $output_panel_genre.= '<li>' . $val . '</li>';
-            $genre_mysql = $val;
-        } else {
-            $output_panel_genre.= 
-            '<li><a href="index.php?sort=' . $sort . 
-            '&amp;genre=' . $key . 
-            '&amp;year=' . $year .
-            '&amp;country=' . $country .
-            '&amp;v_codec=' . $v_codec .
-            '&amp;a_codec=' . $a_codec .
-            '&amp;a_chan=' . $a_chan .
-            '">' . $val . '</a></li>';
-        }
+        '">' . $val . '</a></li>';
     }
-    $output_panel_genre.= '</ul></div>';
-} else {
+}
+$output_panel_genre.= '</ul></div>';
+if ($set['panel_genre'] == 0) {
     $output_panel_genre = '';
 }
 
@@ -151,55 +150,53 @@ if ($set['panel_overall'] > 0) {
  * # YEARS #
  */#########
 $year_mysql = '%';
-if ($set['panel_year'] > 0) {
-    $year_sql = 'SELECT year FROM ' . $mysql_tables[0] . ' ORDER BY year DESC';
-    $year_result = mysql_query($year_sql);
-    $year_array = array();
-    while ($year_mysql_array = mysql_fetch_array($year_result)) {
-        if (!in_array($year_mysql_array['year'], $year_array) && strlen($year_mysql_array['year']) > 0) {
-            $year_array[] = $year_mysql_array['year'];
-        }
+$year_sql = 'SELECT year FROM ' . $mysql_tables[0] . ' ORDER BY year DESC';
+$year_result = mysql_query($year_sql);
+$year_array = array();
+while ($year_mysql_array = mysql_fetch_array($year_result)) {
+    if (!in_array($year_mysql_array['year'], $year_array) && strlen($year_mysql_array['year']) > 0) {
+        $year_array[] = $year_mysql_array['year'];
     }
-    $output_year_menu = '<div id="year" class="panel_box_title">' . $lang['i_year'] . '</div><div id="panel_year" class="panel_box ' . $set['panel_year'] . '"><ul><li>' . (($year == 'all' and $id == 0) ? $lang['i_all'] : '<a href="index.php?sort=' . $sort . '&amp;year=all">' . $lang['i_all'] . '</a>') . '</li>';
-    foreach ($year_array as $key => $val) {
-        if ((string) $key === (string) $year) {
-            $output_year_menu.= '<li>' . $val . '</li>';
-            $year_mysql = $val;
-        } else {
-            $output_year_menu.= '<li><a href="index.php?sort=' . $sort . '&amp;year=' . $key . '">' . $val . '</a></li>';
-        }
+}
+$output_year_menu = '<div id="year" class="panel_box_title">' . $lang['i_year'] . '</div><div id="panel_year" class="panel_box ' . $set['panel_year'] . '"><ul><li>' . (($year == 'all' and $id == 0) ? $lang['i_all'] : '<a href="index.php?sort=' . $sort . '&amp;year=all">' . $lang['i_all'] . '</a>') . '</li>';
+foreach ($year_array as $key => $val) {
+    if ((string) $key === (string) $year) {
+        $output_year_menu.= '<li>' . $val . '</li>';
+        $year_mysql = $val;
+    } else {
+        $output_year_menu.= '<li><a href="index.php?sort=' . $sort . '&amp;year=' . $key . '">' . $val . '</a></li>';
     }
-    $output_year_menu.= '</ul></div>';
-} else {
+}
+$output_year_menu.= '</ul></div>';
+if ($set['panel_year'] == 0) {
     $output_year_menu = '';
 }
 
 /* ###########
  * # COUNTRY #
  */###########
- $country_mysql = '%';
-if ($set['panel_country'] > 0) {
-    $country_sql = 'SELECT country FROM ' . $mysql_tables[0] . ' ORDER BY country';
-    $country_result = mysql_query($country_sql);
-    $country_array = array();
-    while ($country_mysql_array = mysql_fetch_array($country_result)) {
-        foreach (explode(' / ', $country_mysql_array['country']) as $val) {
-            if (!in_array($val, $country_array) && strlen($val) > 0) {
-                $country_array[] = $val;
-            }
+$country_mysql = '%';
+$country_sql = 'SELECT country FROM ' . $mysql_tables[0] . ' ORDER BY country';
+$country_result = mysql_query($country_sql);
+$country_array = array();
+while ($country_mysql_array = mysql_fetch_array($country_result)) {
+    foreach (explode(' / ', $country_mysql_array['country']) as $val) {
+        if (!in_array($val, $country_array) && strlen($val) > 0) {
+            $country_array[] = $val;
         }
     }
-    $output_country_menu = '<div id="country" class="panel_box_title">' . $lang['i_country'] . '</div><div id="panel_country" class="panel_box ' . $set['panel_country'] . '"><ul><li>' . (($country == 'all' and $id == 0) ? $lang['i_all'] : '<a href="index.php?sort=' . $sort . '&amp;country=all">' . $lang['i_all'] . '</a>') . '</li>';
-    foreach ($country_array as $key => $val) {
-        if ((string) $key === (string) $country) {
-            $output_country_menu.= '<li>' . $val . '</li>';
-            $country_mysql = $val;
-        } else {
-            $output_country_menu.= '<li><a href="index.php?sort=' . $sort . '&amp;country=' . $key . '">' . $val . '</a></li>';
-        }
+}
+$output_country_menu = '<div id="country" class="panel_box_title">' . $lang['i_country'] . '</div><div id="panel_country" class="panel_box ' . $set['panel_country'] . '"><ul><li>' . (($country == 'all' and $id == 0) ? $lang['i_all'] : '<a href="index.php?sort=' . $sort . '&amp;country=all">' . $lang['i_all'] . '</a>') . '</li>';
+foreach ($country_array as $key => $val) {
+    if ((string) $key === (string) $country) {
+        $output_country_menu.= '<li>' . $val . '</li>';
+        $country_mysql = $val;
+    } else {
+        $output_country_menu.= '<li><a href="index.php?sort=' . $sort . '&amp;country=' . $key . '">' . $val . '</a></li>';
     }
-    $output_country_menu.= '</ul></div>';
-} else {
+}
+$output_country_menu.= '</ul></div>';
+if ($set['panel_country'] == 0) {
     $output_country_menu = '';
 }
 
