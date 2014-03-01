@@ -1,13 +1,10 @@
 <?PHP
 
-$version = '2.3.2';
+$version = '2.3.3';
 
 if (file_exists('db.php')) {
     require('db.php');
 }
-
-// Tables to array
-$mysql_tables = array('movies', 'config', 'users');
 
 // Dir
 $dir_assoc = array('cache', 'cache/actors');
@@ -82,6 +79,63 @@ $mimetype_assoc['video/ogg']            =   array('ogg', 'ogv');
 $mimetype_assoc['video/webm']           =   array('webm');
 $mimetype_assoc['video/flv']            =   array('flv');
 
+// tables
+$mysql_tables = array('movies', 'config', 'users');
+$movies_table = array(
+    'id'                    => 'int(6) NOT NULL',
+    'title'                 => 'varchar(100)',
+    'plot'                  => 'text',
+    'rating'                => 'float DEFAULT NULL',
+    'year'                  => 'int(4)',
+    'trailer'               => 'varchar(255)',
+    'runtime'               => 'int(4) DEFAULT NULL',
+    'genre'                 => 'varchar(255)',
+    'director'              => 'varchar(255)',
+    'originaltitle'         => 'varchar(255)',
+    'country'               => 'varchar(255)',
+    'cast'                  => 'varchar(255)',
+    'sets'                  => 'varchar(255)',
+    'v_codec'               => 'varchar(255)',
+    'v_aspect'              => 'float DEFAULT NULL',
+    'v_width'               => 'int(11) DEFAULT NULL',
+    'v_height'              => 'int(11) DEFAULT NULL',
+    'v_duration'            => 'int(11) DEFAULT NULL',
+    'a_codec'               => 'varchar(255)',
+    'a_chan'                => 'int(11) DEFAULT NULL',
+    'play_count'            => 'int(11) DEFAULT NULL',
+    'last_played'           => 'varchar(20)',
+    'date_added'            => 'varchar(20)'
+);
+$config_table = array(
+    'site_name'             => 'varchar(30) DEFAULT "MovieLib"',
+    'language'              => 'varchar(2) DEFAULT "en"',
+    'theme'                 => 'varchar(15) DEFAULT "default"',
+    'per_page'              => 'int(5) DEFAULT 50',
+    'panel_top_limit'       => 'int(5) DEFAULT 10',
+    'panel_top_time'        => 'int(5) DEFAULT 5',
+    'panel_top'             => 'int(1) DEFAULT 1',
+    'watched_status'        => 'int(1) DEFAULT 1',
+    'live_search'           => 'int(1) DEFAULT 1',
+    'live_search_max_res'   => 'int(4) DEFAULT 10',
+    'panel_overall'         => 'int(1) DEFAULT 1',
+    'panel_genre'           => 'int(1) DEFAULT 1',
+    'panel_year'            => 'int(1) DEFAULT 1',
+    'panel_country'         => 'int(1) DEFAULT 1',
+    'panel_v_codec'         => 'int(1) DEFAULT 1',
+    'panel_a_codec'         => 'int(1) DEFAULT 1',
+    'panel_a_chan'          => 'int(1) DEFAULT 1',
+    'show_fanart'           => 'int(1) DEFAULT 1',
+    'show_trailer'          => 'int(1) DEFAULT 1',
+    'protect_site'          => 'int(1) DEFAULT 0',
+    'token'                 => 'varchar(6) DEFAULT ""'
+);
+$users_table = array(
+    'id'                    => 'int(2) NOT NULL',
+    'login'                 => 'varchar(5) DEFAULT NULL',
+    'password'              => 'varchar(32) DEFAULT NULL'
+);
+$tables = array($mysql_tables[0] => $movies_table, $mysql_tables[1] => $config_table, $mysql_tables[2] => $users_table);
+
 // Set var
 $var = array(
     'id'        =>  0,
@@ -89,6 +143,8 @@ $var = array(
     'genre'     =>  'all',
     'year'      =>  'all',
     'country'   =>  'all',
+    'director'  =>  'all',
+    'sets'      =>  'all',
     'cast'      =>  'all',    
     'v_codec'   =>  'all',
     'a_codec'   =>  'all',

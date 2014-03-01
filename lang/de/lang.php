@@ -18,6 +18,7 @@ $lang['i_plot']                         =   'Handlung';
 $lang['i_cast']                         =   'Besetzung';
 $lang['i_runtime']                      =   'Länge';
 $lang['i_director']                     =   'Regisseur';
+$lang['i_sets']                          =  'Set';
 $lang['i_country']                      =   'Land';
 $lang['i_minute']                       =   'min.';
 $lang['i_previous']                     =   'Zurück';
@@ -50,6 +51,7 @@ $lang['l_wrong_pass']                   =   'Passwort falsch';
 
 $lang['a_pass_default']                 =   'Das Passwort für den Admin-Bereich wurde noch nicht geändert! Sicherheitshalber umgehend ändern.';
 $lang['a_install_exist']                =   'install.php noch vorhanden! Sicherheitshalber unbedingt löschen';
+$lang['a_tables_updated']               =   'Tables updated';
 $lang['a_movies']                       =   'Filme';
 $lang['a_all']                          =   'Alle';
 $lang['a_watched']                      =   'Gesehen';
@@ -59,7 +61,11 @@ $lang['a_cache']                        =   'Cache';
 $lang['a_cached_posters']               =   'Gecachte Poster';
 $lang['a_cached_fanarts']               =   'Gecachte Fanart';
 $lang['a_server_settings']              =   'Server einstellungen';
+$lang['a_files_md5']                    =   'File checksums';
+$lang['a_match']                        =   'Match';
+$lang['a_mismatch']                     =   'Mismatch';
 $lang['a_delete']                       =   'Löschen';
+$lang['a_delete_all']                   =   'Delete All';
 $lang['a_set_main']                     =   'Grundeinstellungen';
 $lang['a_set_panel_left']               =   'Bereich Links';
 $lang['a_set_panel_top']                =   'Bereich oben';
@@ -128,5 +134,6 @@ $lang['inst_port']                      =   'Port';
 $lang['inst_login']                     =   'Login';
 $lang['inst_pass']                      =   'Passwort';
 $lang['inst_database']                  =   'Datenbank';
+$lang['inst_could_create']              =   'Could not create';
 
 ?>

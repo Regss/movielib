@@ -6,7 +6,7 @@ require('function.php');
 connect($mysql_ml);
 
 // get settings from db
-$set = get_settings($mysql_ml, $mysql_tables);
+$set = get_settings($mysql_tables);
 require('lang/' . $set['language'] . '/lang.php');
 
 /* #################
@@ -26,17 +26,22 @@ if ($token == $set['token']) {
 
     switch ($option) {
         
+        // check allow_url_fopen
+        case 'checkallowurlfopen':
+            echo (ini_get('allow_url_fopen') == 1 ? 'true' : 'false');
+            break;
+        
         // show movie id from database
         case 'showid':
-            show_id($mysql_ml, $mysql_tables);
+            show_id($mysql_tables);
             break;
         
         // sync movie
         case 'addmovie':
-            sync_add($mysql_ml, $mysql_tables);
+            sync_add($tables, $mysql_tables);
             break;
         case 'removemovie':
-            sync_remove($mysql_ml, $mysql_tables);
+            sync_remove($mysql_tables);
             break;
         case 'addactor':
             add_actor($_POST['name'], $_POST['actor']);
@@ -53,12 +58,12 @@ if ($token == $set['token']) {
         
         // sync watched
         case 'watchedmovie':
-            sync_watched($mysql_ml, $mysql_tables);
+            sync_watched($mysql_tables);
             break;
         
         // sync unwatched
         case 'unwatchedmovie':
-            sync_unwatched($mysql_ml, $mysql_tables);
+            sync_unwatched($mysql_tables);
             break;
         
         // show lastplayed movie id
@@ -72,7 +77,7 @@ if ($token == $set['token']) {
         
         // sync lastplayed
         case 'lastplayed':
-            sync_lastplayed($mysql_ml, $mysql_tables);
+            sync_lastplayed($mysql_tables);
             break;
     }
 }

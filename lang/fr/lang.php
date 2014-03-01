@@ -18,6 +18,7 @@ $lang['i_plot']                         =   'Résumé';
 $lang['i_cast']                         =   'Cast';
 $lang['i_runtime']                      =   'Durée';
 $lang['i_director']                     =   'Réalisateur';
+$lang['i_sets']                          =  'Set';
 $lang['i_country']                      =   'Pays';
 $lang['i_minute']                       =   'min.';
 $lang['i_previous']                     =   'Précédent';
@@ -50,6 +51,7 @@ $lang['l_wrong_pass']                   =   'Mot de passe incorrect';
 
 $lang['a_pass_default']                 =   'Le mot de passe du panneau d\'administration est resté par défaut. Changez le pour augmenter la sécurité';
 $lang['a_install_exist']                =   'le fichier install.php existe toujours. Supprimez le pour augmenter la sécurité';
+$lang['a_tables_updated']               =   'Tables updated';
 $lang['a_movies']                       =   'Films';
 $lang['a_all']                          =   'Tout';
 $lang['a_watched']                      =   'Vus';
@@ -59,7 +61,11 @@ $lang['a_cache']                        =   'Cache';
 $lang['a_cached_posters']               =   'Posters en cache';
 $lang['a_cached_fanarts']               =   'Fanarts en cache';
 $lang['a_server_settings']              =   'Paramètres du serveur';
+$lang['a_files_md5']                    =   'File checksums';
+$lang['a_match']                        =   'Match';
+$lang['a_mismatch']                     =   'Mismatch';
 $lang['a_delete']                       =   'Effacer';
+$lang['a_delete_all']                   =   'Delete All';
 $lang['a_set_main']                     =   'Principal';
 $lang['a_set_panel_left']               =   'Panneau de gauche';
 $lang['a_set_panel_top']                =   'Panneau supérieur';
@@ -128,5 +134,6 @@ $lang['inst_port']                      =   'Port';
 $lang['inst_login']                     =   'identifiant';
 $lang['inst_pass']                      =   'Mot de passe';
 $lang['inst_database']                  =   'Base de données';
+$lang['inst_could_create']              =   'Could not create';
 
 ?>

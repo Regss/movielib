@@ -18,7 +18,7 @@ if (!file_exists('db.php')) {
 connect($mysql_ml);
 
 // get settings from db
-$set = get_settings($mysql_ml, $mysql_tables);
+$set = get_settings($mysql_tables);
 require('lang/' . $set['language'] . '/lang.php');
 
 // check install.php file exist
@@ -40,6 +40,26 @@ if ($_SESSION['logged_admin'] !== true) {
 foreach ($dir_assoc as $dir) {
     if (!file_exists($dir)) {
         mkdir($dir);
+    }
+}
+
+/* ################
+ * # CHECK TABLES #
+ */################
+$output_tables = '';
+foreach ($mysql_tables as $table) {
+    $columns_sql = 'SHOW COLUMNS FROM ' . $table;
+    $columns_result = mysql_query($columns_sql);
+    while($columns = mysql_fetch_assoc($columns_result)) {
+        $columns_db_array[$table][] = $columns['Field'];
+    }
+}
+foreach ($tables as $tables_key => $tables_val) {
+    foreach($tables_val as $col_key => $col_type) {
+        if (!in_array($col_key, $columns_db_array[$tables_key])) {
+            mysql_query('ALTER TABLE `' . $tables_key . '` ADD `' . $col_key . '` ' . $col_type);
+            $output_panel_info.= $lang['a_tables_updated'] . ' - ' . $tables_key . '.' . $col_key . '<br />';
+        }
     }
 }
 
@@ -75,6 +95,17 @@ if ($option == '') {
         }
     }
     
+    // MD5 files
+    $md5_file = 'files.md5';
+    $output_md5 = '';
+    $fp = fopen($md5_file, 'r');
+    $data = fread($fp, filesize($md5_file));
+    fclose($fp);
+    foreach (explode(';', $data) as $f) {
+        $file = explode(':', $f);
+        $output_md5.= '<tr><td>' . $file[0] . '</td><td>' . (md5_file($file[0]) == $file[1] ? '<span class="green">' . $lang['a_match'] . '</span>' : '<span class="red">' . $lang['a_mismatch'] . '</span>') . '</td></tr>';
+    }
+    
     $output_panel = '
         <table class="table">
             <tr><td class="bold orange">' . $lang['a_movies'] . '</td><td></td></tr>
@@ -85,8 +116,11 @@ if ($option == '') {
             <tr><td>' . $lang['a_cached_posters'] . '</td><td>' . $poster_cached . '</td></tr>
             <tr><td>' . $lang['a_cached_fanarts'] . '</td><td>' . $fanart_cached . '</td></tr>
             <tr><td class="bold orange">' . $lang['a_server_settings'] . '</td><td></td></tr>
+            <tr><td>ALLOW URL FOPEN</td><td>' . (ini_get('allow_url_fopen') == 1 ? $lang['a_setting_on'] : $lang['a_setting_off']) . '</td></tr>
             <tr><td>UPLOAD MAX FILESIZE</td><td>' . ini_get('upload_max_filesize') . '</td></tr>
             <tr><td>POST MAX SIZE</td><td>' . ini_get('post_max_size') . '</td></tr>
+            <tr><td class="bold orange">' . $lang['a_files_md5'] . '</td><td></td></tr>
+            ' . $output_md5 . '
         </table>';
 }
 
@@ -134,7 +168,19 @@ if ($option == 'list') {
                 <td><img id="' . $list['id'] . '" class="delete_row" src="css/' . $set['theme'] . '/admin/img/delete.png" title="' . $lang['a_delete'] . '" alt=""></td>
             </tr>';
     }
-    $output_panel.= '</table>';
+    $output_panel.= '</table><a id="delete_all" class="box" href="admin.php?option=delete_all">' . $lang['a_delete_all'] . '</a>';
+}
+
+// DELETE ALL
+if ($option == 'delete_all') {
+    $truncate_sql = 'TRUNCATE ' . $mysql_tables[0];
+    $truncate_result = mysql_query($truncate_sql);
+    $files = scandir('cache/');
+    foreach($files as $d) {
+        if(substr($d, -4) == '.jpg') {
+            unlink('cache/' . $d);
+        }
+    }
 }
 
 /* ############

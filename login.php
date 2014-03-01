@@ -6,7 +6,7 @@ require('function.php');
 // connect to database
 connect($mysql_ml);
 
-$set = get_settings($mysql_ml, $mysql_tables);
+$set = get_settings($mysql_tables);
 require('lang/' . $set['language'] . '/lang.php');
 
 if (!isset($_GET['login'])) {

@@ -1,9 +1,16 @@
+v. 2.3.3
+- fixed default poster image in live search
+- added checking files integrity
+- added checking tables integrity (auto update to new versions)
+- added checking if allow_url_fopen is enabled
+- added support for movie sets
+
 v. 2.3.2
-- fix graphics for HD movies
-- fix create tables in install process
+- fixed graphics for HD movies
+- fixed create tables in install process
 
 v. 2.3.1
-- fix sorting
+- fixed sorting
 
 v. 2.3.0
 - added cast field

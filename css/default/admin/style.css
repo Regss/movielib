@@ -11,6 +11,8 @@ a:active { color:#FFF; text-decoration:none; }
 
 .bold { font-weight:bold; }
 .orange { color:#ff7300; }
+.red { color:#FF0000; }
+.green { color:#0FE800; }
 
 input, select { background-color:#222; color:#dddddd; border:1px solid #000; font-size:11px; width:160px; height:20px; }
 .textera { display:block; width:600px; height:420px; background-color:#111; color:#fff; border:1px solid #333; margin:auto; margin-top:10px; margin-bottom:10px; resize:none; padding:10px; }
@@ -25,6 +27,6 @@ input, select { background-color:#222; color:#dddddd; border:1px solid #000; fon
 
 .box { display:block; width:100px; font-weight:bold; border:1px solid #333; background-color:#000; margin:auto; margin-bottom:10px; padding:3px; padding-left:10px; padding-right:10px; text-align:center; }
 
-.table { border:1px solid #222; text-align:left; width:100%; }
+.table { border:1px solid #222; text-align:left; width:100%; margin-bottom:10px; }
 .table td { background-color:#000; padding:2px 5px 2px 5px; }
 .table img { display:block; margin:auto; }

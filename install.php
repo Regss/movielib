@@ -107,7 +107,7 @@ if ($option == 'license') {
     if (!$sel_install) {
         die($lang['ins_could_connect'] . ' - ' . mysql_error());
     }
-    create_table($mysql_tables, $lang);
+    create_table($mysql_tables, $tables, $lang);
     $fp = fopen('db.php', 'w');
     $to_write = '<?PHP $mysql_ml = array(\'' . $_POST['host'] . '\', \'' . $_POST['port'] . '\', \'' . $_POST['login'] . '\', \'' . $_POST['pass'] . '\', \'' . $_POST['database'] . '\'); ?>';
     fwrite($fp, $to_write);

@@ -18,6 +18,7 @@ $lang['i_plot']                         =   'Opis';
 $lang['i_cast']                         =   'Obsada';
 $lang['i_runtime']                      =   'Czas';
 $lang['i_director']                     =   'Reżyser';
+$lang['i_sets']                          =  'Seria';
 $lang['i_country']                      =   'Kraj';
 $lang['i_minute']                       =   'min.';
 $lang['i_previous']                     =   'Poprzednia';
@@ -50,6 +51,7 @@ $lang['l_wrong_pass']                   =   'Błędne hasło';
 
 $lang['a_pass_default']                 =   'Hasło do Panelu Administratora jest wciąż domyślne. Zmień je dla zwiększenia bezpieczeństwa';
 $lang['a_install_exist']                =   'Plik install.php wciąż istnieje. Usuń go dla zwiększenia bezpieczeństwa';
+$lang['a_tables_updated']               =   'Tabele uaktualnione';
 $lang['a_movies']                       =   'Filmy';
 $lang['a_all']                          =   'Wszystkie';
 $lang['a_watched']                      =   'Oglądane';
@@ -59,7 +61,11 @@ $lang['a_cache']                        =   'Cache';
 $lang['a_cached_posters']               =   'Okładki posiadające cache';
 $lang['a_cached_fanarts']               =   'Fanarty posiadające cache';
 $lang['a_server_settings']              =   'Ustawienia serwera';
+$lang['a_files_md5']                    =   'Sumy kontrolne plików';
+$lang['a_match']                        =   'Zgodny';
+$lang['a_mismatch']                     =   'Niezgodny';
 $lang['a_delete']                       =   'Usuń';
+$lang['a_delete_all']                   =   'Usuń wszystko';
 $lang['a_set_main']                     =   'Główne';
 $lang['a_set_panel_left']               =   'Lewy panel';
 $lang['a_set_panel_top']                =   'Górny panel';
@@ -128,5 +134,6 @@ $lang['inst_port']                      =   'Port';
 $lang['inst_login']                     =   'Użytkownik';
 $lang['inst_pass']                      =   'Hasło';
 $lang['inst_database']                  =   'Baza Danych';
+$lang['inst_could_create']              =   'Nie mogę utworzyć';
 
 ?>

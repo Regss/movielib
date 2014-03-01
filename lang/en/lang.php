@@ -18,6 +18,7 @@ $lang['i_plot']                         =   'Plot';
 $lang['i_cast']                         =   'Cast';
 $lang['i_runtime']                      =   'Runtime';
 $lang['i_director']                     =   'Director';
+$lang['i_sets']                          =  'Set';
 $lang['i_country']                      =   'Country';
 $lang['i_minute']                       =   'min.';
 $lang['i_previous']                     =   'Previous';
@@ -50,6 +51,7 @@ $lang['l_wrong_pass']                   =   'Wrong password';
 
 $lang['a_pass_default']                 =   'Password to Admin Panel is still default. Change it for more safety';
 $lang['a_install_exist']                =   'install.php file still exist. Delete it to for more safety';
+$lang['a_tables_updated']               =   'Tables updated';
 $lang['a_movies']                       =   'Movies';
 $lang['a_all']                          =   'All';
 $lang['a_watched']                      =   'Watched';
@@ -59,7 +61,11 @@ $lang['a_cache']                        =   'Cache';
 $lang['a_cached_posters']               =   'Cached posters';
 $lang['a_cached_fanarts']               =   'Cached fanarts';
 $lang['a_server_settings']              =   'Server Settings';
+$lang['a_files_md5']                    =   'File checksums';
+$lang['a_match']                        =   'Match';
+$lang['a_mismatch']                     =   'Mismatch';
 $lang['a_delete']                       =   'Delete';
+$lang['a_delete_all']                   =   'Delete All';
 $lang['a_set_main']                     =   'Main';
 $lang['a_set_panel_left']               =   'Left panel';
 $lang['a_set_panel_top']                =   'Top panel';
@@ -128,5 +134,6 @@ $lang['inst_port']                      =   'Port';
 $lang['inst_login']                     =   'Login';
 $lang['inst_pass']                      =   'Password';
 $lang['inst_database']                  =   'Database';
+$lang['inst_could_create']              =   'Could not create';
 
 ?>

@@ -24,7 +24,7 @@ function connect($mysql_ml) {
 /* ##############################
  * # Get settings from database #
  */##############################
-function get_settings($mysql_ml, $mysql_tables) {
+function get_settings($mysql_tables) {
     
     // if settings in session not exists get it from database
     if (!isset($_SESSION) or count($_SESSION) < 10) {
@@ -41,7 +41,7 @@ function get_settings($mysql_ml, $mysql_tables) {
 /* ######################
  * # Create empty table #
  */######################
-function create_table($mysql_tables, $lang) {
+function create_table($mysql_tables, $tables, $lang) {
         
     // drop tables
     foreach ($mysql_tables as $table) {
@@ -52,59 +52,22 @@ function create_table($mysql_tables, $lang) {
     }
     
     // table movie
-    $create_movies_sql = 'CREATE TABLE `' . $mysql_tables[0] . '` (
-                `id` int(11) NOT NULL,
-                `title` varchar(100),
-                `plot` text,
-                `rating` text,
-                `year` text,
-                `trailer` text,
-                `runtime` text,
-                `genre` text,
-                `director` text,
-                `originaltitle` text,
-                `country` text,
-                `cast` text,
-                `v_codec` text,
-                `v_aspect` float DEFAULT NULL,
-                `v_width` int(11) DEFAULT NULL,
-                `v_height` int(11) DEFAULT NULL,
-                `v_duration` int(11) DEFAULT NULL,
-                `a_codec` text,
-                `a_chan` int(11) DEFAULT NULL,
-                `play_count` int(11) DEFAULT NULL,
-                `last_played` text DEFAULT NULL,
-                `date_added` text DEFAULT NULL,
-                PRIMARY KEY (`id`)
-                ) ENGINE=MyISAM  DEFAULT CHARSET=utf8';
+    $create_movies_sql = 'CREATE TABLE `' . $mysql_tables[0] . '` (';
+    foreach($tables[$mysql_tables[0]] as $key => $val) {
+        $create_movies_sql.= '`' . $key . '` ' . $val . ', ';
+    }
+    $create_movies_sql.= 'PRIMARY KEY (`id`)) DEFAULT CHARSET=utf8';
     if (!@mysql_query($create_movies_sql)) {
         die($lang['inst_could_create'] . ': ' . $mysql_tables[0] . ' - ' . mysql_error() . '<br/>');
     }
     
     // table config
-    $create_config_sql = 'CREATE TABLE `' . $mysql_tables[1] . '` (
-                `site_name` varchar(30) DEFAULT "MovieLib",
-                `language` varchar(2) DEFAULT "' . $_SESSION['install_lang'] . '",
-                `theme` varchar(15) DEFAULT "default",
-                `per_page` int(5) DEFAULT 50,
-                `panel_top_limit` int(5) DEFAULT 10,
-                `panel_top_time` int(5) DEFAULT 5,
-                `panel_top` int(1) DEFAULT 1,
-                `watched_status` int(1) DEFAULT 1,
-                `live_search` int(1) DEFAULT 1,
-                `live_search_max_res` int(4) DEFAULT 10,
-                `panel_overall` int(1) DEFAULT 1,
-                `panel_genre` int(1) DEFAULT 1,
-                `panel_year` int(1) DEFAULT 1,
-                `panel_country` int(1) DEFAULT 1,
-                `panel_v_codec` int(1) DEFAULT 1,
-                `panel_a_codec` int(1) DEFAULT 1,
-                `panel_a_chan` int(1) DEFAULT 1,
-                `show_fanart` int(1) DEFAULT 1,
-                `show_trailer` int(1) DEFAULT 1,
-                `protect_site` int(1) DEFAULT 0,
-                `token` varchar(6) DEFAULT ""
-                ) ENGINE=MyISAM  DEFAULT CHARSET=utf8';
+    $create_config_sql = 'CREATE TABLE `' . $mysql_tables[1] . '` (';
+    foreach($tables[$mysql_tables[1]] as $key => $val) {
+        $create_config_sql.= '`' . $key . '` ' . $val . ', ';
+    }
+    $create_config_sql = substr($create_config_sql, 0, -2);
+    $create_config_sql.= ') DEFAULT CHARSET=utf8';
     if (!@mysql_query($create_config_sql)) {
         die($lang['inst_could_create'] . ': ' . $mysql_tables[1] . ' - ' . mysql_error() . '<br/>');
     }
@@ -114,19 +77,18 @@ function create_table($mysql_tables, $lang) {
     }
     
     // table users
-    $create_users_sql = 'CREATE TABLE `' . $mysql_tables[2] . '` (
-                `id` int(2) NOT NULL AUTO_INCREMENT,
-                `login` varchar(5) DEFAULT NULL,
-                `password` varchar(32) DEFAULT NULL,
-                PRIMARY KEY (`id`)
-                ) ENGINE=MyISAM  DEFAULT CHARSET=utf8';
+    $create_users_sql = 'CREATE TABLE `' . $mysql_tables[2] . '` (';
+    foreach($tables[$mysql_tables[2]] as $key => $val) {
+        $create_users_sql.= '`' . $key . '` ' . $val . ', ';
+    }
+    $create_users_sql.= 'PRIMARY KEY (`id`)) DEFAULT CHARSET=utf8';
     if (!@mysql_query($create_users_sql)) {
         die($lang['inst_could_create'] . ': ' . $mysql_tables[2] . ' - ' . mysql_error() . '<br/>');
     }
     if (@mysql_num_rows(mysql_query('SELECT * FROM ' . $mysql_tables[2])) == 0) {
-        $insert_users_sql = 'INSERT INTO `' . $mysql_tables[2] . '` (`id`, `login`, `password`) VALUES ("", "admin", "21232f297a57a5a743894a0e4a801fc3")';
+        $insert_users_sql = 'INSERT INTO `' . $mysql_tables[2] . '` (`id`, `login`, `password`) VALUES (1, "admin", "21232f297a57a5a743894a0e4a801fc3")';
         mysql_query($insert_users_sql);
-        $insert_users_sql = 'INSERT INTO `' . $mysql_tables[2] . '` (`id`, `login`, `password`) VALUES ("", "user", "ee11cbb19052e40b07aac0ca060c23ee")';
+        $insert_users_sql = 'INSERT INTO `' . $mysql_tables[2] . '` (`id`, `login`, `password`) VALUES (2, "user", "ee11cbb19052e40b07aac0ca060c23ee")';
         mysql_query($insert_users_sql);
     }
 }
@@ -134,7 +96,7 @@ function create_table($mysql_tables, $lang) {
 /* ################################
  * # SYNC - show movie id from db #
  */################################
-function show_id($mysql_ml, $mysql_tables) {
+function show_id($mysql_tables) {
     $show_id_sql = 'SELECT id FROM ' . $mysql_tables[0];
     $show_id_result = mysql_query($show_id_sql);
     while ($id = mysql_fetch_array($show_id_result)) {
@@ -145,32 +107,14 @@ function show_id($mysql_ml, $mysql_tables) {
 /* ##########################
  * # SYNC - add Movie to DB #
  */##########################
-function sync_add($mysql_ml, $mysql_tables) {
+function sync_add($tables, $mysql_tables) {
     
-    $insert_sql = 'INSERT INTO `' . $mysql_tables[0] . '` (
-        `id`,
-        `title`,
-        `plot`,
-        `rating`,
-        `year`,
-        `trailer`,
-        `runtime`,
-        `genre`,
-        `director`,
-        `originaltitle`,
-        `country`,
-        `cast`,
-        `v_codec`,
-        `v_aspect`,
-        `v_width`,
-        `v_height`,
-        `v_duration`,
-        `a_codec`,
-        `a_chan`,
-        `play_count`,
-        `last_played`,
-        `date_added`
-      ) VALUES ';
+    $insert_sql = 'INSERT INTO `' . $mysql_tables[0] . '` (';
+    foreach($tables[$mysql_tables[0]] as $key => $val) {
+        $insert_sql.= '`' . $key . '`, ';
+    }
+    $insert_sql = substr($insert_sql, 0, -2);
+    $insert_sql.= ') VALUES ';
 
     $insert_sql.= '(
         "' . $_POST['id'] . '",
@@ -185,6 +129,7 @@ function sync_add($mysql_ml, $mysql_tables) {
         "' . add_slash($_POST['originaltitle']) . '",
         "' . add_slash($_POST['country']) . '",
         "' . add_slash($_POST['cast']) . '",
+        "' . add_slash($_POST['set']) . '",
         "' . add_slash($_POST['v_codec']) . '",
         "' . add_slash($_POST['v_aspect']) . '",
         "' . add_slash($_POST['v_width']) . '",
@@ -196,7 +141,6 @@ function sync_add($mysql_ml, $mysql_tables) {
         ' . ($_POST['lastplayed'] == '' ? 'NULL' : '"' . add_slash($_POST['lastplayed']) . '"') . ',
         "' . add_slash($_POST['dateadded']) . '"
     )';
-    
     $insert = mysql_query($insert_sql);
 
     if (!$insert) {
@@ -246,7 +190,7 @@ function add_actor($actor_name, $actor_thumb) {
 /* ###############################
  * # SYNC - remove Movie from DB #
  */###############################
-function sync_remove($mysql_ml, $mysql_tables) {
+function sync_remove($mysql_tables) {
     
     $id = $_POST['id'];
     $delete_movie_sql = 'DELETE FROM ' . $mysql_tables[0] . ' WHERE id = "' . $id . '"';
@@ -267,7 +211,7 @@ function sync_remove($mysql_ml, $mysql_tables) {
 /* ##################
  * # SYNC - Watched #
  */##################
-function sync_watched($mysql_ml, $mysql_tables) {
+function sync_watched($mysql_tables) {
     
     $update_sql = 'UPDATE `' . $mysql_tables[0] . '` SET 
         play_count = "' . add_slash($_POST['playcount']) . '",
@@ -285,7 +229,7 @@ function sync_watched($mysql_ml, $mysql_tables) {
 /* ####################
  * # SYNC - unWatched #
  */####################
-function sync_unwatched($mysql_ml, $mysql_tables) {
+function sync_unwatched($mysql_tables) {
     
     $update_sql = 'UPDATE `' . $mysql_tables[0] . '` SET 
         play_count = NULL,
@@ -303,7 +247,7 @@ function sync_unwatched($mysql_ml, $mysql_tables) {
 /* #####################
  * # SYNC - Lastplayed #
  */#####################
-function sync_lastplayed($mysql_ml, $mysql_tables) {
+function sync_lastplayed($mysql_tables) {
     
     $update_sql = 'UPDATE `' . $mysql_tables[0] . '` SET 
         play_count = "' . add_slash($_POST['playcount']) . '",
@@ -328,7 +272,9 @@ function change_token($mysql_tables) {
     }
     $update_sql = 'UPDATE `' . $mysql_tables[1] . '` SET token = "' . $new_token . '"';
     $update = mysql_query($update_sql);
-    unset($_SESSION['site_name']);
+    if ($update) {
+        $_SESSION['token'] = $new_token;
+    }
     return $new_token;
 }
 

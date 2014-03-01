@@ -54,7 +54,7 @@ $(document).ready(function() {
                         $('#panel_live_search').append('\
                         <a href="index.php?id='+movie['id']+'">\
                             <div class="live_search_box" title="'+movie['title']+'">\
-                                <img class="img_live_search" src="cache/'+movie['id']+'.jpg">\
+                                <img class="img_live_search" src="' + movie['poster'] + '">\
                                 <div class="live_search_title">'+movie['title']+'</div>\
                                 <div class="live_search_orig_title">'+movie['originaltitle']+'</div>\
                                 '+movie['year']+' | '+movie['rating']+' | '+movie['runtime']+' min. | '+movie['genre']+' | '+movie['country']+' | '+movie['director']+'\
@@ -151,6 +151,12 @@ $(document).ready(function() {
         var id = $(this).attr('id');
         $('#row_'+id).hide();
         $.ajax({url: 'function.js.php?option=delete&id='+id});
+    });
+    
+    // delete all
+    $('#delete_all').click(function(){
+        var c = $('#delete_all').html();
+        return confirm(c);
     });
     
     // actor thumbnail
