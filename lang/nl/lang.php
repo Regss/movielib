@@ -5,27 +5,33 @@
  */#############
 
 $lang['i_title']                        =   'Titel';
+$lang['i_movies']                       =   'Movies';
+$lang['i_tvshows']                      =   'TVshows';
 $lang['i_year']                         =   'Jaar';
 $lang['i_rating']                       =   'Beoordeling';
 $lang['i_added']                        =   'Toegevoegd';
 $lang['i_last_played']                  =   'Laatst afgespeeld';
 $lang['i_most_watched']                 =   'Most Watched';
-$lang['i_all']                          =   'Alle';
 $lang['i_page']                         =   'Pagina';
+$lang['i_premiered']                    =   'Premiered';
+$lang['i_aired']                        =   'Aired';
 $lang['i_genre']                        =   'Genre';
 $lang['i_sort']                         =   'Sorteren';
 $lang['i_plot']                         =   'Samenvatting';
 $lang['i_cast']                         =   'Cast';
-$lang['i_runtime']                      =   'Runtime';
+$lang['i_season']                       =   'Season';
+$lang['i_seasons']                      =   'Seasons';
+$lang['i_runtime']                      =   'looptijd';
 $lang['i_director']                     =   'Regisseur';
-$lang['i_sets']                          =  'Set';
+$lang['i_sets']                         =   'Set';
 $lang['i_country']                      =   'Land';
-$lang['i_minute']                       =   'min.';
+$lang['i_minute']                       =   'minuten';
 $lang['i_previous']                     =   'Vorige';
 $lang['i_next']                         =   'Volgende';
 $lang['i_search']                       =   'Zoek';
-$lang['i_search_del']                   =   'Verwijder zoekresultaten';
-$lang['i_result']                       =   'Result for phrase';
+$lang['i_filter']                       =   'Filter';
+$lang['i_del_result']                   =   'Delete results';
+$lang['i_result']                       =   'resultaat voor uitdrukking';
 $lang['i_overall_title']                =   'Database';
 $lang['i_overall_all']                  =   'Alle';
 $lang['i_overall_watched']              =   'Gezien';
@@ -33,49 +39,50 @@ $lang['i_overall_notwatched']           =   'Nog niet gezien';
 $lang['i_v_codec']                      =   'Video Codec';
 $lang['i_a_codec']                      =   'Audio Codec';
 $lang['i_a_chan']                       =   'Audio kanalen';
-$lang['i_last_added']                   =   'Laatste toegevoegd';
-$lang['i_top_rated']                    =   'Top rated';
+$lang['i_last_added']                   =   'Last Added';
+$lang['i_top_rated']                    =   'Top Rated';
 
 /* #############
  * # LOGIN.PHP #
  */#############
 
-$lang['l_html_login']                   =   'Login panel';
-$lang['l_pass']                         =   'Password to access site';
-$lang['l_pass_admin']                   =   'Password to access Admin Panel';
-$lang['l_wrong_pass']                   =   'Wrong password';
+$lang['l_html_login']                   =   'login paneel';
+$lang['l_pass']                         =   'toegangs wachtwoord';
+$lang['l_pass_admin']                   =   'administratie wachtwoord';
+$lang['l_wrong_pass']                   =   'verkeerd wachtwoord';
 
 /* #############
  * # ADMIN.PHP #
  */#############
 
-$lang['a_pass_default']                 =   'Password to Admin Panel is still default. Change it for more safety';
-$lang['a_install_exist']                =   'install.php file still exist. Delete it to for more safety';
+$lang['a_pass_default']                 =   'Administratie wachtwoord is nog niet verandert. Gelieve te veranderen voor meer veiligheid.';
+$lang['a_install_exist']                =   'install.php bestaat nog steeds. Gelieve te verwijderen voor meer veiligheid.';
 $lang['a_tables_updated']               =   'Tables updated';
 $lang['a_movies']                       =   'Films';
+$lang['a_tvshows']                      =   'TVshows';
 $lang['a_all']                          =   'Alle';
-$lang['a_watched']                      =   'Watched';
-$lang['a_unwatched']                    =   'Unwatched';
-$lang['a_title']                        =   'Title';
-$lang['a_cache']                        =   'Cache';
-$lang['a_cached_posters']               =   'Cached posters';
-$lang['a_cached_fanarts']               =   'Cached fanarts';
+$lang['a_watched']                      =   'Bekeken';
+$lang['a_unwatched']                    =   'niet bekeken';
+$lang['a_title']                        =   'Titel';
+$lang['a_cache']                        =   'cache';
+$lang['a_cached_posters']               =   'cached posters';
+$lang['a_cached_fanarts']               =   'cached fanarts';
 $lang['a_server_settings']              =   'Server Settings';
 $lang['a_files_md5']                    =   'File checksums';
 $lang['a_match']                        =   'Match';
 $lang['a_mismatch']                     =   'Mismatch';
-$lang['a_delete']                       =   'Delete';
+$lang['a_delete']                       =   'verwijderen';
 $lang['a_delete_all']                   =   'Delete All';
-$lang['a_set_main']                     =   'Main';
-$lang['a_set_panel_left']               =   'Left panel';
-$lang['a_set_panel_top']                =   'Top panel';
-$lang['a_site_name']                    =   'Site title';
-$lang['a_language']                     =   'Language';
-$lang['a_theme']                        =   'Theme';
-$lang['a_per_page']                     =   'Item per page';
+$lang['a_set_main']                     =   'hoofd';
+$lang['a_set_panel_left']               =   'linkse paneel';
+$lang['a_set_panel_top']                =   'boven paneel';
+$lang['a_site_name']                    =   'website titel';
+$lang['a_language']                     =   'taal';
+$lang['a_theme']                        =   'thema';
+$lang['a_per_page']                     =   'fragment per pagina';
 $lang['a_panel_top_limit']              =   'Item to loop in Top panel';
-$lang['a_panel_top_time']               =   'Panel top changeing time (sec.)';
-$lang['a_panel_top']                    =   'Panel top';
+$lang['a_panel_top_time']               =   'verander tijd boven paneel (sec.)';
+$lang['a_panel_top']                    =   'boven paneel';
 $lang['a_watched_status']               =   'Watched status';
 $lang['a_live_search']                  =   'Live search';
 $lang['a_live_search_max_res']          =   'Live search max results';
@@ -83,10 +90,12 @@ $lang['a_panel_overall']                =   'Overall panel';
 $lang['a_panel_genre']                  =   'Genre panel';
 $lang['a_panel_year']                   =   'Year panel';
 $lang['a_panel_country']                =   'Country panel';
+$lang['a_panel_sets']                   =   'Sets panel';
 $lang['a_panel_v_codec']                =   'Video Codec panel';
 $lang['a_panel_a_codec']                =   'Audio Codec panel';
 $lang['a_panel_a_chan']                 =   'Channel panel';
 $lang['a_show_fanart']                  =   'Show fanart in background';
+$lang['a_fadeout_fanart']               =   'Fadeout fanart when mouse leave movie window';
 $lang['a_show_trailer']                 =   'Show trailer';
 $lang['a_protect_site']                 =   'Protect site';
 $lang['a_save']                         =   'Bewaren';
@@ -111,6 +120,7 @@ $lang['a_token_changed']                =   'Token aangepast';
 $lang['a_html_admin_panel']             =   'Admin Panel';
 $lang['a_html_main_site']               =   'Hoofd pagina';
 $lang['a_html_movie_list']              =   'Filmlijst';
+$lang['a_html_tvshow_list']             =   'TVshow List';
 $lang['a_html_settings']                =   'instellingen';
 $lang['a_html_change_password']         =   'Wachtwoord aanpassen';
 $lang['a_html_change_token']            =   'Token';

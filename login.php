@@ -1,5 +1,7 @@
 <?PHP
 session_start();
+header('Content-type: text/html; charset=utf-8');
+
 require('config.php');
 require('function.php');
 
@@ -26,7 +28,7 @@ $output = '';
 
 // admin
 if ($_GET['login'] === 'admin') {
-    $admin_check_sql = 'SELECT * FROM ' . $mysql_tables[2] . ' WHERE login = "admin"';
+    $admin_check_sql = 'SELECT * FROM ' . $mysql_tables[4] . ' WHERE login = "admin"';
     $admin_check_result = mysql_query($admin_check_sql);
     while ($admin_check = mysql_fetch_array($admin_check_result)) {
         if (isset($_POST['movielib_admin_pass']) && md5($_POST['movielib_admin_pass']) == $admin_check['password']) {
@@ -46,7 +48,7 @@ if ($_GET['login'] === 'admin') {
 
 // user
 if ($_GET['login'] === 'user') {
-    $user_check_sql = 'SELECT * FROM ' . $mysql_tables[2] . ' WHERE login = "user"';
+    $user_check_sql = 'SELECT * FROM ' . $mysql_tables[4] . ' WHERE login = "user"';
     $user_check_result = mysql_query($user_check_sql);
     while ($user_check = mysql_fetch_array($user_check_result)) {
         if (isset($_POST['movielib_pass']) && md5($_POST['movielib_pass']) == $user_check['password']) {

@@ -1,3 +1,8 @@
+v. 2.4.0
+- fixed sync images
+- added TVshows
+- added filter info
+
 v. 2.3.3
 - fixed default poster image in live search
 - added checking files integrity

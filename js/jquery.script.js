@@ -1,3 +1,18 @@
+// get settings
+var show_fanart;
+var fadeout_fanart;
+var panel_top_time;
+$.ajax({
+    dataType: "json",
+    url: "function.js.php?option=settings",
+    async: false,
+    success: function(set){
+        show_fanart = set['show_fanart'];
+        fadeout_fanart = set['fadeout_fanart'];
+        panel_top_time = set['panel_top_time'];
+    }
+});
+
 $(document).ready(function() {
     // show panel header when site load
     $('.panel_top_item, .panel_top_item_title').hide().fadeIn(3000);
@@ -23,7 +38,7 @@ $(document).ready(function() {
     
     // show panels in loop
     $(function() {
-        var timeout = $('#panel_top').attr('class');
+        var timeout = panel_top_time * 1000;
         $('.panel_top_item').cycle({
             timeout: +timeout
         });
@@ -40,19 +55,19 @@ $(document).ready(function() {
         }
     });
     
-    // live search
+    // live search movie
     var wait;
-    $(document).on('keyup click', '#search', function() {
+    $(document).on('keyup click', '#search_movies', function() {
         clearTimeout(wait);
         wait = setTimeout(function() {
-            var search = $('#search').val();
+            var search = $('#search_movies').val();
             if (search.length > 0) {
-                $.getJSON("function.js.php?option=search&search="+search, function(data){
+                $.getJSON("function.js.php?option=searchmovie&search="+search, function(data){
                     $('#panel_live_search').empty();
                     for(var m in data) {
                         var movie = data[m];
                         $('#panel_live_search').append('\
-                        <a href="index.php?id='+movie['id']+'">\
+                        <a href="index.php?video=movies&id='+movie['id']+'">\
                             <div class="live_search_box" title="'+movie['title']+'">\
                                 <img class="img_live_search" src="' + movie['poster'] + '">\
                                 <div class="live_search_title">'+movie['title']+'</div>\
@@ -77,8 +92,45 @@ $(document).ready(function() {
         $(this).removeClass('live_hover');
     });
     
+    // live search tvshow
+    var wait;
+    $(document).on('keyup click', '#search_tvshows', function() {
+        clearTimeout(wait);
+        wait = setTimeout(function() {
+            var search = $('#search_tvshows').val();
+            if (search.length > 0) {
+                $.getJSON("function.js.php?option=searchtvshow&search="+search, function(data){
+                    $('#panel_live_search').empty();
+                    for(var m in data) {
+                        var movie = data[m];
+                        $('#panel_live_search').append('\
+                        <a href="index.php?video=tvshows&id='+movie['id']+'">\
+                            <div class="live_search_box" title="'+movie['title']+'">\
+                                <img class="img_live_search" src="' + movie['poster'] + '">\
+                                <div class="live_search_title">'+movie['title']+'</div>\
+                                <div class="live_search_orig_title">'+movie['originaltitle']+'</div>\
+                                '+movie['rating']+' | '+movie['genre']+'\
+                            </div>\
+                        </a>');
+                    }
+                });
+            } else {
+                $('#panel_live_search').empty();
+            }
+            $(document).click(function(){
+                $('#panel_live_search').empty();
+            });
+        }, 500);
+    });
+    $(document).on('mouseenter', '.live_search_box', function(){
+        $(this).addClass('live_hover');
+    });
+    $(document).on('mouseleave', '.live_search_box', function(){
+        $(this).removeClass('live_hover');
+    });
+    
     // change background
-    if ($('#background').attr('alt') == 1) {
+    if (show_fanart == '1') {
         var bg = $('#background').attr('src');
         // mouse enter
         $('.movie').mouseenter(function(){
@@ -95,16 +147,18 @@ $(document).ready(function() {
         });
         // mouse leave
         $('.movie').mouseleave(function(){
-            var movie_id = $(this).attr('id');
-            $.ajax({
-                url: 'cache/'+movie_id+'_f.jpg',
-                success: function(data){
-                    $('#background').fadeOut(500, function(){
-                        $(this).delay(100).attr('src', bg);
-                        $(this).fadeIn(500);
-                    });
-                }
-            });
+            if (fadeout_fanart == '1') {
+                var movie_id = $(this).attr('id');
+                $.ajax({
+                    url: 'cache/'+movie_id+'_f.jpg',
+                    success: function(data){
+                        $('#background').fadeOut(500, function(){
+                            $(this).delay(100).attr('src', bg);
+                            $(this).fadeIn(500);
+                        });
+                    }
+                });
+            }
         });
     }
     
@@ -131,10 +185,10 @@ $(document).ready(function() {
     });
     
     // animate delete button
-    $('.delete_row').mouseenter(function(){
+    $('.animate').mouseenter(function(){
         $(this).css('opacity', '.7');
     });
-    $('.delete_row').mouseleave(function(){
+    $('.animate').mouseleave(function(){
         $(this).css('opacity', '1');
     });
     
@@ -150,7 +204,14 @@ $(document).ready(function() {
     $('.delete_row').click(function(){
         var id = $(this).attr('id');
         $('#row_'+id).hide();
-        $.ajax({url: 'function.js.php?option=delete&id='+id});
+        $.ajax({url: 'function.js.php?option=deletemovie&id='+id});
+    });
+    
+    // delete tvshow
+    $('.delete_row').click(function(){
+        var id = $(this).attr('id');
+        $('#row_'+id).hide();
+        $.ajax({url: 'function.js.php?option=deletetvshow&id='+id});
     });
     
     // delete all
@@ -170,5 +231,19 @@ $(document).ready(function() {
     });
     $('.actor_img').mouseleave(function(){
         $('.actor_thumb').dequeue().hide();
+    });
+    
+    // episode plot toggle
+    $('.episode').mouseenter(function(){
+        var e_id = $(this).attr('id');
+        $(this).mousemove(function(event) {
+            var posX = event.pageX;
+            var posY = event.pageY;
+            $('#plot_'+e_id).css({'top': posY-10, 'left': posX+10});
+        });
+        $('#plot_'+e_id).delay(500).show(0);
+    });
+    $('.episode').mouseleave(function(){
+        $('.episode_plot').dequeue().hide();
     });
 });

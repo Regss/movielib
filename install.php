@@ -1,12 +1,9 @@
 <?PHP
 session_start();
+header('Content-type: text/html; charset=utf-8');
+
 require('config.php');
 require('function.php');
-
-// delete session var
-foreach ($_SESSION as $val) {
-    unset($_SESSION[$val]);
-}
 
 /* ############
  * # LANGUAGE #
@@ -42,109 +39,116 @@ foreach ($option_install_language as $val) {
 }
 require('lang/' . $install_lang . '/lang.php');
 
-if ($option == 'license') {
+switch ($option) {
+    
+    case 'license':
+        /* ###########
+         * # LICENSE #
+         */###########
+        $license_file = 'LICENSE.txt';
+        if (file_exists($license_file)) {
+            $fp = fopen($license_file, 'r');
+            $license = fread($fp, 88192);
+        } else {
+            $license = 'No license file.';
+        }
 
-    /* ###########
-     * # LICENSE #
-     */###########
-    $license_file = 'LICENSE.txt';
-    if (file_exists($license_file)) {
-        $fp = fopen($license_file, 'r');
-        $license = fread($fp, 88192);
-    } else {
-        $license = 'No license file.';
-    }
-    
-    $output_panel = '
-    <div class="container_install">
-        <div class="title">' . $lang['ins_license'] . '</div>
-    </div>
-    <form>
-        <textarea class="textera" readonly="readonly">' . $license . '</textarea>
-    </form>
-    <a class="box" href="install.php?option=database">' . $lang['ins_accept'] . '</a>
-';
-    
-} elseif ($option == 'database') {
-
-    /* ################
-     * # SET DATABASE #
-     */################
-     if (file_exists('db.php')) {
-        $db_exist = '<div class="panel_info">' . $lang['ins_db_exist'] . '</div>';
-    } else {
-        $db_exist = '';
-    }
-    
-    $output_panel = $db_exist . '
-    <div class="container_install">
-        <div class="title">' . $lang['inst_conn_db'] . '</div>
-    </div>
-    <div class="container_install">
-        <form action="install.php?option=success" method="post">
-            <table class="table">
-                <tr><td>' . $lang['inst_server'] . ':</td><td><input type="text" name="host" value="localhost"></td></tr>
-                <tr><td>' . $lang['inst_port'] . ':</td><td><input type="text" name="port" value="3306"></td></tr>
-                <tr><td>' . $lang['inst_login'] . ':</td><td><input type="text" name="login" value="xbmc"></td></tr>
-                <tr><td>' . $lang['inst_pass'] . ':</td><td><input type="password" name="pass" value=""></td></tr>
-                <tr><td>' . $lang['inst_database'] . ':</td><td><input type="text" name="database" value="movielib"></td></tr>
-            </table><br />
-        <input id="ok" type="submit" value="OK" />
+        $output_panel = '
+        <div class="container_install">
+            <div class="title">' . $lang['ins_license'] . '</div>
+        </div>
+        <form>
+            <textarea class="textera" readonly="readonly">' . $license . '</textarea>
         </form>
-    </div>';
+        <a class="box" href="install.php?option=database">' . $lang['ins_accept'] . '</a>
+        ';
+        break;
         
-} elseif ($option == 'success') {
+    case 'database':
+        /* ################
+         * # SET DATABASE #
+         */################
+         if (file_exists('db.php')) {
+            $db_exist = '<div class="panel_info">' . $lang['ins_db_exist'] . '</div>';
+        } else {
+            $db_exist = '';
+        }
+        
+        $output_panel = $db_exist . '
+        <div class="container_install">
+            <div class="title">' . $lang['inst_conn_db'] . '</div>
+        </div>
+        <div class="container_install">
+            <form action="install.php?option=success" method="post">
+                <table class="table">
+                    <tr><td>' . $lang['inst_server'] . ':</td><td><input type="text" name="host" value="localhost"></td></tr>
+                    <tr><td>' . $lang['inst_port'] . ':</td><td><input type="text" name="port" value="3306"></td></tr>
+                    <tr><td>' . $lang['inst_login'] . ':</td><td><input type="text" name="login" value="xbmc"></td></tr>
+                    <tr><td>' . $lang['inst_pass'] . ':</td><td><input type="password" name="pass" value=""></td></tr>
+                    <tr><td>' . $lang['inst_database'] . ':</td><td><input type="text" name="database" value="movielib"></td></tr>
+                </table><br />
+            <input id="ok" type="submit" value="OK" />
+            </form>
+        </div>';
+        break;
+        
+    case 'success':
+        /* ##################
+         * # CHECK DATABASE #
+         */##################
+        $conn_install = @mysql_connect($_POST['host'] . ':' . $_POST['port'], $_POST['login'], $_POST['pass']);
+        if (!$conn_install) {
+            die($lang['ins_could_connect'] . ' - ' . mysql_error());
+        }
+        $create_db = @mysql_query('CREATE DATABASE ' . $_POST['database']);
+        $sel_install = @mysql_select_db($_POST['database']);
+        if (!$sel_install) {
+            die($lang['ins_could_connect'] . ' - ' . mysql_error());
+        }
+        create_table($mysql_tables, $tables, $lang, $version, 1);
+        $fp = fopen('db.php', 'w');
+        $to_write = '<?PHP $mysql_ml = array(\'' . $_POST['host'] . '\', \'' . $_POST['port'] . '\', \'' . $_POST['login'] . '\', \'' . $_POST['pass'] . '\', \'' . $_POST['database'] . '\'); ?>';
+        fwrite($fp, $to_write);
+        fclose($fp);
 
-    /* ##################
-     * # CHECK DATABASE #
-     */##################
-    $conn_install = @mysql_connect($_POST['host'] . ':' . $_POST['port'], $_POST['login'], $_POST['pass']);
-    if (!$conn_install) {
-        die($lang['ins_could_connect'] . ' - ' . mysql_error());
-    }
-    $create_db = @mysql_query('CREATE DATABASE ' . $_POST['database']);
-    $sel_install = @mysql_select_db($_POST['database']);
-    if (!$sel_install) {
-        die($lang['ins_could_connect'] . ' - ' . mysql_error());
-    }
-    create_table($mysql_tables, $tables, $lang);
-    $fp = fopen('db.php', 'w');
-    $to_write = '<?PHP $mysql_ml = array(\'' . $_POST['host'] . '\', \'' . $_POST['port'] . '\', \'' . $_POST['login'] . '\', \'' . $_POST['pass'] . '\', \'' . $_POST['database'] . '\'); ?>';
-    fwrite($fp, $to_write);
-    fclose($fp);
-    
-    $output_panel = '
-    <div class="container_install">
-        <div class="title">' . $lang['ins_finished'] . '</div>
-    </div><br />
-    <a class="box" href="admin.php?option=delete_install">' . $lang['ins_admin'] . '</a>';
+        $output_panel = '
+        <div class="container_install">
+            <div class="title">' . $lang['ins_finished'] . '</div>
+        </div><br />
+        <a class="box" href="admin.php?option=delete_install">' . $lang['ins_admin'] . '</a>';
+        
+        // delete session var
+        $_SESSION = array();
+        
+        break;
+        
+    default:
+        /* ##########
+         * # README #
+         */##########
+        
+        $readme_file = 'lang/' . $_SESSION['install_lang'] . '/readme';
+        if (!file_exists($readme_file)) {
+            $readme_file = 'README.txt';
+        }
+        $fp = fopen($readme_file, 'r');
+        $readme = fread($fp, 88192);
 
-} else {
-
-    /* ##########
-     * # README #
-     */##########
-    $readme_file = 'lang/' . $_SESSION['install_lang'] . '/readme';
-    if (!file_exists($readme_file)) {
-        $readme_file = 'README.txt';
-    }
-    $fp = fopen($readme_file, 'r');
-    $readme = fread($fp, 88192);
-    
-    $output_panel = '
-    <div class="container_install">
-        <div class="title">' . $lang['ins_lang_file'] . '</div>
-        <form action="install.php" method="post"><BR />
-            <select onchange="this.form.submit()" name="install_lang">' . $output_install_lang . '</select><BR />
+        $output_panel = '
+        <div class="container_install">
+            <div class="title">' . $lang['ins_lang_file'] . '</div>
+            <form action="install.php" method="post"><BR />
+                <select onchange="this.form.submit()" name="install_lang">' . $output_install_lang . '</select><BR />
+            </form>
+        </div>
+        <form>
+            <textarea class="textera" readonly="readonly">' . $readme . '</textarea>
         </form>
-    </div>
-    <form>
-        <textarea class="textera" readonly="readonly">' . $readme . '</textarea>
-    </form>
-    <a class="box" href="install.php?option=license">' . $lang['ins_next'] . '</a>
-    ';
+        <a class="box" href="install.php?option=license">' . $lang['ins_next'] . '</a>
+        ';
+        break;
+        
 }
-    
 ?>
 <!DOCTYPE HTML>
 <html>

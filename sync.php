@@ -1,4 +1,7 @@
 <?PHP
+session_start();
+header('Content-type: text/html; charset=utf-8');
+
 require('config.php');
 require('function.php');
 
@@ -13,6 +16,11 @@ require('lang/' . $set['language'] . '/lang.php');
  * # SYNC DATABASE #
  */#################
 
+ // check version
+if ($option == 'checkversion') {
+    echo  $version;
+}
+ 
 // check token
 if ($option == 'checktoken') {
     if ($token == $set['token']) {
@@ -31,25 +39,25 @@ if ($token == $set['token']) {
             echo (ini_get('allow_url_fopen') == 1 ? 'true' : 'false');
             break;
         
+        /* #########
+         * # MOVIE #
+         */#########
         // show movie id from database
-        case 'showid':
-            show_id($mysql_tables);
+        case 'showmovieid':
+            show_id($mysql_tables[0]);
             break;
         
         // sync movie
         case 'addmovie':
-            sync_add($tables, $mysql_tables);
+            sync_add($tables, $mysql_tables[0]);
             break;
         case 'removemovie':
-            sync_remove($mysql_tables);
-            break;
-        case 'addactor':
-            add_actor($_POST['name'], $_POST['actor']);
+            sync_remove($mysql_tables[0]);
             break;
         
         // show movie watched id from database
-        case 'showwatchedid':
-            $sql = 'SELECT id FROM movies WHERE play_count > 0';
+        case 'showwatchedmovieid':
+            $sql = 'SELECT id FROM ' . $mysql_tables[0] . ' WHERE play_count > 0';
             $sql_res = mysql_query($sql);
             while ($id = mysql_fetch_array($sql_res)) {
                 echo $id[0] . ' ';
@@ -58,17 +66,17 @@ if ($token == $set['token']) {
         
         // sync watched
         case 'watchedmovie':
-            sync_watched($mysql_tables);
+            sync_watched($mysql_tables[0]);
             break;
         
         // sync unwatched
         case 'unwatchedmovie':
-            sync_unwatched($mysql_tables);
+            sync_unwatched($mysql_tables[0]);
             break;
         
         // show lastplayed movie id
-        case 'showlastplayed':
-            $sql = 'SELECT last_played FROM movies ORDER BY last_played DESC LIMIT 0 , 1';
+        case 'showlastplayedmovie':
+            $sql = 'SELECT last_played FROM ' . $mysql_tables[0] . ' ORDER BY last_played DESC LIMIT 0 , 1';
             $sql_res = mysql_query($sql);
             while ($date = mysql_fetch_array($sql_res)) {
                 echo $date[0] . ' ';
@@ -76,9 +84,116 @@ if ($token == $set['token']) {
             break;
         
         // sync lastplayed
-        case 'lastplayed':
-            sync_lastplayed($mysql_tables);
+        case 'lastplayedmovie':
+            sync_lastplayed($mysql_tables[0]);
             break;
+            
+        /* ##########
+         * # TVSHOW #
+         */##########
+        // show tvshow id from database
+        case 'showtvshowid':
+            show_id($mysql_tables[1]);
+            break;
+        
+        // sync tvshow
+        case 'addtvshow':
+            sync_add($tables, $mysql_tables[1]);
+            break;
+        case 'removetvshow':
+            sync_remove($mysql_tables[1]);
+            break;
+        
+        // show tvshow watched id from database
+        case 'showwatchedtvshowid':
+            $sql = 'SELECT id FROM ' . $mysql_tables[1] . ' WHERE play_count > 0';
+            $sql_res = mysql_query($sql);
+            while ($id = mysql_fetch_array($sql_res)) {
+                echo $id[0] . ' ';
+            }
+            break;
+        
+        // sync watched
+        case 'watchedtvshow':
+            sync_watched($mysql_tables[1]);
+            break;
+        
+        // sync unwatched
+        case 'unwatchedtvshow':
+            sync_unwatched($mysql_tables[1]);
+            break;
+        
+        // show lastplayed tvshow id
+        case 'showlastplayedtvshow':
+            $sql = 'SELECT last_played FROM ' . $mysql_tables[1] . ' ORDER BY last_played DESC LIMIT 0 , 1';
+            $sql_res = mysql_query($sql);
+            while ($date = mysql_fetch_array($sql_res)) {
+                echo $date[0] . ' ';
+            }
+            break;
+        
+        // sync lastplayed
+        case 'lastplayedtvshow':
+            sync_lastplayed($mysql_tables[1]);
+            break;
+            
+        /* ###########
+         * # EPISODE #
+         */###########
+        // show episode id from database
+        case 'showepisodeid':
+            show_id($mysql_tables[2]);
+            break;
+            
+        // sync episode
+        case 'addepisode':
+            sync_add($tables, $mysql_tables[2]);
+            break;
+        case 'removeepisode':
+            sync_remove($mysql_tables[2]);
+            break;
+        
+        // show episode watched id from database
+        case 'showwatchedepisodeid':
+            $sql = 'SELECT id FROM ' . $mysql_tables[2] . ' WHERE play_count > 0';
+            $sql_res = mysql_query($sql);
+            while ($id = mysql_fetch_array($sql_res)) {
+                echo $id[0] . ' ';
+            }
+            break;
+        
+        // sync watched
+        case 'watchedepisode':
+            sync_watched($mysql_tables[2]);
+            break;
+        
+        // sync unwatched
+        case 'unwatchedepisode':
+            sync_unwatched($mysql_tables[2]);
+            break;
+        
+        // show lastplayed episode id
+        case 'showlastplayedepisode':
+            $sql = 'SELECT last_played FROM ' . $mysql_tables[2] . ' ORDER BY last_played DESC LIMIT 0 , 1';
+            $sql_res = mysql_query($sql);
+            while ($date = mysql_fetch_array($sql_res)) {
+                echo $date[0] . ' ';
+            }
+            break;
+        
+        // sync lastplayed
+        case 'lastplayedepisode':
+            sync_lastplayed($mysql_tables[2]);
+            break;
+        
+        /* #########
+         * # ACTOR #
+         */#########
+        // add actor
+        case 'addactor':
+            add_actor($_POST['name'], $_POST['actor']);
+            break;
+        
     }
 }
 ?>

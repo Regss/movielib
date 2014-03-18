@@ -1,6 +1,6 @@
 <?PHP
 
-$version = '2.3.3';
+$version = '2.4.0';
 
 if (file_exists('db.php')) {
     require('db.php');
@@ -80,31 +80,56 @@ $mimetype_assoc['video/webm']           =   array('webm');
 $mimetype_assoc['video/flv']            =   array('flv');
 
 // tables
-$mysql_tables = array('movies', 'config', 'users');
+$mysql_tables = array('movies', 'tvshows', 'episodes', 'config', 'users');
 $movies_table = array(
     'id'                    => 'int(6) NOT NULL',
-    'title'                 => 'varchar(100)',
-    'plot'                  => 'text',
-    'rating'                => 'float DEFAULT NULL',
-    'year'                  => 'int(4)',
-    'trailer'               => 'varchar(255)',
-    'runtime'               => 'int(4) DEFAULT NULL',
-    'genre'                 => 'varchar(255)',
-    'director'              => 'varchar(255)',
-    'originaltitle'         => 'varchar(255)',
-    'country'               => 'varchar(255)',
-    'cast'                  => 'varchar(255)',
-    'sets'                  => 'varchar(255)',
-    'v_codec'               => 'varchar(255)',
-    'v_aspect'              => 'float DEFAULT NULL',
-    'v_width'               => 'int(11) DEFAULT NULL',
-    'v_height'              => 'int(11) DEFAULT NULL',
-    'v_duration'            => 'int(11) DEFAULT NULL',
-    'a_codec'               => 'varchar(255)',
-    'a_chan'                => 'int(11) DEFAULT NULL',
-    'play_count'            => 'int(11) DEFAULT NULL',
-    'last_played'           => 'varchar(20)',
-    'date_added'            => 'varchar(20)'
+    'title'                 => 'varchar(100) NOT NULL',
+    'plot'                  => 'text NOT NULL',
+    'rating'                => 'float NOT NULL',
+    'year'                  => 'int(4) NOT NULL',
+    'trailer'               => 'varchar(255) NOT NULL',
+    'runtime'               => 'int(4) NOT NULL',
+    'genre'                 => 'varchar(255) NOT NULL',
+    'director'              => 'varchar(255) NOT NULL',
+    'originaltitle'         => 'varchar(255) NOT NULL',
+    'country'               => 'varchar(255) NOT NULL',
+    'cast'                  => 'varchar(255) NOT NULL',
+    'sets'                  => 'varchar(255) NOT NULL',
+    'v_codec'               => 'varchar(255) NOT NULL',
+    'v_aspect'              => 'float NOT NULL',
+    'v_width'               => 'int(11) NOT NULL',
+    'v_height'              => 'int(11) NOT NULL',
+    'v_duration'            => 'int(11) NOT NULL',
+    'a_codec'               => 'varchar(255) NOT NULL',
+    'a_chan'                => 'int(11) NOT NULL',
+    'play_count'            => 'int(11) NOT NULL',
+    'last_played'           => 'varchar(20) NOT NULL',
+    'date_added'            => 'varchar(20) NOT NULL'
+);
+$tvshows_table = array(
+    'id'                    => 'int(6) NOT NULL',
+    'title'                 => 'varchar(100) NOT NULL',
+    'plot'                  => 'text NOT NULL',
+    'rating'                => 'float NOT NULL',
+    'genre'                 => 'varchar(255) NOT NULL',
+    'originaltitle'         => 'varchar(255) NOT NULL',
+    'cast'                  => 'varchar(255) NOT NULL',
+    'premiered'             => 'varchar(20) NOT NULL',
+    'play_count'            => 'int(11) NOT NULL',
+    'last_played'           => 'varchar(20) NOT NULL',
+    'date_added'            => 'varchar(20) NOT NULL'
+);
+$episodes_table = array(
+    'id'                    => 'int(6) NOT NULL',
+    'title'                 => 'varchar(100) NOT NULL',
+    'plot'                  => 'text NOT NULL',
+    'episode'               => 'int(6) NOT NULL',
+    'season'                => 'int(6) NOT NULL',
+    'tvshow'                => 'int(6) NOT NULL',
+    'firstaired'            => 'varchar(20) NOT NULL',
+    'play_count'            => 'int(11) NOT NULL',
+    'last_played'           => 'varchar(20) NOT NULL',
+    'date_added'            => 'varchar(20) NOT NULL'
 );
 $config_table = array(
     'site_name'             => 'varchar(30) DEFAULT "MovieLib"',
@@ -121,39 +146,40 @@ $config_table = array(
     'panel_genre'           => 'int(1) DEFAULT 1',
     'panel_year'            => 'int(1) DEFAULT 1',
     'panel_country'         => 'int(1) DEFAULT 1',
+    'panel_sets'            => 'int(1) DEFAULT 1',
     'panel_v_codec'         => 'int(1) DEFAULT 1',
     'panel_a_codec'         => 'int(1) DEFAULT 1',
     'panel_a_chan'          => 'int(1) DEFAULT 1',
     'show_fanart'           => 'int(1) DEFAULT 1',
+    'fadeout_fanart'        => 'int(1) DEFAULT 0',
     'show_trailer'          => 'int(1) DEFAULT 1',
     'protect_site'          => 'int(1) DEFAULT 0',
-    'token'                 => 'varchar(6) DEFAULT ""'
+    'token'                 => 'varchar(6) DEFAULT ""',
+    'version'               => 'varchar(6) DEFAULT "' . $version . '"'
 );
 $users_table = array(
     'id'                    => 'int(2) NOT NULL',
     'login'                 => 'varchar(5) DEFAULT NULL',
     'password'              => 'varchar(32) DEFAULT NULL'
 );
-$tables = array($mysql_tables[0] => $movies_table, $mysql_tables[1] => $config_table, $mysql_tables[2] => $users_table);
+$tables = array(
+    $mysql_tables[0] => $movies_table,
+    $mysql_tables[1] => $tvshows_table,
+    $mysql_tables[2] => $episodes_table,
+    $mysql_tables[3] => $config_table,
+    $mysql_tables[4] => $users_table
+);
 
 // Set var
 $var = array(
     'id'        =>  0,
     'sort'      =>  1,
-    'genre'     =>  'all',
-    'year'      =>  'all',
-    'country'   =>  'all',
-    'director'  =>  'all',
-    'sets'      =>  'all',
-    'cast'      =>  'all',    
-    'v_codec'   =>  'all',
-    'a_codec'   =>  'all',
-    'a_chan'    =>  'all',
     'search'    =>  '',
     'page'      =>  1,
-    'output'    =>  '',
     'token'     =>  '',
-    'option'    =>  ''
+    'option'    =>  '',
+    'filter'    =>  '',
+    'filterid'  =>  ''
     );
 foreach ($var as $key => $val) {
     if (isset($_GET[$key])) {

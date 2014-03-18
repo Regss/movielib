@@ -11,12 +11,17 @@ a:active { color:#000; text-decoration:none; }
 
 .bold { font-weight:bold; }
 .orange { color:#414141; }
+.text_left { text-align:left; }
+.text_right { text-align:right; }
 
 input, select { background-color:#ddd; color:#333; border:1px solid #fff; font-size:11px; width:160px; height:20px; }
 .panel_info { border:3px solid #00cc00; background-color:#66ff33; font-weight:bold; color:#000; padding:5px; }
 
-.container { background-color:#eee; border:1px solid #ccc; width:800px; overflow:hidden; margin:auto; padding-bottom:20px; padding-top:10px; opacity:0.9; }
+.container { background-color:#eee; border:1px solid #ccc; border-top:0px; width:800px; overflow:hidden; margin:auto; padding-bottom:20px; opacity:0.9; }
 .container_login { width:300px; margin:auto; background-color:#ccc; border:1px solid #333; margin-top:20px; padding:10px; text-align:center; }
+
+#select_media { width:800px; margin:auto; overflow:hidden; color:#414141; padding-bottom:10px; font-family:Verdana, Tahoma, sans-serif; font-size:20px; font-weight:bold; text-align:center; }
+.media { display:block; width:399px; float:left; border-bottom:1px solid #ddd; border-left:1px solid #ddd; background-color:#fff; padding: 10px 0px 10px 0px; }
 
 #panel_top, #panel_title { width:728px; overflow:hidden; margin:auto; }
 .panel_top_item_title { float:left; color:#414141; font-weight:bold; padding-top:3px; padding-left:4px; background-color:#fff; width:138px; height:17px; margin-left:20px; margin-right:20px; }
@@ -34,7 +39,7 @@ input, select { background-color:#ddd; color:#333; border:1px solid #fff; font-s
 #panel_sort { text-align:center; background-color:#ddd; border:1px solid #fff; margin-bottom:10px; }
 .box_inline{ display:inline-block; font-weight:bold; border:1px solid #ccc; background-color:#fff; margin:5px 3px 5px 3px; padding:3px 10px 3px 10px; text-align:center; }
 
-input#search { width:250px; }
+input.search { width:250px; }
 #panel_search { margin-bottom:10px; overflow:hidden; text-align:right;  }
 #panel_input_search { width:252px; float:right; }
 #search_res { display:block; float:right; line-height: 22px; }
@@ -55,6 +60,8 @@ input#search { width:250px; }
 .title a:hover { font-size:20px; font-weight:bold; color:#414141; text-decoration:underline; }
 .title_org { font-size:11px; font-weight:bold; color:#888; }
 .watched { position:absolute; margin-left:104px; margin-top:162px; display:block; }
+.watched_episode { width:10px; height:10px; }
+.episode_plot { display: none; position: absolute; width:380px; border:1px solid #fff; background-color:#ddd; padding:5px; text-align:left; }
 .img_trailer { position:absolute; margin-left:94px; margin-top:8px; display:block; opacity: .8; }
 .flag { margin-left:3px; }
 .desc { text-align:center; margin-left:150px; margin-top:5px; min-height: 220px; }
@@ -65,6 +72,7 @@ input#search { width:250px; }
 .table { margin:0px; padding:0px; border:0px; }
 .left { font-weight:bold; color:#414141; text-align:right; width:60px; vertical-align:top; }
 .right { text-align:left; }
+.aired { width:50px; }
 .actor_thumb { position: absolute; display:none; border:1px solid #111;}
 .trailer { border: 1px solid #000; margin:auto; margin-top:10px; margin-bottom:10px; width:560px; }
 .img_space { width:300px; height:1px; display:block; margin:auto; margin-top:5px; margin-bottom:5px; }
