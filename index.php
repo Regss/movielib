@@ -42,9 +42,9 @@ if ($set['protect_site'] == 1) {
  * # SELECT MEDIA #
  */################
 if ($video == 'tvshows') {
-    $output_select_media = '<a id="media_movies" class="media" href="index.php?video=movies">' . mb_strtoupper($lang['i_movies']) . '</a><div id="media_tvshows" class="media">' . mb_strtoupper($lang['i_tvshows']) . '</div>';
+    $output_select_media = '<a class="media" href="index.php?video=movies">' . mb_strtoupper($lang['i_movies']) . '</a><div class="media">' . mb_strtoupper($lang['i_tvshows']) . '</div>';
 } else {
-    $output_select_media = '<div id="media_movies" class="media">' . mb_strtoupper($lang['i_movies']) . '</div><a id="media_tvshows" class="media" href="index.php?video=tvshows">' . mb_strtoupper($lang['i_tvshows']) . '</a>';
+    $output_select_media = '<div class="media">' . mb_strtoupper($lang['i_movies']) . '</div><a class="media" href="index.php?video=tvshows">' . mb_strtoupper($lang['i_tvshows']) . '</a>';
 }
 
 /* #############
