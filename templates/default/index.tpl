@@ -46,31 +46,45 @@
                 {/SHOW.panel_overall}
                 {SHOW.panel_genre}
                 <div id="genre" class="panel_box_title">{LANG.i_genre}</div>
-                <div id="panel_genre" class="panel_box {SET.panel_genre}"><ul>{panel_genre}</ul></div>
+                <div id="panel_genre" class="panel_box {SET.panel_genre}">
+                    <ul>{panel_genre}</ul>
+                </div>
                 {/SHOW.panel_genre}
                 {SHOW.panel_year}
                 <div id="year" class="panel_box_title">{LANG.i_year}</div>
-                <div id="panel_year" class="panel_box {SET.panel_year}"><ul>{panel_year}</ul></div>
+                <div id="panel_year" class="panel_box {SET.panel_year}">
+                    <ul>{panel_year}</ul>
+                </div>
                 {/SHOW.panel_year}
                 {SHOW.panel_country}
                 <div id="country" class="panel_box_title">{LANG.i_country}</div>
-                <div id="panel_country" class="panel_box {SET.panel_country}"><ul>{panel_country}</ul></div>
+                <div id="panel_country" class="panel_box {SET.panel_country}">
+                    <ul>{panel_country}</ul>
+                </div>
                 {/SHOW.panel_country}
                 {SHOW.panel_sets}
                 <div id="sets" class="panel_box_title">{LANG.i_sets}</div>
-                <div id="panel_sets" class="panel_box {SET.panel_sets}"><ul>{panel_sets}</ul></div>
+                <div id="panel_sets" class="panel_box {SET.panel_sets}">
+                    <ul>{panel_sets}</ul>
+                </div>
                 {/SHOW.panel_sets}
                 {SHOW.panel_v_codec}
                 <div id="v_codec" class="panel_box_title">{LANG.i_v_codec}</div>
-                <div id="panel_v_codec" class="panel_box {SET.panel_v_codec}"><ul>{panel_v_codec}</ul></div>
+                <div id="panel_v_codec" class="panel_box {SET.panel_v_codec}">
+                    <ul>{panel_v_codec}</ul>
+                </div>
                 {/SHOW.panel_v_codec}
                 {SHOW.panel_a_codec}
                 <div id="a_codec" class="panel_box_title">{LANG.i_a_codec}</div>
-                <div id="panel_a_codec" class="panel_box {SET.panel_a_codec}"><ul>{panel_a_codec}</ul></div>
+                <div id="panel_a_codec" class="panel_box {SET.panel_a_codec}">
+                    <ul>{panel_a_codec}</ul>
+                </div>
                 {/SHOW.panel_a_codec}
                 {SHOW.panel_a_chan}
                 <div id="a_chan" class="panel_box_title">{LANG.i_a_chan}</div>
-                <div id="panel_a_chan" class="panel_box {SET.panel_a_chan}"><ul>{panel_a_chan}</ul></div>
+                <div id="panel_a_chan" class="panel_box {SET.panel_a_chan}">
+                    <ul>{panel_a_chan}</ul>
+                </div>
                 {/SHOW.panel_a_chan}
             </div>
             <div id="panel_right" class="panel_right_ex">
