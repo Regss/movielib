@@ -158,8 +158,8 @@ switch ($option) {
         <!--[if IE]>
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
         <![endif]-->
-        <link type="image/x-icon" href="css/default/img/icon.ico" rel="icon" media="all" />
-        <link type="text/css" href="css/default/admin/style.css" rel="stylesheet" media="all" />
+        <link type="image/x-icon" href="admin/img/icon.ico" rel="icon" media="all" />
+        <link type="text/css" href="admin/css/style.css" rel="stylesheet" media="all" />
         <script type="text/javascript" src="js/jquery-1.9.1.js"></script>
         <script type="text/javascript" src="js/jquery.script.js"></script>
     </head>

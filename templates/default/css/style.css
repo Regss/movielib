@@ -37,7 +37,9 @@ input, select { background-color:#222; color:#ddd; border:1px solid #000; font-s
 .panel_right_ex { width: 630px; float:right; }
 
 #panel_sort { text-align:center; background-color:#222; border:1px solid #000; margin-bottom:10px; }
-.box_inline{ display:inline-block; font-weight:bold; border:1px solid #333; background-color:#000; margin:5px 3px 5px 3px; padding:3px 10px 3px 10px; text-align:center; }
+#panel_sort a, #panel_sort span { display:inline-block; font-weight:bold; border:1px solid #333; background-color:#000; margin:5px 3px 5px 3px; padding:3px 10px 3px 10px; text-align:center; }
+
+#panel_nav a, #panel_nav span { display:inline-block; font-weight:bold; border:1px solid #333; background-color:#000; margin:5px 3px 5px 3px; padding:3px 10px 3px 10px; text-align:center;}
 
 input.search { width:250px; }
 #panel_search { margin-bottom:10px; overflow:hidden; text-align:right;  }
@@ -51,6 +53,7 @@ input.search { width:250px; }
 
 #panel_filter { text-align:left; overflow:hidden; margin-top: 5px; margin-bottom:-5px; }
 #filter_text { float:left; margin-left: 8px; }
+#filter_text span { color:#ff7300; font-weight:bold; }
 #filter_delete_img { margin:2px 5px 0px 5px; float:left; }
 
 .movie { text-align:left; border:1px solid #000; background-color:#222; min-height:250px; margin-top:10px; margin-bottom:10px; padding:5px 10px 5px 10px; }
