@@ -30,10 +30,17 @@ if ($set['protect_site'] == 1) {
 /* #################
  * # DEFINE ARRAYS #
  */#################
+ if (!isset($_GET['video'])) {
+    $video = 'movies';
+} else {
+    $video = $_GET['video'];
+}
+
 $output = array();
 $show = array();
 
 $item = array(
+        'video',
         'version',
         'panel_top',
         'panel_top_last_added',
@@ -62,13 +69,8 @@ foreach ($item as $val) {
 }
  
 $output['version'] = $version;
- 
-if (!isset($_GET['video'])) {
-    $video = 'movies';
-} else {
-    $video = $_GET['video'];
-}
-if ($video == 'tvshows') {
+$output['video'] = $video;
+
 
 /* ################
  * # SELECT MEDIA #
