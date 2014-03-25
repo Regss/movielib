@@ -1,0 +1,12 @@
+.movie { color:#aaa; text-align:left; font-size:11px; border:1px solid #000; background-color:#222; margin-top:1px; margin-bottom:1px; padding:2px 2px 2px 4px; overflow:hidden; }
+.text { float:left; }
+.title { font-weight:bold; color:#ff7300; }
+.title a:link { font-size:11px; font-weight:bold; color:#ff7300; }
+.title a:visited { font-size:11px; font-weight:bold; color:#ff7300; }
+.title a:active { font-size:11px; font-weight:bold; color:#ff7300; }
+.title a:hover { font-size:11px; font-weight:bold; color:#ff7300; text-decoration:underline; }
+.title_org { font-weight:bold; }
+.images { float:right; }
+.images div { width:26px; height:14px; float:left; }
+.movie img { height:12px; display:block; margin:auto; margin-top:1px; }
+.img_trailer { opacity: .8; }

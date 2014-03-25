@@ -8,6 +8,7 @@
         <![endif]-->
         <link type="image/x-icon" href="templates/{SET.theme}/img/icon.ico" rel="icon" media="all" />
         <link type="text/css" href="templates/{SET.theme}/css/style.css" rel="stylesheet" media="all" />
+        <link type="text/css" href="templates/{SET.theme}/css/view_{view}.css" rel="stylesheet" media="all" />
         <link type="text/css" href="templates/{SET.theme}/css/video.css" rel="stylesheet" media="all" />
         <script type="text/javascript" src="js/jquery-1.9.1.js"></script>
         <script type="text/javascript" src="js/jquery.cycle.lite.js"></script>
@@ -18,8 +19,7 @@
         <img src="templates/{SET.theme}/img/bg.jpg" id="background" alt="">
         <div class="container">
             <div id="select_media">
-                <a class="media {movies}" href="index.php?video=movies">{LANG.i_movies}</a>
-                <a class="media {tvshows}" href="index.php?video=tvshows">{LANG.i_tvshows}</a>
+                {select_media}
             </div>
             <div id="panel_top">
                 <div class="panel_top_item">{top_item_last_added}</div>
