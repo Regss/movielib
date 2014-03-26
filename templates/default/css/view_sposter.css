@@ -1,0 +1,3 @@
+.movie { border:1px solid #fff; margin:10px; display:inline-block; }
+.movie img { width:100px; display:block; }
+.img_trailer { opacity: .8; }

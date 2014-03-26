@@ -36,10 +36,16 @@ if ($set['protect_site'] == 1) {
     $video = $_GET['video'];
 }
 
- if (!isset($_GET['view']) or $id <> 0) {
-    $view = 'default';
-} else {
-    $view = $_GET['view'];
+// views
+$view = $set['view'];
+if ($id == 0) {
+    if (isset($_COOKIE['view'])) {
+        $view = $_COOKIE['view'];
+    }
+    if (isset($_GET['view'])) {
+        $view = $_GET['view'];
+        setcookie('view', $view, time()+(60 * 60 * 24 * 7));
+    }
 }
 
 $output = array();
@@ -66,6 +72,7 @@ $item = array(
         'panel_a_chan',
         'panel_live_search',
         'panel_sort',
+        'panel_view',
         'panel_nav',
         'panel_filter'
     );
@@ -76,7 +83,7 @@ foreach ($item as $val) {
 }
  
 $output['version'] = $version;
-$output['view'] = $view;
+$output['view'] = $views[$view];
 $output['video'] = $video;
 
 
@@ -185,6 +192,22 @@ foreach ($sort_array as $key => $val) {
     '&filter=' . $filter .
     '&filterid=' . $filterid .
     '" title="' . $lang['i_sort'] . '">' . $val . '</a>');
+}
+
+/* ########
+ * # VIEW #
+ */########
+if ($set['panel_view'] > 0) {
+    $show['panel_view'] = 1;
+    $output['panel_view'].= '<div id="view_menu"><div id="view_title">' . $lang['i_view'] . '</div><div id="views">';
+    foreach ($views as $key => $val) {
+            if ($view == $key) {
+                $output['panel_view'].= '<span>' . $lang['i_' . $val] . '</span>';
+            } else {
+                $output['panel_view'].= '<a href="index.php?video=' . $video . '&view=' . $key . '">' . $lang['i_' . $val] . '</a>';
+            }
+    }
+    $output['panel_view'].= '</div></div>';
 }
 
 /* ##########
@@ -301,13 +324,17 @@ while ($list = mysql_fetch_array($list_result)) {
     $output_desc['video']           = $video;
     $output_desc['view']            = $view;
     $output_desc['title']           = $list['title'];
-    $output_desc['originaltitle']   = $list['originaltitle'];
     
     $show_desc['mysql_table']     = 1;
     $show_desc['id']              = 1;
     $show_desc['video']           = 1;
     $show_desc['title']           = 1;
-    $show_desc['originaltitle']   = 1;
+    
+    // originaltitle
+    if ($list['originaltitle'] !== '') {
+        $show_desc['originaltitle'] = 1;
+        $output_desc['originaltitle'] = $list['originaltitle'];
+    }
     
     // poster
     $poster = 'cache/' . $mysql_table . '_' . $list['id'] . '.jpg';
@@ -520,7 +547,7 @@ while ($list = mysql_fetch_array($list_result)) {
     }
     
     // panel movie
-    $panel_list = new Teamplate('view_' . $view . '.tpl', $set, $lang);
+    $panel_list = new Teamplate($views[$view] . '.tpl', $set, $lang);
     foreach ($output_desc as $key => $val) {
         $panel_list->tpl($key, $val);
     }

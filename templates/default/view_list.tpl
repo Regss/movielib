@@ -3,11 +3,15 @@
         <span class="title">
             <a href="index.php?video={video}&view={view}&id={id}">{title}</a>
         </span>
+        {SHOW.originaltitle}
         <span class="title_org"> / 
         {originaltitle}
         </span>
+        {/SHOW.originaltitle}
         <span class="bold">
+        {SHOW.year}
         ({year})
+        {/SHOW.year}
         </span>
     </div>
     <div class="images">

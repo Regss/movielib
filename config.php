@@ -135,10 +135,12 @@ $config_table = array(
     'site_name'             => 'varchar(30) DEFAULT "MovieLib"',
     'language'              => 'varchar(2) DEFAULT "en"',
     'theme'                 => 'varchar(15) DEFAULT "default"',
+    'view'                  => 'int(1) DEFAULT 0',
     'per_page'              => 'int(5) DEFAULT 50',
     'panel_top_limit'       => 'int(5) DEFAULT 10',
     'panel_top_time'        => 'int(5) DEFAULT 5',
     'panel_top'             => 'int(1) DEFAULT 1',
+    'panel_view'            => 'int(1) DEFAULT 1',
     'watched_status'        => 'int(1) DEFAULT 1',
     'live_search'           => 'int(1) DEFAULT 1',
     'live_search_max_res'   => 'int(4) DEFAULT 10',
@@ -169,6 +171,9 @@ $tables = array(
     $mysql_tables[3] => $config_table,
     $mysql_tables[4] => $users_table
 );
+
+// views
+$views = array('view_default', 'view_list', 'view_sposter', 'view_bposter');
 
 // Set var
 $var = array(

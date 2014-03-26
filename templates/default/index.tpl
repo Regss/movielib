@@ -8,7 +8,7 @@
         <![endif]-->
         <link type="image/x-icon" href="templates/{SET.theme}/img/icon.ico" rel="icon" media="all" />
         <link type="text/css" href="templates/{SET.theme}/css/style.css" rel="stylesheet" media="all" />
-        <link type="text/css" href="templates/{SET.theme}/css/view_{view}.css" rel="stylesheet" media="all" />
+        <link type="text/css" href="templates/{SET.theme}/css/{view}.css" rel="stylesheet" media="all" />
         <link type="text/css" href="templates/{SET.theme}/css/video.css" rel="stylesheet" media="all" />
         <script type="text/javascript" src="js/jquery-1.9.1.js"></script>
         <script type="text/javascript" src="js/jquery.cycle.lite.js"></script>
@@ -89,6 +89,9 @@
             </div>
             <div id="panel_right" class="panel_right_ex">
                 <div id="panel_sort">{panel_sort}</div>
+                {SHOW.panel_view}
+                <div id="panel_view">{panel_view}</div>
+                {/SHOW.panel_view}
                 <div id="panel_search">
                     <form method="get" action="index.php" autocomplete="off">
                         <div id="panel_input_search">
@@ -109,7 +112,9 @@
                     <a href="index.php?video={video}"><img id="filter_delete_img" class="animate" src="templates/{SET.theme}/img/delete.png" title="{LANG.i_del_result}" alt=""></a>
                 </div>
                 {/SHOW.panel_filter}
-                {panel_list}
+                <div id="panel_list">
+                    {panel_list}
+                </div>
                 <div id="panel_nav">
                     {panel_nav}
                 </div>

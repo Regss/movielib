@@ -272,7 +272,9 @@ if ($option == 'settings') {
     
     $output_lang = '';
     $output_theme = '';
+    $output_view = '';
     $output_panel_top = '';
+    $output_panel_view = '';
     $output_watched_status = '';
     $output_live_search = '';
     $output_live_search_max_res = '';
@@ -305,7 +307,6 @@ if ($option == 'settings') {
     }
     
     // set theme input
-    $output_theme = '';
     $option_theme = scandir('templates/');
     foreach ($option_theme as $val) {
         if ($val !== '.' && $val !== '..') {
@@ -313,10 +314,17 @@ if ($option == 'settings') {
         }
     }
     
+    // set view input
+    foreach ($views as $key => $val) {
+        $output_view.= '<option' . ($key == $set['view'] ? ' selected="selected"' : '') . ' value="' . $key . '">' . $lang['a_' . $val] . '</option>';
+    }
+    
     $mode = array(0, 1);
     foreach ($mode as $val) {
         // set panel_top input
         $output_panel_top.= '<option' . ($set['panel_top'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
+        // set panel_view input
+        $output_panel_view.= '<option' . ($set['panel_view'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         // set wached status input
         $output_watched_status.= '<option' . ($set['watched_status'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         // set live search input
@@ -369,8 +377,10 @@ if ($option == 'settings') {
                 <tr><td>' . $lang['a_site_name'] . ':</td><td><input type="text" name="site_name" value="' . $set['site_name'] . '" /></td></tr>
                 <tr><td>' . $lang['a_language'] . ':</td><td><select name="language">' . $output_lang . '</select></td></tr>
                 <tr><td>' . $lang['a_theme'] . ':</td><td><select name="theme">' . $output_theme . '</select></td></tr>
+                <tr><td>' . $lang['a_view'] . ':</td><td><select name="view">' . $output_view . '</select></td></tr>
                 <tr><td>' . $lang['a_per_page'] . ':</td><td><select name="per_page">' . $output_per_page . '</select></td></tr>
                 <tr><td>' . $lang['a_panel_top'] . ':</td><td><select name="panel_top">' . $output_panel_top . '</select></td></tr>
+                <tr><td>' . $lang['a_panel_view'] . ':</td><td><select name="panel_view">' . $output_panel_view . '</select></td></tr>
                 <tr><td>' . $lang['a_watched_status'] . ':</td><td><select name="watched_status">' . $output_watched_status . '</select></td></tr>
                 <tr><td>' . $lang['a_live_search'] . ':</td><td><select name="live_search">' . $output_live_search . '</select></td></tr>
                 <tr><td>' . $lang['a_live_search_max_res'] . ':</td><td><select name="live_search_max_res">' . $output_live_search_max_res . '</select></td></tr>
@@ -401,10 +411,12 @@ if ($option == 'settings_save') {
         site_name = "' . $_POST['site_name'] . '",
         language = "' . $_POST['language'] . '",
         theme = "' . $_POST['theme'] . '",
+        view = "' . $_POST['view'] . '",
         per_page = "' . $_POST['per_page'] . '",
         panel_top_limit = "' . $_POST['panel_top_limit'] . '",
         panel_top_time = "' . $_POST['panel_top_time'] . '",
         panel_top = "' . $_POST['panel_top'] . '",
+        panel_view = "' . $_POST['panel_view'] . '",
         watched_status = "' . $_POST['watched_status'] . '",
         live_search = "' . $_POST['live_search'] . '",
         live_search_max_res = "' . $_POST['live_search_max_res'] . '",
