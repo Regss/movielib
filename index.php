@@ -46,37 +46,13 @@ if ($id == 0) {
         $view = $_GET['view'];
         setcookie('view', $view, time()+(60 * 60 * 24 * 7));
     }
+} else {
+    $view = 0;
 }
 
+// output and show arrays
 $output = array();
-$show = array();
-
-$item = array(
-        'select_media',
-        'view',
-        'version',
-        'panel_top',
-        'panel_top_last_added',
-        'panel_top_most_watched',
-        'panel_top_last_played',
-        'panel_top_top_rated',
-        'overall_all',
-        'overall_watched',
-        'overall_unwatched',
-        'panel_genre',
-        'panel_year',
-        'panel_country',
-        'panel_sets',
-        'panel_v_codec',
-        'panel_a_codec',
-        'panel_a_chan',
-        'panel_live_search',
-        'panel_sort',
-        'panel_view',
-        'panel_nav',
-        'panel_filter'
-    );
-    
+$show = array();    
 foreach ($item as $val) {
     $output[$val] = '';
     $show[$val] = 0;
@@ -161,7 +137,7 @@ if ($set['panel_overall'] > 0) {
 $menu_array = array('genre', 'year', 'country', 'sets', 'v_codec', 'a_codec', 'a_chan');
 foreach ($menu_array as $menu_name) {
     $output['panel_' . $menu_name] = '';
-    if ($set['panel_' . $menu_name] <> 0 && isset($panels_array[$menu_name])) {
+    if ($set['panel_' . $menu_name] <> 0 && isset($panels_array[$menu_name]) && count($panels_array[$menu_name]) > 0) {
         $show['panel_' . $menu_name] = 1;
         foreach ($panels_array[$menu_name] as $key => $val) {
             if ($filter == $menu_name && $filterid == $key) {
@@ -282,38 +258,9 @@ $output_panel_list = '';
 
 while ($list = mysql_fetch_array($list_result)) {
     
+    // output and show desc arrays
     $output_desc = array();
-    $show_desc = array();
-    
-    $item_desc = array(
-        'mysql_table',
-        'id',
-        'video',
-        'view',
-        'title',
-        'originaltitle',
-        'watched_img',
-        'genre',
-        'rating',
-        'cast',
-        'plot',
-        'year',
-        'country',
-        'runtime',
-        'director',
-        'sets',
-        'img_flag_vres',
-        'img_flag_vtype',
-        'img_flag_atype',
-        'img_flag_achan',
-        'trailer_img',
-        'trailer',
-        'premiered',
-        'seasons',
-        'episodes',
-        'episodes_plot'
-    );
-    
+    $show_desc = array();    
     foreach ($item_desc as $val) {
         $output_desc[$val] = '';
         $show_desc[$val] = 0;
@@ -346,7 +293,7 @@ while ($list = mysql_fetch_array($list_result)) {
     
     // wached status
     if ($set['watched_status'] == 1 && $list['play_count'] > 0) {
-        $output_desc['watched_img'] = '<img class="watched" src="templates/' . $set['theme'] . '/img/watched.png" title="' . $lang['i_last_played'] . ': ' . $list['last_played'] . '" alt="">';
+        $output_desc['watched_img'] = '<img class="watched_img" src="templates/' . $set['theme'] . '/img/watched.png" title="' . $lang['i_last_played'] . ': ' . $list['last_played'] . '" alt="">';
     }
     
     // genre
@@ -455,7 +402,7 @@ while ($list = mysql_fetch_array($list_result)) {
 
         // trailer
         if ($list['trailer'] !== '' && $set['show_trailer'] == 1) {
-            $output_desc['trailer_img'] = '<a href="?view=' . $view . '&id=' . $list['id'] . '"><img class="img_trailer" src="templates/' . $set['theme'] . '/img/trailer.png" alt=""></a>';
+            $output_desc['trailer_img'] = '<a href="?view=' . $view . '&id=' . $list['id'] . '#trailer"><img class="trailer_img" src="templates/' . $set['theme'] . '/img/trailer.png" alt=""></a>';
         }
         if ($list['trailer'] !== '' && $set['show_trailer'] == 1 && $id <> 0) {
             $show_desc['trailer'] = 1;

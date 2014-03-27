@@ -33,8 +33,7 @@ input, select { background-color:#222; color:#ddd; border:1px solid #000; font-s
 .panel_box { padding:5px; border:1px solid #000; border-top:0px; background-color:#222; }
 .panel_box ul, .panel_box li, .panel_box a { display:block; list-style:none; margin:0; padding:0 }
 
-#panel_right { text-align:center; margin:10px; }
-.panel_right_ex { width: 630px; float:right; }
+#panel_right { width:630px; float:right; text-align:center; margin:10px; }
 
 #panel_sort { text-align:center; background-color:#222; border:1px solid #000; margin-bottom:10px; }
 #panel_sort a, #panel_sort span { display:inline-block; font-weight:bold; border:1px solid #333; background-color:#000; margin:5px 3px 5px 3px; padding:3px 10px 3px 10px; text-align:center; }
@@ -42,10 +41,9 @@ input, select { background-color:#222; color:#ddd; border:1px solid #000; font-s
 #panel_nav a, #panel_nav span { display:inline-block; font-weight:bold; border:1px solid #333; background-color:#000; margin:5px 3px 5px 3px; padding:3px 10px 3px 10px; text-align:center;}
 
 #panel_view { margin-bottom:10px; font-weight:bold; overflow:hidden; }
-#view_menu { width:80px; float:right; }
-#view_title, #views a, #views span { width:78px; display:block; background-color:#222; border:1px solid #000; padding: 2px 0px 2px 0px; }
-#views { position:absolute; display:none; }
-#views a, #views span { background-color:#111; }
+#view_menu { width:120px; float:right; }
+#view_title, #views a, #views span { width:118px; display:block; background-color:#222; border:1px solid #000; padding: 4px 0px 4px 0px; }
+#views { position:absolute; display:none; z-index:5; }
 
 input.search { width:250px; }
 #panel_search { margin-bottom:10px; overflow:hidden; text-align:right;  }

@@ -87,7 +87,7 @@
                 </div>
                 {/SHOW.panel_a_chan}
             </div>
-            <div id="panel_right" class="panel_right_ex">
+            <div id="panel_right">
                 <div id="panel_sort">{panel_sort}</div>
                 {SHOW.panel_view}
                 <div id="panel_view">{panel_view}</div>

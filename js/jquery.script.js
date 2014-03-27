@@ -201,10 +201,10 @@ $(document).ready(function() {
     });
     
     // animate trailer button
-    $('.img_trailer').mouseenter(function(){
+    $('.trailer_img').mouseenter(function(){
         $(this).css('opacity', '1');
     });
-    $('.img_trailer').mouseleave(function(){
+    $('.trailer_img').mouseleave(function(){
         $(this).css('opacity', '.8');
     });
     
