@@ -73,8 +73,8 @@ if ($_GET['login'] === 'user') {
         <!--[if IE]>
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
         <![endif]-->
-        <link type="image/x-icon" href="css/<?PHP echo $set['theme'] ?>/img/icon.ico" rel="icon" media="all" />
-        <link type="text/css" href="css/<?PHP echo $set['theme'] ?>/style.css" rel="stylesheet" media="all" />
+        <link type="image/x-icon" href="templates/<?PHP echo $set['theme'] ?>/img/icon.ico" rel="icon" media="all" />
+        <link type="text/css" href="templates/<?PHP echo $set['theme'] ?>/css/style.css" rel="stylesheet" media="all" />
         <script type="text/javascript" src="js/jquery-1.9.1.js"></script>
         <script type="text/javascript" src="js/jquery.script.js"></script>
     </head>

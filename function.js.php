@@ -36,7 +36,7 @@ if ($option == 'searchmovie') {
         if (file_exists('cache/' . $mysql_tables[0] . '_' . $searched['id'] . '.jpg')) {
             $searched['poster'] = 'cache/' . $mysql_tables[0] . '_' . $searched['id'] . '.jpg';
         } else {
-            $searched['poster'] = 'css/' . $set['theme'] . '/img/d_poster.jpg';
+            $searched['poster'] = 'templates/' . $set['theme'] . '/img/d_poster.jpg';
         }
         $json_assoc[] = $searched;
     }
@@ -55,7 +55,7 @@ if ($option == 'searchtvshow') {
         if (file_exists('cache/' . $mysql_tables[1] . '_' . $searched['id'] . '.jpg')) {
             $searched['poster'] = 'cache/' . $mysql_tables[1] . '_' . $searched['id'] . '.jpg';
         } else {
-            $searched['poster'] = 'css/' . $set['theme'] . '/img/d_poster.jpg';
+            $searched['poster'] = 'templates/' . $set['theme'] . '/img/d_poster.jpg';
         }
         $json_assoc[] = $searched;
     }

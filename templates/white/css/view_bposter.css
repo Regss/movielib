@@ -1,0 +1,6 @@
+.movie { border:1px solid #ddd; margin:10px; display:inline-block; }
+.poster { width:180px; display:block; }
+.flag_panel { position:absolute; margin-top:-17px; width:180px; opacity: .8; background-color:#fff; }
+.flag { width:40px; }
+.watched_img { position:absolute; margin-left:145px; margin-top:210px; display:block; z-index:1; }
+.trailer_img { opacity: .8; position:absolute; margin-left:130px; margin-top:4px; display:block; }

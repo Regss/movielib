@@ -1,6 +1,6 @@
 @charset "utf-8";
 
-body { background-color:#aaa; font-family:Arial, Helvetica, sans-serif; font-size:11px; color:#000; border:0px; padding:0px; margin:0px; outline:none; }
+body { background-color:#aaa; font-family:Arial, sans-serif; font-size:11px; color:#000; border:0px; padding:0px; margin:0px; outline:none; }
 #background { position:fixed; top:0; left:0; z-index:-10; min-width:100%; min-height:100%; }
 img { border:0px; }
 
@@ -21,7 +21,7 @@ input, select { background-color:#ddd; color:#333; border:1px solid #fff; font-s
 .container_login { width:300px; margin:auto; background-color:#ccc; border:1px solid #333; margin-top:20px; padding:10px; text-align:center; }
 
 #select_media { width:800px; margin:auto; overflow:hidden; color:#414141; padding-bottom:10px; font-family:Verdana, Tahoma, sans-serif; font-size:20px; font-weight:bold; text-align:center; }
-.media { display:block; width:399px; float:left; border-bottom:1px solid #ddd; border-left:1px solid #ddd; background-color:#fff; padding: 10px 0px 10px 0px; }
+#select_media a, #select_media span { display:block; width:399px; float:left; border-bottom:1px solid #ddd; border-left:1px solid #ddd; background-color:#fff; padding: 10px 0px 10px 0px; }
 
 #panel_top, #panel_title { width:728px; overflow:hidden; margin:auto; }
 .panel_top_item_title { float:left; color:#414141; font-weight:bold; padding-top:3px; padding-left:4px; background-color:#fff; width:138px; height:17px; margin-left:20px; margin-right:20px; }
@@ -33,17 +33,21 @@ input, select { background-color:#ddd; color:#333; border:1px solid #fff; font-s
 .panel_box { padding:5px; border:1px solid #fff; border-top:0px; background-color:#ddd; }
 .panel_box ul, .panel_box li, .panel_box a { display:block; list-style:none; margin:0; padding:0 }
 
-#panel_right { text-align:center; margin:10px; }
-.panel_right_ex { width: 630px; float:right; }
+#panel_right { width:630px; float:right; text-align:center; margin:10px; }
 
 #panel_sort { text-align:center; background-color:#ddd; border:1px solid #fff; margin-bottom:10px; }
-.box_inline{ display:inline-block; font-weight:bold; border:1px solid #ccc; background-color:#fff; margin:5px 3px 5px 3px; padding:3px 10px 3px 10px; text-align:center; }
+#panel_sort a, #panel_sort span { display:inline-block; font-weight:bold; border:1px solid #ccc; background-color:#fff; margin:5px 3px 5px 3px; padding:3px 10px 3px 10px; text-align:center; }
+
+#panel_nav a, #panel_nav span { display:inline-block; font-weight:bold; border:1px solid #ccc; background-color:#fff; margin:5px 3px 5px 3px; padding:3px 10px 3px 10px; text-align:center;}
+
+#panel_view { margin-bottom:10px; font-weight:bold; overflow:hidden; }
+#view_menu { width:120px; float:right; }
+#view_title, #views a, #views span { width:118px; display:block; background-color:#ddd; border:1px solid #fff; padding: 4px 0px 4px 0px; }
+#views { position:absolute; display:none; z-index:5; }
 
 input.search { width:250px; }
 #panel_search { margin-bottom:10px; overflow:hidden; text-align:right;  }
 #panel_input_search { width:252px; float:right; }
-#search_res { display:block; float:right; line-height: 22px; }
-#search_res_img { float:right; margin:3px 3px 0px 3px; }
 #panel_live_search { position:absolute; z-index:1; border:0px solid #fff; background-color:#ddd; overflow:hidden; }
 .live_search_box { width:246px; text-align:left; cursor:pointer; border:1px solid #fff; margin:1px; font-size:10px; overflow: hidden; }
 .live_search_title { width:181px; margin:3px; font-weight:bold; color:#414141; font-size:12px; white-space:nowrap; text-overflow:ellipsis; display: block; overflow:hidden }
@@ -51,30 +55,11 @@ input.search { width:250px; }
 .img_live_search { width:48px; height:68px; border:1px solid #000; margin:5px; float:left; }
 .live_hover { background-color: #bbb; }
 
-.movie { text-align:left; border:1px solid #fff; background-color:#ddd; min-height:250px; margin-top:10px; margin-bottom:10px; padding:5px 10px 5px 10px; }
-.poster { float:left; width:140px; height:198px; margin-top:5px; margin-right:5px; border:1px solid #000; }
-.title { font-size:20px; font-weight:bold; color:#414141; }
-.title a:link { font-size:20px; font-weight:bold; color:#414141; }
-.title a:visited { font-size:20px; font-weight:bold; color:#414141; }
-.title a:active { font-size:20px; font-weight:bold; color:#414141; }
-.title a:hover { font-size:20px; font-weight:bold; color:#414141; text-decoration:underline; }
-.title_org { font-size:11px; font-weight:bold; color:#888; }
-.watched { position:absolute; margin-left:104px; margin-top:162px; display:block; }
-.watched_episode { width:10px; height:10px; }
-.episode_plot { display: none; position: absolute; width:380px; border:1px solid #fff; background-color:#ddd; padding:5px; text-align:left; }
-.img_trailer { position:absolute; margin-left:94px; margin-top:8px; display:block; opacity: .8; }
-.flag { margin-left:3px; }
-.desc { text-align:center; margin-left:150px; margin-top:5px; min-height: 220px; }
-.desc a:link { color:#555; text-decoration:none; }
-.desc a:visited { color:#555; text-decoration:none; }
-.desc a:hover { color:#555; text-decoration:underline; }
-.desc a:active { color:#555; text-decoration:none; }
-.table { margin:0px; padding:0px; border:0px; }
-.left { font-weight:bold; color:#414141; text-align:right; width:60px; vertical-align:top; }
-.right { text-align:left; }
-.aired { width:50px; }
-.actor_thumb { position: absolute; display:none; border:1px solid #111;}
-.trailer { border: 1px solid #000; margin:auto; margin-top:10px; margin-bottom:10px; width:560px; }
-.img_space { width:300px; height:1px; display:block; margin:auto; margin-top:5px; margin-bottom:5px; }
+#panel_filter { text-align:left; overflow:hidden; margin-top: 5px; margin-bottom:5px; }
+#filter_text { float:left; margin-left: 8px; }
+#filter_text span { color:#414141; font-weight:bold; }
+#filter_delete_img { margin:2px 5px 0px 5px; float:left; }
+
+#panel_list { overflow:hidden; }
 
 #panel_bottom { bottom:0px; text-align:right; color:#999; background-color:#ddd; margin-top:20px; padding:3px; padding-right:20px; }

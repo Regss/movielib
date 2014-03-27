@@ -1,3 +1,6 @@
+v. 2.5.0
+- added views
+
 v. 2.4.0
 - fixed sync images
 - added TVshows

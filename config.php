@@ -1,6 +1,6 @@
 <?PHP
 
-$version = '2.4.0';
+$version = '2.5.0';
 
 if (file_exists('db.php')) {
     require('db.php');
@@ -135,10 +135,12 @@ $config_table = array(
     'site_name'             => 'varchar(30) DEFAULT "MovieLib"',
     'language'              => 'varchar(2) DEFAULT "en"',
     'theme'                 => 'varchar(15) DEFAULT "default"',
+    'view'                  => 'int(1) DEFAULT 0',
     'per_page'              => 'int(5) DEFAULT 50',
     'panel_top_limit'       => 'int(5) DEFAULT 10',
     'panel_top_time'        => 'int(5) DEFAULT 5',
     'panel_top'             => 'int(1) DEFAULT 1',
+    'panel_view'            => 'int(1) DEFAULT 1',
     'watched_status'        => 'int(1) DEFAULT 1',
     'live_search'           => 'int(1) DEFAULT 1',
     'live_search_max_res'   => 'int(4) DEFAULT 10',
@@ -168,6 +170,64 @@ $tables = array(
     $mysql_tables[2] => $episodes_table,
     $mysql_tables[3] => $config_table,
     $mysql_tables[4] => $users_table
+);
+
+// views
+$views = array('view_default', 'view_list', 'view_sposter', 'view_bposter');
+
+//outputs
+$item = array(
+    'select_media',
+    'view',
+    'version',
+    'panel_top',
+    'panel_top_last_added',
+    'panel_top_most_watched',
+    'panel_top_last_played',
+    'panel_top_top_rated',
+    'overall_all',
+    'overall_watched',
+    'overall_unwatched',
+    'panel_genre',
+    'panel_year',
+    'panel_country',
+    'panel_sets',
+    'panel_v_codec',
+    'panel_a_codec',
+    'panel_a_chan',
+    'panel_live_search',
+    'panel_sort',
+    'panel_view',
+    'panel_nav',
+    'panel_filter'
+);
+$item_desc = array(
+    'mysql_table',
+    'id',
+    'video',
+    'view',
+    'title',
+    'originaltitle',
+    'watched_img',
+    'genre',
+    'rating',
+    'cast',
+    'plot',
+    'year',
+    'country',
+    'runtime',
+    'director',
+    'sets',
+    'img_flag_vres',
+    'img_flag_vtype',
+    'img_flag_atype',
+    'img_flag_achan',
+    'trailer_img',
+    'trailer',
+    'premiered',
+    'seasons',
+    'episodes',
+    'episodes_plot'
 );
 
 // Set var

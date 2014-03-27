@@ -1,4 +1,43 @@
 <?PHP
+/* #########
+ * # CLASS #
+ */#########
+class Teamplate {
+    function __construct($file, $set, $lang) {
+        $this->file = 'templates/' . $set['theme'] . '/' . $file;
+        $this->set = $set;
+        $this->lang = $lang;
+        $this->tpl = array();
+        $this->show = array();
+    }
+    function tpl($title, $val) {    
+        $this->tpl[$title] = $val;
+    }
+    function show($title, $val) {    
+        $this->show[$title] = $val;
+    }
+    function init() {
+        $cont = file_get_contents($this->file);
+        
+        foreach ($this->tpl as $key => $val) {
+            $cont = str_replace('{' . $key . '}', $val, $cont);
+        }
+        foreach ($this->lang as $key => $val) {
+            $cont = str_replace('{LANG.' . $key . '}', $val, $cont);
+        }
+        foreach ($this->set as $key => $val) {
+            $cont = str_replace('{SET.' . $key . '}', $val, $cont);
+        }
+        foreach ($this->show as $key  => $val) {
+            if ($val <> 1) {
+                $cont = preg_replace('|{SHOW\.' . $key . '}.*?{/SHOW\.' . $key . '}|s', '', $cont);
+            }
+        }
+        $cont = preg_replace('|{.?SHOW\.[^}]+}|s', '', $cont);
+        return $cont;
+    }
+}
+
 /* #############
  * # FUNCTIONS #
  */#############

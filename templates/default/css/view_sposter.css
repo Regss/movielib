@@ -1,0 +1,4 @@
+.movie { border:1px solid #fff; margin:10px; display:inline-block; }
+.poster { width:100px; display:block; }
+.watched_img { width:30px; position:absolute; margin-left:76px; margin-top:118px; display:block; }
+.trailer_img { width:30px; opacity: .8; position:absolute; margin-left:68px; margin-top:2px; display:block; }
