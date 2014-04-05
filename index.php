@@ -38,16 +38,17 @@ if ($set['protect_site'] == 1) {
 
 // views
 $view = $set['view'];
+if (isset($_COOKIE['view'])) {
+    $view = $_COOKIE['view'];
+}
+if (isset($_GET['view'])) {
+    $view = $_GET['view'];
+    setcookie('view', $view, time()+(60 * 60 * 24 * 7));
+}
 if ($id == 0) {
-    if (isset($_COOKIE['view'])) {
-        $view = $_COOKIE['view'];
-    }
-    if (isset($_GET['view'])) {
-        $view = $_GET['view'];
-        setcookie('view', $view, time()+(60 * 60 * 24 * 7));
-    }
+    $include_view = $view;
 } else {
-    $view = 0;
+    $include_view = 0;
 }
 
 // output and show arrays
@@ -59,9 +60,9 @@ foreach ($item as $val) {
 }
  
 $output['version'] = $version;
-$output['view'] = $views[$view];
+$output['view'] = $view;
+$output['include_view'] = $views[$include_view];
 $output['video'] = $video;
-
 
 /* ################
  * # SELECT MEDIA #
@@ -180,7 +181,7 @@ if ($set['panel_view'] > 0) {
             if ($view == $key) {
                 $output['panel_view'].= '<span>' . $lang['i_' . $val] . '</span>';
             } else {
-                $output['panel_view'].= '<a href="index.php?video=' . $video . '&view=' . $key . '">' . $lang['i_' . $val] . '</a>';
+                $output['panel_view'].= '<a href="index.php?id=' . $id . '&video=' . $video . '&view=' . $key . '&sort=' . $sort . '&filter=' . $filter . '&filterid=' . $filterid . '">' . $lang['i_' . $val] . '</a>';
             }
     }
     $output['panel_view'].= '</div></div>';
@@ -231,7 +232,7 @@ if ($search !== '') {
     $output['panel_filter'] = '<span>' . $lang['i_search'] . ': </span>' . $lang['i_result'] . ' &raquo; ' . $search;
     $show['panel_filter'] = 1;
 }
-if ($id <> '') {
+if ($id > 0) {
     $output['panel_filter'] = '<span>' . $lang['i_filter'] . ': </span>' . $lang['i_title'];
     $show['panel_filter'] = 1;
 }
@@ -270,6 +271,9 @@ while ($list = mysql_fetch_array($list_result)) {
     $output_desc['id']              = $list['id'];
     $output_desc['video']           = $video;
     $output_desc['view']            = $view;
+    $output_desc['sort']            = $sort;
+    $output_desc['filter']          = $filter;
+    $output_desc['filterid']        = $filterid;
     $output_desc['title']           = $list['title'];
     
     $show_desc['mysql_table']     = 1;
@@ -402,7 +406,7 @@ while ($list = mysql_fetch_array($list_result)) {
 
         // trailer
         if ($list['trailer'] !== '' && $set['show_trailer'] == 1) {
-            $output_desc['trailer_img'] = '<a href="?view=' . $view . '&id=' . $list['id'] . '#trailer"><img class="trailer_img" src="templates/' . $set['theme'] . '/img/trailer.png" alt=""></a>';
+            $output_desc['trailer_img'] = '<a href="index.php?id=' . $list['id'] . '&video=' . $video . '&view=' . $view . '&sort=' . $sort . '&filter=' . $filter . '&filterid=' . $filterid . '#trailer"><img class="trailer_img" src="templates/' . $set['theme'] . '/img/trailer.png" alt=""></a>';
         }
         if ($list['trailer'] !== '' && $set['show_trailer'] == 1 && $id <> 0) {
             $show_desc['trailer'] = 1;
@@ -494,7 +498,7 @@ while ($list = mysql_fetch_array($list_result)) {
     }
     
     // panel movie
-    $panel_list = new Teamplate($views[$view] . '.tpl', $set, $lang);
+    $panel_list = new Teamplate($views[$include_view] . '.tpl', $set, $lang);
     foreach ($output_desc as $key => $val) {
         $panel_list->tpl($key, $val);
     }
@@ -504,6 +508,7 @@ while ($list = mysql_fetch_array($list_result)) {
     $output_panel_list.= $panel_list->init();
 }
 $output['panel_list'] = $output_panel_list;
+$output['sort'] = $sort;
 
 // create page
 $index = new Teamplate('index.tpl', $set, $lang);

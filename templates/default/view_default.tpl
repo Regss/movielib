@@ -1,11 +1,13 @@
 <div id="{mysql_table}_{id}" class="movie">
     <div class="title">
-        <a href="index.php?video={video}&id={id}">{title}</a>
+        <a href="index.php?id={id}&video={video}&view={view}&sort={sort}&filter={filter}&filterid={filterid}">{title}</a>
     </div>
     <div class="title_org">{originaltitle}</div>
-    {watched_img}
     {trailer_img}
-    <img id="poster_movie_{id}" class="poster" src="{poster}" alt="">
+    <div class="poster_container">
+        <img id="poster_movie_{id}" class="poster" src="{poster}" alt="">
+        {watched_img}
+    </div>
     <div class="desc">
         <table class="table">
             {SHOW.year}

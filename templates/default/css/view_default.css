@@ -1,12 +1,13 @@
 .movie { text-align:left; border:1px solid #000; background-color:#222; min-height:250px; margin-top:10px; margin-bottom:10px; padding:5px 10px 5px 10px; }
-.poster { float:left; width:140px; height:198px; margin-top:5px; margin-right:5px; border:1px solid #fff; }
+.poster_container { float:left; width:142px; margin-top:5px; margin-right:5px; }
+.poster { border:1px solid #fff; }
 .title { font-size:20px; font-weight:bold; color:#ff7300; }
 .title a:link { font-size:20px; font-weight:bold; color:#ff7300; }
 .title a:visited { font-size:20px; font-weight:bold; color:#ff7300; }
 .title a:active { font-size:20px; font-weight:bold; color:#ff7300; }
 .title a:hover { font-size:20px; font-weight:bold; color:#ff7300; text-decoration:underline; }
 .title_org { font-size:11px; font-weight:bold; color:#aaa; }
-.watched_img { position:absolute; margin-left:104px; margin-top:162px; display:block; }
+.watched_img { display:block; position:absolute; margin-left:102px; margin-top:-44px; }
 .watched_episode { width:10px; height:10px; }
 .episode_plot { display: none; position: absolute; width:300px; border:1px solid #000; background-color:#222; padding:5px; text-align:left; }
 .trailer_img { position:absolute; margin-left:94px; margin-top:8px; display:block; opacity: .8; }

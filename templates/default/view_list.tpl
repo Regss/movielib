@@ -1,7 +1,7 @@
 <div id="{mysql_table}_{id}" class="movie">
     <div class="text">
         <span class="title">
-            <a href="index.php?video={video}&view={view}&id={id}">{title}</a>
+            <a href="index.php?id={id}&video={video}&view={view}&sort={sort}&filter={filter}&filterid={filterid}">{title}</a>
         </span>
         {SHOW.originaltitle}
         <span class="title_org"> / 

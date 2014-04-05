@@ -274,12 +274,22 @@ function sync_add($tables, $table) {
         if (isset($_POST['poster'])) {
             $poster = base64_decode($_POST['poster']);
             if (substr($poster, 0, 4) == 'http') {
-                gd_convert('cache/' . $table . '_' . $_POST['id'] . '.jpg', $poster, 140, 198);
+                $size = getimagesize($poster);
+                if ($size[0] > $size[1]) {
+                    gd_convert('cache/' . $table . '_' . $_POST['id'] . '.jpg', $poster, 140, 35);
+                } else {
+                    gd_convert('cache/' . $table . '_' . $_POST['id'] . '.jpg', $poster, 140, 198);
+                }
             } else {
                 $fp = fopen('cache/temp_' . $table . '_' . $_POST['id'], 'wb');
                 fwrite($fp, $poster);
                 fclose($fp);
-                gd_convert('cache/' . $table . '_' . $_POST['id'] . '.jpg', 'cache/temp_' . $table . '_' . $_POST['id'], 140, 198);
+                $size = getimagesize('cache/temp_' . $table . '_' . $_POST['id']);
+                if ($size[0] > $size[1]) {
+                    gd_convert('cache/' . $table . '_' . $_POST['id'] . '.jpg', 'cache/temp_' . $table . '_' . $_POST['id'], 140, 35);
+                } else {
+                    gd_convert('cache/' . $table . '_' . $_POST['id'] . '.jpg', 'cache/temp_' . $table . '_' . $_POST['id'], 140, 198);
+                }
                 unlink('cache/temp_' . $table . '_' . $_POST['id']);
             }
         }
@@ -413,7 +423,20 @@ function change_token($mysql_tables) {
  */#################
 function gd_convert($cache_path, $img_link, $new_width, $new_height) {
     if (!file_exists($cache_path) and !empty($img_link)) {
+        $convert = false;
         $img = @imagecreatefromjpeg($img_link);
+        if (!$img) {
+            $curl_opt = array(
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_FOLLOWLOCATION => true
+            ); 
+            $c = curl_init($img_link); 
+            curl_setopt_array($c, $curl_opt); 
+            curl_exec($c); 
+            $redirect = curl_getinfo($c); 
+            curl_close($c);
+            $img = @imagecreatefromjpeg($redirect['redirect_url']);
+        }
         if ($img) {
             $width = imagesx($img);
             $height = imagesy($img);
@@ -421,6 +444,7 @@ function gd_convert($cache_path, $img_link, $new_width, $new_height) {
             imagecopyresampled($img_temp, $img, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
             imagejpeg($img_temp, $cache_path, 80);
         }
+        
     }
 }
 

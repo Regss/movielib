@@ -8,7 +8,7 @@
         <![endif]-->
         <link type="image/x-icon" href="templates/{SET.theme}/img/icon.ico" rel="icon" media="all" />
         <link type="text/css" href="templates/{SET.theme}/css/style.css" rel="stylesheet" media="all" />
-        <link type="text/css" href="templates/{SET.theme}/css/{view}.css" rel="stylesheet" media="all" />
+        <link type="text/css" href="templates/{SET.theme}/css/{include_view}.css" rel="stylesheet" media="all" />
         <link type="text/css" href="templates/{SET.theme}/css/video.css" rel="stylesheet" media="all" />
         <script type="text/javascript" src="js/jquery-1.9.1.js"></script>
         <script type="text/javascript" src="js/jquery.cycle.lite.js"></script>
@@ -21,6 +21,7 @@
             <div id="select_media">
                 {select_media}
             </div>
+            {SHOW.panel_top}
             <div id="panel_top">
                 <div class="panel_top_item">{top_item_last_added}</div>
                 <div class="panel_top_item">{top_item_most_watched}</div>
@@ -33,6 +34,7 @@
                     <div class="panel_top_item_title">{LANG.i_top_rated}</div>
                 </div>
             </div>
+            {/SHOW.panel_top}
             <div id="panel_left">
                 {SHOW.panel_overall}
                 <div id="overall" class="panel_box_title">{LANG.i_overall_title}</div>
@@ -109,7 +111,7 @@
                 {SHOW.panel_filter}
                 <div id="panel_filter">
                     <div id="filter_text">{panel_filter}</div>
-                    <a href="index.php?video={video}"><img id="filter_delete_img" class="animate" src="templates/{SET.theme}/img/delete.png" title="{LANG.i_del_result}" alt=""></a>
+                    <a href="index.php?video={video}&view={view}&sort={sort}&filter={filter}&filterid={filterid}"><img id="filter_delete_img" class="animate" src="templates/{SET.theme}/img/delete.png" title="{LANG.i_del_result}" alt=""></a>
                 </div>
                 {/SHOW.panel_filter}
                 <div id="panel_list">

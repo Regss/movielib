@@ -1,6 +1,6 @@
 <?PHP
 
-$version = '2.5.0';
+$version = '2.5.1';
 
 if (file_exists('db.php')) {
     require('db.php');
@@ -179,6 +179,10 @@ $views = array('view_default', 'view_list', 'view_sposter', 'view_bposter');
 $item = array(
     'select_media',
     'view',
+    'include_view',
+    'sort',
+    'filter',
+    'filterid',
     'version',
     'panel_top',
     'panel_top_last_added',
@@ -206,6 +210,10 @@ $item_desc = array(
     'id',
     'video',
     'view',
+    'include_view',
+    'sort',
+    'filter',
+    'filterid',
     'title',
     'originaltitle',
     'watched_img',
