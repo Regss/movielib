@@ -81,10 +81,10 @@ if ($video == 'tvshows') {
 $show['panel_top'] = $set['panel_top'];
 if ($set['panel_top'] == 1) {
     $top_panel_sql = array(
-        'top_item_last_added' => 'SELECT id, title, date_added FROM ' . $mysql_table . ' ORDER BY date_added DESC LIMIT ' . $set['panel_top_limit'],
-        'top_item_most_watched' => 'SELECT id, title FROM ' . $mysql_table . ' ORDER BY play_count DESC LIMIT ' . $set['panel_top_limit'],
-        'top_item_last_played' => 'SELECT id, title, last_played FROM ' . $mysql_table . ' WHERE play_count > 0 ORDER BY last_played DESC LIMIT ' . $set['panel_top_limit'],
-        'top_item_top_rated' => 'SELECT id, title, rating FROM ' . $mysql_table . ' ORDER BY rating DESC LIMIT ' . $set['panel_top_limit']
+        'top_item_last_added' => 'SELECT id, title, date_added, hide FROM ' . $mysql_table . ' WHERE hide=0 ORDER BY date_added DESC LIMIT ' . $set['panel_top_limit'],
+        'top_item_most_watched' => 'SELECT id, title, hide FROM ' . $mysql_table . ' WHERE hide=0 ORDER BY play_count DESC LIMIT ' . $set['panel_top_limit'],
+        'top_item_last_played' => 'SELECT id, title, last_played, hide FROM ' . $mysql_table . ' WHERE hide=0 AND play_count > 0 ORDER BY last_played DESC LIMIT ' . $set['panel_top_limit'],
+        'top_item_top_rated' => 'SELECT id, title, rating, hide FROM ' . $mysql_table . ' WHERE hide=0 ORDER BY rating DESC LIMIT ' . $set['panel_top_limit']
     );
     foreach ($top_panel_sql as $name => $item_top_sql) {
         $output[$name] = '';
@@ -120,7 +120,7 @@ if ($filter !== '') {
 // overall panel
 $show['panel_overall'] = $set['panel_overall'];
 if ($set['panel_overall'] > 0) {
-    $overall_sql = 'SELECT play_count FROM ' . $mysql_table;
+    $overall_sql = 'SELECT play_count, hide FROM ' . $mysql_table . ' WHERE hide=0';
     $overall_result = mysql_query($overall_sql);
     $overall_all = mysql_num_rows($overall_result);
     $overall_watched = 0;
@@ -204,7 +204,8 @@ $nav_sql = 'SELECT id FROM ' . $mysql_table . ' WHERE
     ' . $filter_mysql . '
     title LIKE "%' . $search_mysql . '%" AND
     id LIKE "' . $id_mysql . '" AND
-    play_count ' . $play_count_mysql . '
+    play_count ' . $play_count_mysql . ' AND
+    hide=0
     ORDER BY ' . $sort_mysql[$sort];
 $nav_result = mysql_query($nav_sql);
 $row = mysql_num_rows($nav_result);
@@ -251,7 +252,8 @@ $list_sql = 'SELECT * FROM ' . $mysql_table . ' WHERE
     ' . $filter_mysql . '
     title LIKE "%' . $search_mysql . '%" AND
     id LIKE "' . $id_mysql . '" AND
-    play_count ' . $play_count_mysql . '
+    play_count ' . $play_count_mysql . ' AND
+    hide=0
     ORDER BY ' . $sort_mysql[$sort] . $limit_sql;
 $list_result = mysql_query($list_sql);
 

@@ -1,6 +1,6 @@
 <?PHP
 
-$version = '2.5.1';
+$version = '2.5.2';
 
 if (file_exists('db.php')) {
     require('db.php');
@@ -104,7 +104,8 @@ $movies_table = array(
     'a_chan'                => 'int(11) NOT NULL',
     'play_count'            => 'int(11) NOT NULL',
     'last_played'           => 'varchar(20) NOT NULL',
-    'date_added'            => 'varchar(20) NOT NULL'
+    'date_added'            => 'varchar(20) NOT NULL',
+    'hide'                  => 'int(1) NOT NULL'
 );
 $tvshows_table = array(
     'id'                    => 'int(6) NOT NULL',
@@ -117,7 +118,8 @@ $tvshows_table = array(
     'premiered'             => 'varchar(20) NOT NULL',
     'play_count'            => 'int(11) NOT NULL',
     'last_played'           => 'varchar(20) NOT NULL',
-    'date_added'            => 'varchar(20) NOT NULL'
+    'date_added'            => 'varchar(20) NOT NULL',
+    'hide'                  => 'int(1) NOT NULL'
 );
 $episodes_table = array(
     'id'                    => 'int(6) NOT NULL',

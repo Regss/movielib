@@ -68,6 +68,7 @@ $lang['a_tvshows']                      =   'TVshows';
 $lang['a_all']                          =   'All';
 $lang['a_watched']                      =   'Watched';
 $lang['a_unwatched']                    =   'Unwatched';
+$lang['a_hidden']                       =   'Hidden';
 $lang['a_title']                        =   'Title';
 $lang['a_cache']                        =   'Cache';
 $lang['a_cached_posters']               =   'Cached posters';

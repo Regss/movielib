@@ -1,3 +1,6 @@
+v. 2.5.2
+- added ability to hide movie or tvshow
+
 v. 2.5.1
 - fixed switching between views
 - added banner support

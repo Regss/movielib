@@ -82,24 +82,34 @@ if ($option == '') {
     }
 
     // Watched
-    $overall_movies_sql = 'SELECT play_count FROM ' . $mysql_tables[0];
+    $overall_movies_sql = 'SELECT play_count, hide FROM ' . $mysql_tables[0];
     $overall_movies_result = mysql_query($overall_movies_sql);
     $overall_movies_all = mysql_num_rows($overall_movies_result);
     $overall_movies_watched = 0;
+    $overall_movies_hidden = 0;
     while ($overall_movies = mysql_fetch_array($overall_movies_result)) {
-        if ($overall_movies['play_count'] > 0) {
-            $overall_movies_watched++;
+        if ($overall_movies['hide'] == 1) {
+            $overall_movies_hidden++;
+        } else {
+            if ($overall_movies['play_count'] > 0) {
+                $overall_movies_watched++;
+            }
         }
     }
     $overall_movies_unwatched = $overall_movies_all - $overall_movies_watched;
     
-    $overall_tvshows_sql = 'SELECT play_count FROM ' . $mysql_tables[1];
+    $overall_tvshows_sql = 'SELECT play_count, hide FROM ' . $mysql_tables[1];
     $overall_tvshows_result = mysql_query($overall_tvshows_sql);
     $overall_tvshows_all = mysql_num_rows($overall_tvshows_result);
     $overall_tvshows_watched = 0;
+    $overall_tvshows_hidden = 0;
     while ($overall_tvshows = mysql_fetch_array($overall_tvshows_result)) {
-        if ($overall_tvshows['play_count'] > 0) {
-            $overall_tvshows_watched++;
+        if ($overall_tvshows['hide'] == 1) {
+            $overall_tvshows_hidden++;
+        } else {
+            if ($overall_tvshows['play_count'] > 0) {
+                $overall_tvshows_watched++;
+            }
         }
     }
     $overall_tvshows_unwatched = $overall_tvshows_all - $overall_tvshows_watched;
@@ -134,15 +144,20 @@ if ($option == '') {
             <tr><td>' . $lang['a_all'] . '</td><td>' . $overall_movies_all . '</td></tr>
             <tr><td>' . $lang['a_watched'] . '</td><td>' . $overall_movies_watched . '</td></tr>
             <tr><td>' . $lang['a_unwatched'] . '</td><td>' . $overall_movies_unwatched . '</td></tr>
+            <tr><td>' . $lang['a_hidden'] . '</td><td>' . $overall_movies_hidden . '</td></tr>
             <tr><td class="bold orange">' . $lang['a_tvshows'] . '</td><td></td></tr>
             <tr><td>' . $lang['a_all'] . '</td><td>' . $overall_tvshows_all . '</td></tr>
             <tr><td>' . $lang['a_watched'] . '</td><td>' . $overall_tvshows_watched . '</td></tr>
             <tr><td>' . $lang['a_unwatched'] . '</td><td>' . $overall_tvshows_unwatched . '</td></tr>
+            <tr><td>' . $lang['a_hidden'] . '</td><td>' . $overall_tvshows_hidden . '</td></tr>
             <tr><td class="bold orange">' . $lang['a_cache'] . '</td><td></td></tr>
             <tr><td>' . $lang['a_cached_posters'] . '</td><td>' . $poster_cached . '</td></tr>
             <tr><td>' . $lang['a_cached_fanarts'] . '</td><td>' . $fanart_cached . '</td></tr>
             <tr><td class="bold orange">' . $lang['a_server_settings'] . '</td><td></td></tr>
+            <tr><td>GD</td><td>' . (extension_loaded('gd') && function_exists('gd_info') ? $lang['a_setting_on'] : $lang['a_setting_off']) . '</td></tr>
+            <tr><td>CURL</td><td>' . (function_exists('curl_version') ? $lang['a_setting_on'] : $lang['a_setting_off']) . '</td></tr>
             <tr><td>ALLOW URL FOPEN</td><td>' . (ini_get('allow_url_fopen') == 1 ? $lang['a_setting_on'] : $lang['a_setting_off']) . '</td></tr>
+            <tr><td>MAX EXECUTION TIME</td><td>' . ini_get('max_execution_time') . '</td></tr>
             <tr><td>UPLOAD MAX FILESIZE</td><td>' . ini_get('upload_max_filesize') . '</td></tr>
             <tr><td>POST MAX SIZE</td><td>' . ini_get('post_max_size') . '</td></tr>
             <tr><td class="bold orange">' . $lang['a_files_md5'] . '</td><td></td></tr>
@@ -154,16 +169,17 @@ if ($option == '') {
  * # MOVIE LIST #
  */##############
 if ($option == 'movieslist') {
-    $list_sql = 'SELECT id, title, trailer, play_count FROM ' . $mysql_tables[0] . ' ORDER BY title';
+    $list_sql = 'SELECT id, title, trailer, play_count, hide FROM ' . $mysql_tables[0] . ' ORDER BY title';
     $list_result = mysql_query($list_sql);
     $output_panel = '
-        <table class="table">
+        <table id="movie" class="table">
             <tr class="bold"><td>
                 </td><td>ID</td>
                 <td>' . $lang['a_title'] . '</td>
                 <td>P</td>
                 <td>F</td>
                 <td>T</td>
+                <td>H</td>
                 <td></td>
             </tr>';
     $i = 0;
@@ -183,15 +199,21 @@ if ($option == 'movieslist') {
         } else {
             $trailer_link = '';
         }
+        if ($list['hide'] == 1) {
+            $hide = '<img class="hidden animate" src="admin/img/hidden.png" title="visible / hide" alt="">';
+        } else {
+            $hide = '<img class="visible animate" src="admin/img/visible.png" title="visible / hide" alt="">';
+        }
         $i++;
         $output_panel.= '
-            <tr id="row_' . $list['id'] . '">
+            <tr id="' . $list['id'] . '">
                 <td>' . $i . '</td><td>' . $list['id'] . '</td>
                 <td>' . $list['title'] . '</td>
                 <td>'  . $poster_exist . '</td>
                 <td>'  . $fanart_exist . '</td>
                 <td>'  . $trailer_link . '</td>
-                <td><img id="' . $list['id'] . '" class="delete_row animate" src="admin/img/delete.png" title="' . $lang['a_delete'] . '" alt=""></td>
+                <td>' . $hide . '</td>
+                <td><img class="delete_row animate" src="admin/img/delete.png" title="' . $lang['a_delete'] . '" alt=""></td>
             </tr>';
     }
     $output_panel.= '</table><a id="delete_all" class="box" href="admin.php?option=delete_all_movies">' . $lang['a_delete_all'] . '</a>';
@@ -214,15 +236,16 @@ if ($option == 'delete_all_movies') {
  * # TVSHOW LIST #
  */###############
 if ($option == 'tvshowslist') {
-    $list_sql = 'SELECT id, title, play_count FROM ' . $mysql_tables[1] . ' ORDER BY title';
+    $list_sql = 'SELECT id, title, play_count, hide FROM ' . $mysql_tables[1] . ' ORDER BY title';
     $list_result = mysql_query($list_sql);
     $output_panel = '
-        <table class="table">
+        <table id="tvshow" class="table">
             <tr class="bold"><td>
                 </td><td>ID</td>
                 <td>' . $lang['a_title'] . '</td>
                 <td>P</td>
                 <td>F</td>
+                <td>H</td>
                 <td></td>
             </tr>';
     $i = 0;
@@ -237,14 +260,20 @@ if ($option == 'tvshowslist') {
         } else {
             $fanart_exist = '';
         }
+        if ($list['hide'] == 1) {
+            $hide = '<img class="hidden animate" src="admin/img/hidden.png" title="visible / hide" alt="">';
+        } else {
+            $hide = '<img class="visible animate" src="admin/img/visible.png" title="visible / hide" alt="">';
+        }
         $i++;
         $output_panel.= '
-            <tr id="row_' . $list['id'] . '">
+            <tr id="' . $list['id'] . '">
                 <td>' . $i . '</td><td>' . $list['id'] . '</td>
                 <td>' . $list['title'] . '</td>
                 <td>'  . $poster_exist . '</td>
                 <td>'  . $fanart_exist . '</td>
-                <td><img id="' . $list['id'] . '" class="delete_row animate" src="admin/img/delete.png" title="' . $lang['a_delete'] . '" alt=""></td>
+                <td>' . $hide . '</td>
+                <td><img class="delete_row animate" src="admin/img/delete.png" title="' . $lang['a_delete'] . '" alt=""></td>
             </tr>';
     }
     $output_panel.= '</table><a id="delete_all" class="box" href="admin.php?option=delete_all_tvshows">' . $lang['a_delete_all'] . '</a>';

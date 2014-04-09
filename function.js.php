@@ -24,17 +24,23 @@ if ($option == 'panel') {
 }
 
 // live search
-if ($option == 'searchmovie') {
+if ($option == 'searchmovie' or $option == 'searchtvshow') {
     require('config.php');
     require('function.php');
     connect($mysql_ml);
     $set = get_settings($mysql_tables);
     $json_assoc = array();
-    $search_sql = 'SELECT id, title, rating, year, runtime, genre, director, originaltitle, country FROM ' . $mysql_tables[0] . ' WHERE (title LIKE "%' . $_GET['search'] . '%" OR originaltitle LIKE "%' . $_GET['search'] . '%") LIMIT 0, ' . $_SESSION['live_search_max_res'];
+    if ($option == 'searchmovie') {
+        $table = $mysql_tables[0];
+        $search_sql = 'SELECT id, title, rating, year, runtime, genre, director, originaltitle, country, hide FROM ' . $table . ' WHERE (title LIKE "%' . $_GET['search'] . '%" OR originaltitle LIKE "%' . $_GET['search'] . '%") AND hide=0 LIMIT 0, ' . $_SESSION['live_search_max_res'];
+    } else {
+        $table = $mysql_tables[1];
+        $search_sql = 'SELECT id, title, rating, genre, originaltitle, hide FROM ' . $table . ' WHERE (title LIKE "%' . $_GET['search'] . '%" OR originaltitle LIKE "%' . $_GET['search'] . '%") AND hide=0 LIMIT 0, ' . $_SESSION['live_search_max_res'];
+    }
     $search_res = mysql_query($search_sql);
     while($searched = mysql_fetch_assoc($search_res)) {
-        if (file_exists('cache/' . $mysql_tables[0] . '_' . $searched['id'] . '.jpg')) {
-            $searched['poster'] = 'cache/' . $mysql_tables[0] . '_' . $searched['id'] . '.jpg';
+        if (file_exists('cache/' . $table . '_' . $searched['id'] . '.jpg')) {
+            $searched['poster'] = 'cache/' . $table . '_' . $searched['id'] . '.jpg';
         } else {
             $searched['poster'] = 'templates/' . $set['theme'] . '/img/d_poster.jpg';
         }
@@ -43,64 +49,54 @@ if ($option == 'searchmovie') {
     echo json_encode($json_assoc);
 }
 
-if ($option == 'searchtvshow') {
-    require('config.php');
-    require('function.php');
-    connect($mysql_ml);
-    $set = get_settings($mysql_tables);
-    $json_assoc = array();
-    $search_sql = 'SELECT id, title, rating, genre, originaltitle FROM ' . $mysql_tables[1] . ' WHERE (title LIKE "%' . $_GET['search'] . '%" OR originaltitle LIKE "%' . $_GET['search'] . '%") LIMIT 0, ' . $_SESSION['live_search_max_res'];
-    $search_res = mysql_query($search_sql);
-    while($searched = mysql_fetch_assoc($search_res)) {
-        if (file_exists('cache/' . $mysql_tables[1] . '_' . $searched['id'] . '.jpg')) {
-            $searched['poster'] = 'cache/' . $mysql_tables[1] . '_' . $searched['id'] . '.jpg';
-        } else {
-            $searched['poster'] = 'templates/' . $set['theme'] . '/img/d_poster.jpg';
-        }
-        $json_assoc[] = $searched;
-    }
-    echo json_encode($json_assoc);
-}
-
-// delete movie
-if ($option  == 'deletemovie') {
+// delete movie or tvshow
+if ($option  == 'deletemovie' or $option  == 'deletetvshow') {
     // admin permission
     if (!isset($_SESSION['logged_admin']) or $_SESSION['logged_admin'] !== true) {
         die('no permission');
     }
     require('config.php');
     require('function.php');
-    connect($mysql_ml);
     $id = $_GET['id'];
-    $delete_movie_sql = 'DELETE FROM ' . $mysql_tables[0] . ' WHERE id = "' . $id . '"';
-    if (file_exists('cache/' . $mysql_tables[0] . '_' . $id . '.jpg')) {
-        unlink('cache/' . $mysql_tables[0] . '_' . $id . '.jpg');
+    if ($option  == 'deletemovie') {
+        $table = $mysql_tables[0];
+    } else {
+        $table = $mysql_tables[1];
+        $delete_sql = 'DELETE FROM ' . $table . ' WHERE tvshow = "' . $id . '"';
+        mysql_query($delete_sql);
     }
-    if (file_exists('cache/' . $mysql_tables[0] . '_' . $id . '_f.jpg')) {
-        unlink('cache/' . $mysql_tables[0] . '_' . $id . '_f.jpg');
+    connect($mysql_ml);
+    $delete_sql = 'DELETE FROM ' . $table . ' WHERE id = "' . $id . '"';
+    if (file_exists('cache/' . $table . '_' . $id . '.jpg')) {
+        unlink('cache/' . $table . '_' . $id . '.jpg');
     }
-    mysql_query($delete_movie_sql);
+    if (file_exists('cache/' . $table . '_' . $id . '_f.jpg')) {
+        unlink('cache/' . $table . '_' . $id . '_f.jpg');
+    }
+    mysql_query($delete_sql);
 }
 
-// delete tvshow
-if ($option  == 'deletetvshow') {
+// hide movie or tvshow
+if ($option  == 'hidemovie' or $option  == 'hidetvshow' or $option  == 'visiblemovie' or $option  == 'visibletvshow') {
     // admin permission
     if (!isset($_SESSION['logged_admin']) or $_SESSION['logged_admin'] !== true) {
         die('no permission');
     }
     require('config.php');
     require('function.php');
-    connect($mysql_ml);
     $id = $_GET['id'];
-    $delete_movie_sql = 'DELETE FROM ' . $mysql_tables[1] . ' WHERE id = "' . $id . '"';
-    if (file_exists('cache/' . $mysql_tables[1] . '_' . $id . '.jpg')) {
-        unlink('cache/' . $mysql_tables[1] . '_' . $id . '.jpg');
+    if($option  == 'hidemovie' or $option  == 'hidetvshow') {
+        $hide = 1;
+    } else {
+        $hide = 0;
     }
-    if (file_exists('cache/' . $mysql_tables[1] . '_' . $id . '_f.jpg')) {
-        unlink('cache/' . $mysql_tables[1] . '_' . $id . '_f.jpg');
+    if($option  == 'hidemovie' or $option  == 'visiblemovie') {
+        $table = $mysql_tables[0];
+    } else {
+        $table = $mysql_tables[1];
     }
-    mysql_query($delete_movie_sql);
-    $delete_movie_sql = 'DELETE FROM ' . $mysql_tables[2] . ' WHERE tvshow = "' . $id . '"';
-    mysql_query($delete_movie_sql);
+    connect($mysql_ml);
+    $hide_sql = 'UPDATE `' . $table . '` SET hide = ' . $hide . ' WHERE id = "' . $id . '"';
+    mysql_query($hide_sql);
 }
 ?>

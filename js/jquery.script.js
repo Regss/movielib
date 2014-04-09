@@ -210,18 +210,12 @@ $(document).ready(function() {
     
     // delete movie
     $('.delete_row').click(function(){
-        var id = $(this).attr('id');
-        $('#row_'+id).hide();
-        $.ajax({url: 'function.js.php?option=deletemovie&id='+id});
+        var id = $(this).parent().parent().attr('id');
+        var video = $(this).parent().parent().parent().parent().attr('id');
+        $('#'+id).hide();
+        $.ajax({url: 'function.js.php?option=delete'+video+'&id='+id});
     });
-    
-    // delete tvshow
-    $('.delete_row').click(function(){
-        var id = $(this).attr('id');
-        $('#row_'+id).hide();
-        $.ajax({url: 'function.js.php?option=deletetvshow&id='+id});
-    });
-    
+        
     // delete all
     $('#delete_all').click(function(){
         var c = $('#delete_all').html();
@@ -253,5 +247,23 @@ $(document).ready(function() {
     });
     $('.episode').mouseleave(function(){
         $('.episode_plot').dequeue().hide();
+    });
+    
+    // admin visible - hidden
+    $(document).on('click', '.visible', function(){
+        var id = $(this).parent().parent().attr('id');
+        var video = $(this).parent().parent().parent().parent().attr('id');
+        $(this).attr('src', 'admin/img/hidden.png');
+        $(this).addClass('hidden');
+        $(this).removeClass('visible');
+        $.ajax({url: 'function.js.php?option=hide'+video+'&id='+id});
+    });
+    $(document).on('click', '.hidden', function(){
+        var id = $(this).parent().parent().attr('id');
+        var video = $(this).parent().parent().parent().parent().attr('id');
+        $(this).attr('src', 'admin/img/visible.png');
+        $(this).addClass('visible');
+        $(this).removeClass('hidden');
+        $.ajax({url: 'function.js.php?option=visible'+video+'&id='+id});
     });
 });
