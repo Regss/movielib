@@ -225,44 +225,17 @@ function show_id($table) {
  * # SYNC - add Movie to DB #
  */##########################
 function sync_add($tables, $table) {
+    $insert_row = '';
+    $insert_value = '';
     
-    $insert_sql = 'INSERT INTO `' . $table . '` (';
     foreach($tables[$table] as $key => $val) {
-        $insert_sql.= '`' . $key . '`, ';
+        $insert_row.= '`' . $key . '`,';
+        $insert_value.= '"' . (isset($_POST[$key]) ? add_slash($_POST[$key]) : '') . '",';
     }
-    $insert_sql = substr($insert_sql, 0, -2);
-    $insert_sql.= ') VALUES ';
-
-    $insert_sql.= '(
-        ' . (isset($_POST['id']) ? '"' . $_POST['id'] . '",' : '') . '
-        ' . (isset($_POST['title']) ? '"' . add_slash($_POST['title']) . '",' : '') . '
-        ' . (isset($_POST['plot']) ? '"' . add_slash($_POST['plot']) . '",' : '') . '
-        ' . (isset($_POST['rating']) ? '"' . round($_POST['rating'], 1) . '",' : '') . '
-        ' . (isset($_POST['year']) ? '"' . $_POST['year'] . '",' : '') . '
-        ' . (isset($_POST['trailer']) ? '"' . add_slash($_POST['trailer']) . '",' : '') . '
-        ' . (isset($_POST['runtime']) ? '"' . $_POST['runtime'] . '",' : '') . '
-        ' . (isset($_POST['genre']) ? '"' . add_slash($_POST['genre']) . '",' : '') . '
-        ' . (isset($_POST['director']) ? '"' . add_slash($_POST['director']) . '",' : '') . '
-        ' . (isset($_POST['originaltitle']) ? '"' . add_slash($_POST['originaltitle']) . '",' : '') . '
-        ' . (isset($_POST['country']) ? '"' . add_slash($_POST['country']) . '",' : '') . '
-        ' . (isset($_POST['cast']) ? '"' . add_slash($_POST['cast']) . '",' : '') . '
-        ' . (isset($_POST['set']) ? '"' . add_slash($_POST['set']) . '",' : '') . '
-        ' . (isset($_POST['episode']) ? '"' . add_slash($_POST['episode']) . '",' : '') . '
-        ' . (isset($_POST['season']) ? '"' . add_slash($_POST['season']) . '",' : '') . '
-        ' . (isset($_POST['tvshow']) ? '"' . add_slash($_POST['tvshow']) . '",' : '') . '
-        ' . (isset($_POST['premiered']) ? '"' . add_slash($_POST['premiered']) . '",' : '') . '
-        ' . (isset($_POST['firstaired']) ? '"' . add_slash($_POST['firstaired']) . '",' : '') . '
-        ' . (isset($_POST['v_codec']) ? '"' . add_slash($_POST['v_codec']) . '",' : '') . '
-        ' . (isset($_POST['v_aspect']) ? '"' . add_slash($_POST['v_aspect']) . '",' : '') . '
-        ' . (isset($_POST['v_width']) ? '"' . add_slash($_POST['v_width']) . '",' : '') . '
-        ' . (isset($_POST['v_height']) ? '"' . add_slash($_POST['v_height']) . '",' : '') . '
-        ' . (isset($_POST['v_duration']) ? '"' . add_slash($_POST['v_duration']) . '",' : '') . '
-        ' . (isset($_POST['a_codec']) ? '"' . add_slash($_POST['a_codec']) . '",' : '') . '
-        ' . (isset($_POST['a_chan']) ? '"' . add_slash($_POST['a_chan']) . '",' : '') . '
-        ' . (isset($_POST['playcount']) ? '"' . add_slash($_POST['playcount']) . '",' : '') . '
-        ' . (isset($_POST['lastplayed']) ? '"' . add_slash($_POST['lastplayed']) . '",' : '') . '
-        ' . (isset($_POST['dateadded']) ? '"' . add_slash($_POST['dateadded']) . '",' : '');
-    $insert_sql = substr(trim($insert_sql), 0, -1) . ')';
+    $insert_row = substr($insert_row, 0, -1);
+    $insert_value = substr(trim($insert_value), 0, -1);
+    $insert_sql = 'INSERT INTO `' . $table . '` (' . $insert_row . ') VALUES (' . $insert_value . ')';
+    
     $insert = mysql_query($insert_sql);
 
     if (!$insert) {
@@ -274,7 +247,7 @@ function sync_add($tables, $table) {
         if (isset($_POST['poster'])) {
             $poster = base64_decode($_POST['poster']);
             if (substr($poster, 0, 4) == 'http') {
-                $size = getimagesize($poster);
+                $size = @getimagesize($poster);
                 if ($size[0] > $size[1]) {
                     gd_convert('cache/' . $table . '_' . $_POST['id'] . '.jpg', $poster, 140, 35);
                 } else {
@@ -284,7 +257,7 @@ function sync_add($tables, $table) {
                 $fp = fopen('cache/temp_' . $table . '_' . $_POST['id'], 'wb');
                 fwrite($fp, $poster);
                 fclose($fp);
-                $size = getimagesize('cache/temp_' . $table . '_' . $_POST['id']);
+                $size = @getimagesize('cache/temp_' . $table . '_' . $_POST['id']);
                 if ($size[0] > $size[1]) {
                     gd_convert('cache/' . $table . '_' . $_POST['id'] . '.jpg', 'cache/temp_' . $table . '_' . $_POST['id'], 140, 35);
                 } else {
@@ -463,7 +436,7 @@ function add_slash($string){
  * # ARRAYS FOR PANEL #
  */####################
 function panels_array($columns, $table) {
-    $panels_sql = 'SELECT ' . implode(', ', $columns) . ' FROM ' . $table;
+    $panels_sql = 'SELECT ' . implode(', ', $columns) . ' FROM ' . $table . ' WHERE hide=0';
     $panels_result = mysql_query($panels_sql);
     $panels_array = array();
     while ($panels_mysql_array = mysql_fetch_assoc($panels_result)) {

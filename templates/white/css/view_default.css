@@ -1,6 +1,6 @@
 .movie { text-align:left; border:1px solid #fff; background-color:#ddd; min-height:250px; margin-top:10px; margin-bottom:10px; padding:5px 10px 5px 10px; }
-.poster_container { float:left; width:142px; margin-top:5px; margin-right:5px; }
-.poster { border:1px solid #000; }
+.poster_container { float:left; margin-top:5px; margin-right:5px; }
+.poster { width:142px; border:1px solid #000; }
 .title { font-size:20px; font-weight:bold; color:#414141; }
 .title a:link { font-size:20px; font-weight:bold; color:#414141; }
 .title a:visited { font-size:20px; font-weight:bold; color:#414141; }
