@@ -176,11 +176,11 @@ if ($option == 'movieslist') {
             <tr class="bold"><td>
                 </td><td>ID</td>
                 <td>' . $lang['a_title'] . '</td>
-                <td>P</td>
-                <td>F</td>
-                <td>T</td>
-                <td>H</td>
-                <td></td>
+                <td><img src="admin/img/i_poster.png" title="' . $lang['a_poster'] . '" alt=""></td>
+                <td><img src="admin/img/i_fanart.png" title="' . $lang['a_fanart'] . '" alt=""></td>
+                <td><img src="admin/img/i_trailer.png" title="' . $lang['a_trailer'] . '" alt=""></td>
+                <td><img src="admin/img/i_hidden.png" title="' . $lang['a_visible'] . ' / ' . $lang['a_hidden'] . '" alt=""></td>
+                <td><img src="admin/img/i_delete.png" title="' . $lang['a_delete'] . '" alt=""></td>
             </tr>';
     $i = 0;
     while ($list = mysql_fetch_array($list_result)) {
@@ -195,14 +195,14 @@ if ($option == 'movieslist') {
             $fanart_exist = '';
         }
         if (stristr($list['trailer'], 'http://')) {
-            $trailer_link = '<a href="' . $list['trailer'] . '" target="_blank"><img src="admin/img/link.png" title="Link" alt=""></a>';
+            $trailer_link = '<a href="' . $list['trailer'] . '" target="_blank"><img class="animate" src="admin/img/link.png" title="Link" alt=""></a>';
         } else {
             $trailer_link = '';
         }
         if ($list['hide'] == 1) {
-            $hide = '<img class="hidden animate" src="admin/img/hidden.png" title="visible / hide" alt="">';
+            $hide = '<img class="hidden animate" src="admin/img/hidden.png" title="' . $lang['a_visible'] . ' / ' . $lang['a_hidden'] . '" alt="">';
         } else {
-            $hide = '<img class="visible animate" src="admin/img/visible.png" title="visible / hide" alt="">';
+            $hide = '<img class="visible animate" src="admin/img/visible.png" title="' . $lang['a_visible'] . ' / ' . $lang['a_hidden'] . '" alt="">';
         }
         $i++;
         $output_panel.= '
@@ -243,10 +243,10 @@ if ($option == 'tvshowslist') {
             <tr class="bold"><td>
                 </td><td>ID</td>
                 <td>' . $lang['a_title'] . '</td>
-                <td>P</td>
-                <td>F</td>
-                <td>H</td>
-                <td></td>
+                <td><img src="admin/img/i_poster.png" title="' . $lang['a_poster'] . '" alt=""></td>
+                <td><img src="admin/img/i_fanart.png" title="' . $lang['a_fanart'] . '" alt=""></td>
+                <td><img src="admin/img/i_hidden.png" title="' . $lang['a_visible'] . ' / ' . $lang['a_hidden'] . '" alt=""></td>
+                <td><img src="admin/img/i_delete.png" title="' . $lang['a_delete'] . '" alt=""></td>
             </tr>';
     $i = 0;
     while ($list = mysql_fetch_array($list_result)) {
