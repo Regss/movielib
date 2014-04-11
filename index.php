@@ -512,6 +512,23 @@ while ($list = mysql_fetch_array($list_result)) {
 $output['panel_list'] = $output_panel_list;
 $output['sort'] = $sort;
 
+// meta data
+$url = 'http://' . $_SERVER['SERVER_NAME'] . implode('/', array_slice(explode('/', $_SERVER['REQUEST_URI']), 0, -1)) . '/';
+if ($id <> 0) {
+    $meta_sql = 'SELECT title, originaltitle, plot FROM ' . $mysql_table . ' WHERE id = ' . $id;
+    $meta_result = mysql_query($meta_sql);
+    $meta = mysql_fetch_array($meta_result);
+    $output['meta_img'] = (file_exists('cache/' . $mysql_table . '_' . $id . '.jpg') ? $url . 'cache/' . $mysql_table . '_' . $id . '.jpg' : 'templates/' . $set['theme'] . '/img/d_poster.jpg');
+    $output['meta_title'] = htmlspecialchars($meta['title']);
+    $output['meta_originaltitle'] = htmlspecialchars($meta['originaltitle']);
+    $output['meta_plot'] = htmlspecialchars($meta['plot']);
+    $output['meta_url'] = $url . 'index.php?video=' . $video . '&id=' . $id;
+} else {
+    $output['meta_title'] = 'Movielib';
+    $output['meta_originaltitle'] = $set['site_name'];
+    $output['meta_url'] = $url . 'index.php';
+}
+
 // create page
 $index = new Teamplate('index.tpl', $set, $lang);
 foreach ($output as $key => $val) {
