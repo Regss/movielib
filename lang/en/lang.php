@@ -139,6 +139,7 @@ $lang['a_html_tvshow_list']             =   'TVshow List';
 $lang['a_html_settings']                =   'Settings';
 $lang['a_html_change_password']         =   'Change Password';
 $lang['a_html_change_token']            =   'Token';
+$lang['a_html_banner']                  =   'Banner';    
 $lang['a_html_logout']                  =   'Logout';
 
 /* ###############

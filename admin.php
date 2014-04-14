@@ -548,6 +548,17 @@ if ($option == 'token') {
     ';
 }
 
+/* ##########
+ * # BANNER #
+ */##########
+if ($option == 'banner') {
+    create_banner($lang);
+    $output_panel.= '<img src="cache/banner.jpg">';
+    $output_panel.= '<form action="admin.php?option=banner" method="post">';
+    $output_panel.= '<input type="text" name="c_bg">';
+    $output_panel.= '</form>';
+}
+
 /* ##############
  * # PANEL INFO #
  */##############
@@ -578,6 +589,7 @@ if ($output_panel_info !== '') {
                 <a class="box" href="admin.php?option=settings"><?PHP echo $lang['a_html_settings'] ?></a>
                 <a class="box" href="admin.php?option=password"><?PHP echo $lang['a_html_change_password'] ?></a>
                 <a class="box" href="admin.php?option=token"><?PHP echo $lang['a_html_change_token'] ?></a>
+                <a class="box" href="admin.php?option=banner"><?PHP echo $lang['a_html_banner'] ?></a>
                 <a class="box" href="login.php?login=admin_logout"><?PHP echo $lang['a_html_logout'] ?></a>
             </div>
             <div id="panel_right">
