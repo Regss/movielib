@@ -552,11 +552,34 @@ if ($option == 'token') {
  * # BANNER #
  */##########
 if ($option == 'banner') {
-    create_banner($lang);
-    $output_panel.= '<img src="cache/banner.jpg">';
-    $output_panel.= '<form action="admin.php?option=banner" method="post">';
-    $output_panel.= '<input type="text" name="c_bg">';
-    $output_panel.= '</form>';
+    
+    if (isset($_POST['banner'])) {
+        foreach ($_POST['banner'] as $val) {
+            if (!is_numeric($val)) {
+                $false = true;
+                break;
+            }
+        }
+        if (!isset($false)) {
+            $update = 'UPDATE ' . $mysql_tables[3] . ' SET `banner` = "' . implode(';', $_POST['banner']) . '"';
+            mysql_query($update);
+            $_SESSION['banner'] = implode(';', $_POST['banner']);
+            $set['banner'] = $_SESSION['banner'];
+        } else {
+            $output_panel_info.= 'Podaj poprawna cyfre';
+        }
+    }
+    $b = create_banner($lang, $set);
+
+    $output_panel.= '<img id="banner" src="cache/banner.jpg">';
+    $output_panel.= '<form class="banner" action="admin.php?option=banner" method="post"><table id="t_banner">';
+    $output_panel.= '<tr><td class="text_right">Background:</td><td class="text_left orange">R <input class="ban" type="text" name="banner[]" value="' . $b[0] . '"> G <input class="ban" type="text" name="banner[]" value="' . $b[1] . '"> B <input class="ban" type="text" name="banner[]" value="' . $b[2] . '"></td></tr>';
+    $output_panel.= '<tr><td class="text_right">Last Played:</td><td class="text_left orange">R <input class="ban" type="text" name="banner[]" value="' . $b[3] . '"> G <input class="ban" type="text" name="banner[]" value="' . $b[4] . '"> B <input class="ban" type="text" name="banner[]" value="' . $b[5] . '"> S <input class="ban" type="text" name="banner[]" value="' . $b[6] . '"> X <input class="ban" type="text" name="banner[]" value="' . $b[7] . '"> Y <input class="ban" type="text" name="banner[]" value="' . $b[8] . '"></td></tr>';
+    $output_panel.= '<tr><td class="text_right">Title:</td><td class="text_left orange">R <input class="ban" type="text" name="banner[]" value="' . $b[9] . '"> G <input class="ban" type="text" name="banner[]" value="' . $b[10] . '"> B <input class="ban" type="text" name="banner[]" value="' . $b[11] . '"> S <input class="ban" type="text" name="banner[]" value="' . $b[12] . '"> X <input class="ban" type="text" name="banner[]" value="' . $b[13] . '"> Y <input class="ban" type="text" name="banner[]" value="' . $b[14] . '"></td></tr>';
+    $output_panel.= '<tr><td class="text_right">Info:</td><td class="text_left orange">R <input class="ban" type="text" name="banner[]" value="' . $b[15] . '"> G <input class="ban" type="text" name="banner[]" value="' . $b[16] . '"> B <input class="ban" type="text" name="banner[]" value="' . $b[17] . '"> S <input class="ban" type="text" name="banner[]" value="' . $b[18] . '"> X <input class="ban" type="text" name="banner[]" value="' . $b[19] . '"> Y <input class="ban" type="text" name="banner[]" value="' . $b[20] . '"></td></tr>';
+    $output_panel.= '<tr><td class="text_right">Stroke:</td><td class="text_left orange">R <input class="ban" type="text" name="banner[]" value="' . $b[21] . '"> G <input class="ban" type="text" name="banner[]" value="' . $b[22] . '"> B <input class="ban" type="text" name="banner[]" value="' . $b[23] . '"></td></tr>';
+    $output_panel.= '<tr><td class="text_right">Border:</td><td class="text_left orange">R <input class="ban" type="text" name="banner[]" value="' . $b[24] . '"> G <input class="ban" type="text" name="banner[]" value="' . $b[25] . '"> B <input class="ban" type="text" name="banner[]" value="' . $b[26] . '"></td></tr>';
+    $output_panel.= '</table><input type="submit" value="zapisz"></form>';
 }
 
 /* ##############

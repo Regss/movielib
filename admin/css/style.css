@@ -32,3 +32,7 @@ input, select { background-color:#222; color:#dddddd; border:1px solid #000; fon
 .table { border:1px solid #222; text-align:left; width:100%; margin-bottom:10px; }
 .table td { background-color:#000; padding:2px 5px 2px 5px; }
 .table img { display:block; margin:auto; }
+
+.banner input { width:30px; }
+.text_left { text-align:left; }
+.text_right { text-align:right; }

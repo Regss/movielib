@@ -266,4 +266,19 @@ $(document).ready(function() {
         $(this).removeClass('hidden');
         $.ajax({url: 'function.js.php?option=visible'+video+'&id='+id});
     });
+    
+    // admin banner
+    $(document).on('keyup', '.ban', function() {
+        var b = [];
+        $('.ban').each(function(){
+            b.push($(this).val());
+        });
+        banner = b.join(';');
+        $.ajax({
+            url: 'function.js.php?option=banner&banner='+banner,
+            success: function(){
+                $('#banner').attr('src', 'cache/banner.jpg?'+Math.random());
+            }
+        });
+    });
 });

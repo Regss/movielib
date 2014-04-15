@@ -471,20 +471,32 @@ function panels_array($columns, $table) {
 /* #################
  * # CREATE BANNER #
  */#################
-function create_banner($lang) {
+function create_banner($lang, $set) {
     
     $banner_sql = 'SELECT id, title, originaltitle, year, rating, runtime, genre, country FROM movies ORDER BY last_played LIMIT 0, 1';
     $banner_result = mysql_query($banner_sql);
     $ban = mysql_fetch_array($banner_result);
     
     // (color R, color G, color B, font size, pos X, pos Y)
-    $c_bg = array(20, 20, 20); // background color
-    $c_lw = array(255, 255, 255, 10, 144, 20); // last watched color
-    $c_t = array(255, 255, 255, 8, 150, 36); // title color
-    $c_i = array(128, 128, 128, 6, 150, 50); // info color
-    $c_s = array(0, 0, 0); // stroke color
-    $c_b = array(255, 255, 255); // border color
-    $font = 'ArchivoNarrow-Bold.ttf';
+    $b = array(
+        20, 20, 20, // background color
+        255, 255, 255, 10, 144, 20, // last watched color
+        255, 255, 255, 8, 150, 36, // title color
+        128, 128, 128, 6, 150, 50, // info color
+        0, 0, 0, // stroke color
+        255, 255, 255); // border color
+        
+    if (count(explode(';', $set['banner'])) == 27 ) {
+        $b = explode(';', $set['banner']);
+    }
+    
+    $c_bg = array($b[0], $b[1], $b[2]);
+    $c_lw = array($b[3], $b[4], $b[5], $b[6], $b[7], $b[8]);
+    $c_t = array($b[9], $b[10], $b[11], $b[12], $b[13], $b[14]); 
+    $c_i = array($b[15], $b[16], $b[17], $b[18], $b[19], $b[20]);
+    $c_s = array($b[21], $b[22], $b[23]);
+    $c_b = array($b[24], $b[25], $b[26]);
+    $font = 'admin/css/font/archivonarrow.ttf';
 
     // background
     $banner = imagecreatetruecolor(400,60);
@@ -525,7 +537,7 @@ function create_banner($lang) {
     imagettfstroketext($banner, $c_i[3], 0, $c_i[4], $c_i[5], $info_color, $stroke_color, $font, $ban['year'] . ' | ' . $ban['rating'] . ' | ' . $ban['runtime'] . ' ' . $lang['i_minute'] . ' | ' . $ban['genre'] . ' | ' . $ban['country'], 1);
 
     // icon
-    $icon = imagecreatefrompng('movie.png');
+    $icon = imagecreatefrompng('admin/img/movie.png');
     imagecopy($banner, $icon, 374, 6, 0, 0, 20, 20);
 
     // border
@@ -537,6 +549,7 @@ function create_banner($lang) {
 
     // save as file
     imagejpeg($banner, 'cache/banner.jpg', 100);
+    return $b;
 }
 
 /* ##########################
