@@ -501,16 +501,17 @@ function create_banner($lang, $file, $data, $mysql_tables) {
         255, 255, 255, 8, 150, 36, // title color
         128, 128, 128, 6, 150, 50, // info color
         0, 0, 0, // stroke color
-        255, 255, 255); // border color
+        255, 255, 255, // border color
+        400, 60); // width x height banner
         
-    if (count(explode(';', $data)) == 27 ) {
+    if (count(explode(';', $data)) == count($b) ) {
         $b = explode(';', $data);
     }
 
     $font = 'admin/css/font/archivonarrow.ttf';
 
     // background
-    $banner = imagecreatetruecolor(400,60);
+    $banner = imagecreatetruecolor($b[27], $b[28]);
     $bg_color = imagecolorallocate($banner, $b[0], $b[1], $b[2]);
     imagefill($banner, 0, 0, $bg_color);
 
@@ -524,21 +525,21 @@ function create_banner($lang, $file, $data, $mysql_tables) {
     }
     $width = imagesx($post);
     $height = imagesy($post);
-    $new_width = 140;
-    $new_height = $height / ($width / $new_width);
+    $new_height = $b[28];
+    $new_width = $width / ($height / $new_height);
     imagecopyresampled($banner, $post, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
 
     // add gradient
     $width = 80;
-    $gradient = imagecreatetruecolor($width, 60);
+    $gradient = imagecreatetruecolor($width, $b[28]);
     $gradient_color = imagecolorallocatealpha($gradient, $b[0], $b[1], $b[2], 127);
     imagefill($gradient, 0, 0, $gradient_color);
     for ($x=0; $x < $width; ++$x) {
         $alpha = 127 - $x*(127/$width);
         $gradient_color = imagecolorallocatealpha($gradient, $b[0], $b[1], $b[2], $alpha);
-        imageline($gradient, $x, 0, $x, 60, $gradient_color);
+        imageline($gradient, $x, 0, $x, $b[28], $gradient_color);
     }
-    imagecopyresampled($banner, $gradient, 140-$width, 0, 0, 0, $width, 60, $width, 60);
+    imagecopyresampled($banner, $gradient, $new_width-$width, 0, 0, 0, $width, $b[28], $width, $b[28]);
 
     // add text
     $last_watched_color = imagecolorallocate($banner, $b[3], $b[4], $b[5]);
@@ -562,14 +563,14 @@ function create_banner($lang, $file, $data, $mysql_tables) {
 
     // icon
     $icon = imagecreatefrompng('admin/img/' . $table . '.png');
-    imagecopy($banner, $icon, 374, 6, 0, 0, 20, 20);
+    imagecopy($banner, $icon, $b[27]-26, 6, 0, 0, 20, 20);
 
     // border
     $border_color = imagecolorallocate($banner, $b[24], $b[25], $b[26]);
-    imageline($banner, 0, 0, 399, 0, $border_color);
-    imageline($banner, 399, 0, 399, 59, $border_color);
-    imageline($banner, 0, 59, 399, 59, $border_color);
-    imageline($banner, 0, 0, 0, 59, $border_color);
+    imageline($banner, 0, 0, $b[27]-1, 0, $border_color);
+    imageline($banner, $b[27]-1, 0, $b[27]-1, $b[28]-1, $border_color);
+    imageline($banner, 0, $b[28]-1, $b[27]-1, $b[28]-1, $border_color);
+    imageline($banner, 0, 0, 0, $b[28]-1, $border_color);
 
     // save as file
     imagejpeg($banner, 'cache/' . $file, 100);
