@@ -471,11 +471,28 @@ function panels_array($columns, $table) {
 /* #################
  * # CREATE BANNER #
  */#################
-function create_banner($lang, $set) {
+function create_banner($lang, $file, $data, $mysql_tables) {
     
-    $banner_sql = 'SELECT id, title, originaltitle, year, rating, runtime, genre, country FROM movies ORDER BY last_played LIMIT 0, 1';
-    $banner_result = mysql_query($banner_sql);
-    $ban = mysql_fetch_array($banner_result);
+    $movie_sql = 'SELECT id, title, originaltitle, year, rating, runtime, genre, country, last_played FROM ' . $mysql_tables[0] . ' ORDER BY last_played DESC LIMIT 0, 1';
+    $movie_result = mysql_query($movie_sql);
+    $movie = mysql_fetch_assoc($movie_result);
+    
+    $episode_sql = 'SELECT episode, season, tvshow, title, last_played FROM ' . $mysql_tables[2] . ' ORDER BY last_played DESC LIMIT 0, 1';
+    $episode_result = mysql_query($episode_sql);
+    $episode = mysql_fetch_assoc($episode_result);
+    $episode['e_title'] = $episode['title'];
+    unset($episode['title']);
+    
+    if ($episode['last_played'] > $movie['last_played']) {
+        $tvshow_sql = 'SELECT id, title, originaltitle, rating, genre, last_played FROM ' . $mysql_tables[1] . ' WHERE id = ' . $episode['tvshow'];
+        $tvshow_result = mysql_query($tvshow_sql);
+        $tvshow = mysql_fetch_assoc($tvshow_result);
+        $ban = array_merge($tvshow, $episode);
+        $table = $mysql_tables[1];
+    } else {
+        $ban = $movie;
+        $table = $mysql_tables[0];
+    }
     
     // (color R, color G, color B, font size, pos X, pos Y)
     $b = array(
@@ -486,26 +503,22 @@ function create_banner($lang, $set) {
         0, 0, 0, // stroke color
         255, 255, 255); // border color
         
-    if (count(explode(';', $set['banner'])) == 27 ) {
-        $b = explode(';', $set['banner']);
+    if (count(explode(';', $data)) == 27 ) {
+        $b = explode(';', $data);
     }
-    
-    $c_bg = array($b[0], $b[1], $b[2]);
-    $c_lw = array($b[3], $b[4], $b[5], $b[6], $b[7], $b[8]);
-    $c_t = array($b[9], $b[10], $b[11], $b[12], $b[13], $b[14]); 
-    $c_i = array($b[15], $b[16], $b[17], $b[18], $b[19], $b[20]);
-    $c_s = array($b[21], $b[22], $b[23]);
-    $c_b = array($b[24], $b[25], $b[26]);
+
     $font = 'admin/css/font/archivonarrow.ttf';
 
     // background
     $banner = imagecreatetruecolor(400,60);
-    $bg_color = imagecolorallocate($banner, $c_bg[0], $c_bg[1], $c_bg[2]);
+    $bg_color = imagecolorallocate($banner, $b[0], $b[1], $b[2]);
     imagefill($banner, 0, 0, $bg_color);
 
     // get poster and copy
-    if (file_exists('cache/movies_' . $ban['id'] . '_f.jpg')) {
-        $post = imagecreatefromjpeg('cache/movies_' . $ban['id'] . '_f.jpg');
+    if (file_exists('cache/' . $table . '_' . $ban['id'] . '_f.jpg')) {
+        $post = imagecreatefromjpeg('cache/' . $table . '_' . $ban['id'] . '_f.jpg');
+    } elseif (file_exists('cache/' . $table . '_' . $ban['id'] . '.jpg')) {
+        $post = imagecreatefromjpeg('cache/' . $table . '_' . $ban['id'] . '.jpg');
     } else {
         $post = imagecreatefromjpeg('templates/default/img/d_poster.jpg');
     }
@@ -518,37 +531,48 @@ function create_banner($lang, $set) {
     // add gradient
     $width = 80;
     $gradient = imagecreatetruecolor($width, 60);
-    $gradient_color = imagecolorallocatealpha($gradient, $c_bg[0], $c_bg[1], $c_bg[2], 127);
+    $gradient_color = imagecolorallocatealpha($gradient, $b[0], $b[1], $b[2], 127);
     imagefill($gradient, 0, 0, $gradient_color);
     for ($x=0; $x < $width; ++$x) {
         $alpha = 127 - $x*(127/$width);
-        $gradient_color = imagecolorallocatealpha($gradient, $c_bg[0], $c_bg[1], $c_bg[2], $alpha);
+        $gradient_color = imagecolorallocatealpha($gradient, $b[0], $b[1], $b[2], $alpha);
         imageline($gradient, $x, 0, $x, 60, $gradient_color);
     }
     imagecopyresampled($banner, $gradient, 140-$width, 0, 0, 0, $width, 60, $width, 60);
 
     // add text
-    $last_watched_color = imagecolorallocate($banner, $c_lw[0], $c_lw[1], $c_lw[2]);
-    $title_color = imagecolorallocate($banner, $c_t[0], $c_t[1], $c_t[2]);
-    $info_color = imagecolorallocate($banner, $c_i[0], $c_i[1], $c_i[2]);
-    $stroke_color = imagecolorallocate($banner, $c_s[0], $c_s[1], $c_s[2]);
-    imagettfstroketext($banner, $c_lw[3], 0, $c_lw[4], $c_lw[5], $last_watched_color, $stroke_color, $font, $lang['i_last_played'], 1);
-    imagettfstroketext($banner, $c_t[3], 0, $c_t[4], $c_t[5], $title_color, $stroke_color, $font, $ban['title'], 1);
-    imagettfstroketext($banner, $c_i[3], 0, $c_i[4], $c_i[5], $info_color, $stroke_color, $font, $ban['year'] . ' | ' . $ban['rating'] . ' | ' . $ban['runtime'] . ' ' . $lang['i_minute'] . ' | ' . $ban['genre'] . ' | ' . $ban['country'], 1);
+    $last_watched_color = imagecolorallocate($banner, $b[3], $b[4], $b[5]);
+    $title_color = imagecolorallocate($banner, $b[9], $b[10], $b[11]);
+    $info_color = imagecolorallocate($banner, $b[15], $b[16], $b[17]);
+    $stroke_color = imagecolorallocate($banner, $b[21], $b[22], $b[23]);
+    imagettfstroketext($banner, $b[6], 0, $b[7], $b[8], $last_watched_color, $stroke_color, $font, $lang['i_last_played'], 1);
+    imagettfstroketext($banner, $b[12], 0, $b[13], $b[14], $title_color, $stroke_color, $font, 
+        (isset($ban['title']) ? $ban['title'] : '') . 
+        (isset($ban['season']) ? ' - ' . $ban['season'] . 'x' : '') . 
+        (isset($ban['episode']) ? $ban['episode'] . ' ' : '') . 
+        (isset($ban['e_title']) ? $ban['e_title'] : '')
+        , 1);
+    imagettfstroketext($banner, $b[18], 0, $b[19], $b[20], $info_color, $stroke_color, $font, 
+        (isset($ban['year']) ? $ban['year'] : '') . ' | ' . 
+        (isset($ban['rating']) ? $ban['rating'] : '') . ' | ' . 
+        (isset($ban['runtime']) ? $ban['runtime'] . ' ' . $lang['i_minute'] : '') . ' | ' . 
+        (isset($ban['genre']) ? $ban['genre'] : '') . ' | ' . 
+        (isset($ban['country']) ? $ban['country'] : '')
+        , 1);
 
     // icon
-    $icon = imagecreatefrompng('admin/img/movie.png');
+    $icon = imagecreatefrompng('admin/img/' . $table . '.png');
     imagecopy($banner, $icon, 374, 6, 0, 0, 20, 20);
 
     // border
-    $border_color = imagecolorallocate($banner, $c_b[0], $c_b[1], $c_b[2]);
+    $border_color = imagecolorallocate($banner, $b[24], $b[25], $b[26]);
     imageline($banner, 0, 0, 399, 0, $border_color);
     imageline($banner, 399, 0, 399, 59, $border_color);
     imageline($banner, 0, 59, 399, 59, $border_color);
     imageline($banner, 0, 0, 0, 59, $border_color);
 
     // save as file
-    imagejpeg($banner, 'cache/banner.jpg', 100);
+    imagejpeg($banner, 'cache/' . $file, 100);
     return $b;
 }
 

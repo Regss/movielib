@@ -111,9 +111,7 @@ if ($option  == 'banner') {
     connect($mysql_ml);
     $set = get_settings($mysql_tables);
     require('lang/' . $set['language'] . '/lang.php');
-    $_SESSION['banner'] = $_GET['banner'];
-    $set['banner'] = $_GET['banner'];
-    $b = create_banner($lang, $set);
+    $b = create_banner($lang, 'banner_v.jpg', $_GET['banner'], $mysql_tables);
     
     
 }

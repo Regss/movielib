@@ -16,7 +16,8 @@ a:active { color:#FFF; text-decoration:none; }
 
 .animate { cursor:pointer; }
 
-input, select { background-color:#222; color:#dddddd; border:1px solid #000; font-size:11px; width:160px; height:20px; }
+input, select  { resize:none; background-color:#222; color:#dddddd; border:1px solid #000; font-size:11px; width:160px; height:20px; }
+textarea { resize:none; background-color:#222; color:#dddddd; border:1px solid #000; font-size:11px; width:500px; height:18px; padding:5px; margin:10px; }
 .textera { display:block; width:600px; height:420px; background-color:#111; color:#fff; border:1px solid #333; margin:auto; margin-top:10px; margin-bottom:10px; resize:none; padding:10px; }
 .panel_info { border:3px solid #00cc00; background-color:#66ff33; font-weight:bold; color:#000; padding:5px; }
 
@@ -33,6 +34,6 @@ input, select { background-color:#222; color:#dddddd; border:1px solid #000; fon
 .table td { background-color:#000; padding:2px 5px 2px 5px; }
 .table img { display:block; margin:auto; }
 
-.banner input { width:30px; }
+.ban{ width:30px; }
 .text_left { text-align:left; }
 .text_right { text-align:right; }

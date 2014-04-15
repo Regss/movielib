@@ -565,13 +565,14 @@ if ($option == 'banner') {
             mysql_query($update);
             $_SESSION['banner'] = implode(';', $_POST['banner']);
             $set['banner'] = $_SESSION['banner'];
+            $b = create_banner($lang, 'banner.jpg', $set['banner'], $mysql_tables);
         } else {
             $output_panel_info.= 'Podaj poprawna cyfre';
         }
     }
-    $b = create_banner($lang, $set);
+    $b = create_banner($lang, 'banner_v.jpg', $set['banner'], $mysql_tables);
 
-    $output_panel.= '<img id="banner" src="cache/banner.jpg">';
+    $output_panel.= '<img id="banner" src="cache/banner_v.jpg">';
     $output_panel.= '<form class="banner" action="admin.php?option=banner" method="post"><table id="t_banner">';
     $output_panel.= '<tr><td class="text_right">Background:</td><td class="text_left orange">R <input class="ban" type="text" name="banner[]" value="' . $b[0] . '"> G <input class="ban" type="text" name="banner[]" value="' . $b[1] . '"> B <input class="ban" type="text" name="banner[]" value="' . $b[2] . '"></td></tr>';
     $output_panel.= '<tr><td class="text_right">Last Played:</td><td class="text_left orange">R <input class="ban" type="text" name="banner[]" value="' . $b[3] . '"> G <input class="ban" type="text" name="banner[]" value="' . $b[4] . '"> B <input class="ban" type="text" name="banner[]" value="' . $b[5] . '"> S <input class="ban" type="text" name="banner[]" value="' . $b[6] . '"> X <input class="ban" type="text" name="banner[]" value="' . $b[7] . '"> Y <input class="ban" type="text" name="banner[]" value="' . $b[8] . '"></td></tr>';
@@ -580,6 +581,8 @@ if ($option == 'banner') {
     $output_panel.= '<tr><td class="text_right">Stroke:</td><td class="text_left orange">R <input class="ban" type="text" name="banner[]" value="' . $b[21] . '"> G <input class="ban" type="text" name="banner[]" value="' . $b[22] . '"> B <input class="ban" type="text" name="banner[]" value="' . $b[23] . '"></td></tr>';
     $output_panel.= '<tr><td class="text_right">Border:</td><td class="text_left orange">R <input class="ban" type="text" name="banner[]" value="' . $b[24] . '"> G <input class="ban" type="text" name="banner[]" value="' . $b[25] . '"> B <input class="ban" type="text" name="banner[]" value="' . $b[26] . '"></td></tr>';
     $output_panel.= '</table><input type="submit" value="zapisz"></form>';
+    $url = 'http://' . $_SERVER['SERVER_NAME'] . implode('/', array_slice(explode('/', $_SERVER['REQUEST_URI']), 0, -1)) . '/';
+    $output_panel.= '<textarea readonly="readonly">' . $url . 'cache/banner.jpg</textarea>';
 }
 
 /* ##############

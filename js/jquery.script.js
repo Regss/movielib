@@ -277,7 +277,7 @@ $(document).ready(function() {
         $.ajax({
             url: 'function.js.php?option=banner&banner='+banner,
             success: function(){
-                $('#banner').attr('src', 'cache/banner.jpg?'+Math.random());
+                $('#banner').attr('src', 'cache/banner_v.jpg?'+Math.random());
             }
         });
     });
