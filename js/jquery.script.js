@@ -271,7 +271,9 @@ $(document).ready(function() {
     $(document).on('keyup', '.ban', function() {
         var b = [];
         $('.ban').each(function(){
-            b.push($(this).val());
+            var key = $(this).attr('id');
+            var val = $(this).val();
+            b.push(key+':'+val);
         });
         banner = b.join(';');
         $.ajax({
