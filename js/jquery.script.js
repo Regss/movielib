@@ -270,17 +270,27 @@ $(document).ready(function() {
     // admin banner
     $(document).on('keyup', '.ban', function() {
         var b = [];
+        var f = false;
         $('.ban').each(function(){
             var key = $(this).attr('id');
             var val = $(this).val();
             b.push(key+':'+val);
-        });
-        banner = b.join(';');
-        $.ajax({
-            url: 'function.js.php?option=banner&banner='+banner,
-            success: function(){
-                $('#banner').attr('src', 'cache/banner_v.jpg?'+Math.random());
+            if (f == false) {
+                if (!$.isNumeric(val)) {
+                    if (!val.match(/[0-9abcdefABCDEF]{6}/)) {
+                        f = true;
+                    }
+                }
             }
         });
+        banner = b.join(';');
+        if (f == false) {
+            $.ajax({
+                url: 'function.js.php?option=banner&banner='+banner,
+                success: function(){
+                    $('#banner').attr('src', 'cache/banner_v.jpg?'+Math.random());
+                }
+            });
+        }
     });
 });

@@ -496,22 +496,26 @@ function create_banner($lang, $file, $data, $mysql_tables) {
 
     $b = array();
     $b['w']     = 400; // banner width
-    $b['h']     = 60; // banner height
+    $b['h']     = 70; // banner height
     $b['bg_c']  = '141414'; // background color
-    $b['lw_c']  = 'ffffff'; // last watched color
+    $b['lw_c']  = 'FFFFFF'; // last watched color
     $b['lw_s']  = 10; // last watched font size
-    $b['lw_x']  = 144; // last watched pos. x
+    $b['lw_x']  = 130; // last watched pos. x
     $b['lw_y']  = 20; // last watched pos. y
-    $b['t_c']   = 'ffffff'; // title color
+    $b['t_c']   = 'FFFFFF'; // title color
     $b['t_s']   = 8; // title font size
-    $b['t_x']   = 150; // title pos. x
+    $b['t_x']   = 136; // title pos. x
     $b['t_y']   = 36; // title pos. y
+    $b['o_c']   = 'AAAAAA'; // title color
+    $b['o_s']   = 8; // title font size
+    $b['o_x']   = 136; // title pos. x
+    $b['o_y']   = 51; // title pos. y
     $b['i_c']   = '808080'; // info color
     $b['i_s']   = 6; // info font size
-    $b['i_x']   = 150; // info pos. x
-    $b['i_y']   = 50; // info pos. y
+    $b['i_x']   = 138; // info pos. x
+    $b['i_y']   = 63; // info pos. y
     $b['st_c']  = '000000'; // stroke color
-    $b['b_c']   = 'ffffff'; // border color
+    $b['b_c']   = 'FFFFFF'; // border color
 
     if ($data !== '0') {
         $banner_array = explode(';', $data);
@@ -526,6 +530,7 @@ function create_banner($lang, $file, $data, $mysql_tables) {
     $bg_c = hex2rgb($b['bg_c']);
     $lw_c = hex2rgb($b['lw_c']);
     $t_c  = hex2rgb($b['t_c']);
+    $o_c  = hex2rgb($b['o_c']);
     $i_c  = hex2rgb($b['i_c']);
     $st_c = hex2rgb($b['st_c']);
     $b_c  = hex2rgb($b['b_c']);
@@ -566,6 +571,7 @@ function create_banner($lang, $file, $data, $mysql_tables) {
     // add text
     $last_watched_color = imagecolorallocate($banner, $lw_c['r'], $lw_c['g'], $lw_c['b']);
     $title_color = imagecolorallocate($banner, $t_c['r'], $t_c['g'], $t_c['b']);
+    $o_title_color = imagecolorallocate($banner, $o_c['r'], $o_c['g'], $o_c['b']);
     $info_color = imagecolorallocate($banner, $i_c['r'], $i_c['g'], $i_c['b']);
     $stroke_color = imagecolorallocate($banner, $st_c['r'], $st_c['g'], $st_c['b']);
     imagettfstroketext($banner, $b['lw_s'], 0, $b['lw_x'], $b['lw_y'], $last_watched_color, $stroke_color, $font, $lang['i_last_played'], 1);
@@ -575,6 +581,7 @@ function create_banner($lang, $file, $data, $mysql_tables) {
         (isset($ban['episode']) ? $ban['episode'] . ' ' : '') . 
         (isset($ban['e_title']) ? $ban['e_title'] : '')
         , 1);
+    imagettfstroketext($banner, $b['o_s'], 0, $b['o_x'], $b['o_y'], $o_title_color, $stroke_color, $font, (isset($ban['originaltitle']) ? $ban['title'] : ''), 1);
     imagettfstroketext($banner, $b['i_s'], 0, $b['i_x'], $b['i_y'], $info_color, $stroke_color, $font, 
         (isset($ban['year']) ? $ban['year'] : '') . ' | ' . 
         (isset($ban['rating']) ? $ban['rating'] : '') . ' | ' . 
@@ -599,16 +606,29 @@ function create_banner($lang, $file, $data, $mysql_tables) {
     return $b;
 }
 
+/* ################
+ * # BANNER 2 STR #
+ */################
+function banner2str($array) {
+    $banner = '';
+    foreach ($array as $key => $val) {
+        $banner.= $key . ':' . strtoupper($val) . ';';
+    }
+    return substr($banner, 0, -1);
+}
+
 /* #############
  * # HEX 2 RGB #
  */#############
 function hex2rgb($hex) {
-    $match = preg_match('/^[0-9abcdef]{6}$/', $hex);
+    $match = preg_match('/^[0-9abcdefABCDEF]{6}$/', $hex);
     if ($match == true) {
         $rgb = str_split($hex, 2);
+        $rgb = array('r' => hexdec($rgb[0]), 'g' => hexdec($rgb[1]), 'b' => hexdec($rgb[2]));
+        return $rgb;
+    } else {
+        return False;
     }
-    $rgb = array('r' => hexdec($rgb[0]), 'g' => hexdec($rgb[1]), 'b' => hexdec($rgb[2]));
-    return $rgb;
 }
 
 /* ##########################

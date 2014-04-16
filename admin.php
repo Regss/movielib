@@ -552,44 +552,45 @@ if ($option == 'token') {
  * # BANNER #
  */##########
 if ($option == 'banner') {
-
     if (isset($_POST['banner'])) {
         foreach ($_POST['banner'] as $val) {
             if (!is_numeric($val)) {
-                if (!preg_match('/^[0-9abcdef]{6}$/', $val)) {
+                if (!preg_match('/^[0-9abcdefABCDEF]{6}$/', $val)) {
                     $false = true;
                     break;
                 }
             }
         }
         if (!isset($false)) {
-            $banner = '';
-            foreach ($_POST['banner'] as $key => $val) {
-                $banner.= $key . ':' . $val . ';';
-            }
-            $banner = substr($banner, 0, -1);
-            $update = 'UPDATE ' . $mysql_tables[3] . ' SET `banner` = "' . $banner . '"';
+            $update = 'UPDATE ' . $mysql_tables[3] . ' SET `banner` = "' . banner2str($_POST['banner']) . '"';
             mysql_query($update);
-            $_SESSION['banner'] = $set['banner'] = $banner;
-            $b = create_banner($lang, 'banner.jpg', $banner, $mysql_tables);
+            $_SESSION['banner'] = $set['banner'] = banner2str($_POST['banner']);
+            $b = create_banner($lang, 'banner.jpg', banner2str($_POST['banner']), $mysql_tables);
         } else {
-            $output_panel_info.= 'Podaj poprawna cyfre';
+            $output_panel_info.= $lang['a_error_form'];
         }
-        
+    }
+    
+    if (isset($_POST['reset'])) {
+        $b = create_banner($lang, 'banner.jpg', '0', $mysql_tables);
+        $_SESSION['banner'] = $set['banner'] = banner2str($b);
     }
 
     $b = create_banner($lang, 'banner_v.jpg', $set['banner'], $mysql_tables);
     
     $output_panel.= '<img id="banner" src="cache/banner_v.jpg">';
     $output_panel.= '<form class="banner" action="admin.php?option=banner" method="post"><table id="t_banner">';
-    $output_panel.= '<tr><td class="text_right">Size:</td><td class="text_left orange">W <input id="w" class="ban" type="text" name="banner[w]" value="' . $b['w'] . '"> H <input id="h" class="ban" type="text" name="banner[h]" value="' . $b['h'] . '"></td></tr>';
-    $output_panel.= '<tr><td class="text_right">Background:</td><td class="text_left orange"> color #<input id="bg_c" class="ban" type="text" name="banner[bg_c]" value="' . $b['bg_c'] . '"></td></tr>';
-    $output_panel.= '<tr><td class="text_right">Last Watched:</td><td class="text_left orange"> color #<input id="lw_c" class="ban" type="text" name="banner[lw_c]" value="' . $b['lw_c'] . '"> size <input id="lw_s" class="ban" type="text" name="banner[lw_s]" value="' . $b['lw_s'] . '"> poz. X <input id="lw_x" class="ban" type="text" name="banner[lw_x]" value="' . $b['lw_x'] . '"> poz. Y <input id="lw_y" class="ban" type="text" name="banner[lw_y]" value="' . $b['lw_y'] . '"></td></tr>';
-    $output_panel.= '<tr><td class="text_right">Title:</td><td class="text_left orange"> color #<input id="t_c" class="ban" type="text" name="banner[t_c]" value="' . $b['t_c'] . '"> size <input id="t_s" class="ban" type="text" name="banner[t_s]" value="' . $b['t_s'] . '"> poz. X <input id="t_x" class="ban" type="text" name="banner[t_x]" value="' . $b['t_x'] . '"> poz. Y <input id="t_y" class="ban" type="text" name="banner[t_y]" value="' . $b['t_y'] . '"></td></tr>';
-    $output_panel.= '<tr><td class="text_right">Info:</td><td class="text_left orange"> color #<input id="i_c" class="ban" type="text" name="banner[i_c]" value="' . $b['i_c'] . '"> size <input id="i_s" class="ban" type="text" name="banner[i_s]" value="' . $b['i_s'] . '"> poz. X <input id="i_x" class="ban" type="text" name="banner[i_x]" value="' . $b['i_x'] . '"> poz. Y <input id="i_y" class="ban" type="text" name="banner[i_y]" value="' . $b['i_y'] . '"></td></tr>';
-    $output_panel.= '<tr><td class="text_right">Stroke:</td><td class="text_left orange"> color #<input id="st_c" class="ban" type="text" name="banner[st_c]" value="' . $b['st_c'] . '"></td></tr>';
-    $output_panel.= '<tr><td class="text_right">Border:</td><td class="text_left orange"> color #<input id="b_c" class="ban" type="text" name="banner[b_c]" value="' . $b['b_c'] . '"></td></tr>';
-    $output_panel.= '</table><input type="submit" value="zapisz"></form>';
+    $output_panel.= '<tr><td class="text_right">' . $lang['a_banner_size'] . ':</td><td class="text_left orange">W <input id="w" class="ban" type="text" name="banner[w]" value="' . $b['w'] . '"> H <input id="h" class="ban" type="text" name="banner[h]" value="' . $b['h'] . '"></td></tr>';
+    $output_panel.= '<tr><td class="text_right">' . $lang['a_banner_bg'] . ':</td><td class="text_left orange"> color #<input id="bg_c" class="ban" type="text" name="banner[bg_c]" value="' . $b['bg_c'] . '"></td></tr>';
+    $output_panel.= '<tr><td class="text_right">' . $lang['a_banner_last_watched'] . ':</td><td class="text_left orange"> color #<input id="lw_c" class="ban" type="text" name="banner[lw_c]" value="' . $b['lw_c'] . '"> size <input id="lw_s" class="ban" type="text" name="banner[lw_s]" value="' . $b['lw_s'] . '"> poz. X <input id="lw_x" class="ban" type="text" name="banner[lw_x]" value="' . $b['lw_x'] . '"> poz. Y <input id="lw_y" class="ban" type="text" name="banner[lw_y]" value="' . $b['lw_y'] . '"></td></tr>';
+    $output_panel.= '<tr><td class="text_right">' . $lang['a_banner_title'] . ':</td><td class="text_left orange"> color #<input id="t_c" class="ban" type="text" name="banner[t_c]" value="' . $b['t_c'] . '"> size <input id="t_s" class="ban" type="text" name="banner[t_s]" value="' . $b['t_s'] . '"> poz. X <input id="t_x" class="ban" type="text" name="banner[t_x]" value="' . $b['t_x'] . '"> poz. Y <input id="t_y" class="ban" type="text" name="banner[t_y]" value="' . $b['t_y'] . '"></td></tr>';
+    $output_panel.= '<tr><td class="text_right">' . $lang['a_banner_o_title'] . ':</td><td class="text_left orange"> color #<input id="o_c" class="ban" type="text" name="banner[o_c]" value="' . $b['o_c'] . '"> size <input id="o_s" class="ban" type="text" name="banner[o_s]" value="' . $b['o_s'] . '"> poz. X <input id="o_x" class="ban" type="text" name="banner[o_x]" value="' . $b['o_x'] . '"> poz. Y <input id="o_y" class="ban" type="text" name="banner[o_y]" value="' . $b['o_y'] . '"></td></tr>';
+    $output_panel.= '<tr><td class="text_right">' . $lang['a_banner_info'] . ':</td><td class="text_left orange"> color #<input id="i_c" class="ban" type="text" name="banner[i_c]" value="' . $b['i_c'] . '"> size <input id="i_s" class="ban" type="text" name="banner[i_s]" value="' . $b['i_s'] . '"> poz. X <input id="i_x" class="ban" type="text" name="banner[i_x]" value="' . $b['i_x'] . '"> poz. Y <input id="i_y" class="ban" type="text" name="banner[i_y]" value="' . $b['i_y'] . '"></td></tr>';
+    $output_panel.= '<tr><td class="text_right">' . $lang['a_banner_stroke'] . ':</td><td class="text_left orange"> color #<input id="st_c" class="ban" type="text" name="banner[st_c]" value="' . $b['st_c'] . '"></td></tr>';
+    $output_panel.= '<tr><td class="text_right">' . $lang['a_banner_border'] . ':</td><td class="text_left orange"> color #<input id="b_c" class="ban" type="text" name="banner[b_c]" value="' . $b['b_c'] . '"></td></tr>';
+    $output_panel.= '</table><input type="submit" value="' . $lang['a_save'] . '"></form>';
+    $output_panel.= '<p><form action="admin.php?option=banner" method="post">';
+    $output_panel.= '<input type="submit" name="reset" value="' . $lang['a_reset'] . '"></form></p>';
     $url = 'http://' . $_SERVER['SERVER_NAME'] . implode('/', array_slice(explode('/', $_SERVER['REQUEST_URI']), 0, -1)) . '/';
     $output_panel.= '<textarea readonly="readonly">' . $url . 'cache/banner.jpg</textarea>';
 }
