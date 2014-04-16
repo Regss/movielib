@@ -581,7 +581,7 @@ function create_banner($lang, $file, $data, $mysql_tables) {
         (isset($ban['episode']) ? $ban['episode'] . ' ' : '') . 
         (isset($ban['e_title']) ? $ban['e_title'] : '')
         , 1);
-    imagettfstroketext($banner, $b['o_s'], 0, $b['o_x'], $b['o_y'], $o_title_color, $stroke_color, $font, (isset($ban['originaltitle']) ? $ban['title'] : ''), 1);
+    imagettfstroketext($banner, $b['o_s'], 0, $b['o_x'], $b['o_y'], $o_title_color, $stroke_color, $font, (isset($ban['originaltitle']) ? $ban['originaltitle'] : ''), 1);
     imagettfstroketext($banner, $b['i_s'], 0, $b['i_x'], $b['i_y'], $info_color, $stroke_color, $font, 
         (isset($ban['year']) ? $ban['year'] : '') . ' | ' . 
         (isset($ban['rating']) ? $ban['rating'] : '') . ' | ' . 

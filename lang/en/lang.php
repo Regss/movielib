@@ -138,6 +138,7 @@ $lang['a_banner_size']                  =   'Size';
 $lang['a_banner_bg']                    =   'Background';
 $lang['a_banner_last_watched']          =   'Last Watched';
 $lang['a_banner_title']                 =   'Title';
+$lang['a_banner_o_title']               =   'Originaltitle';
 $lang['a_banner_info']                  =   'Info';
 $lang['a_banner_stroke']                =   'Stroke';
 $lang['a_banner_border']                =   'Border';
