@@ -512,7 +512,7 @@ function create_banner($lang, $file, $data, $mysql_tables) {
     $b['o_y']   = 51; // title pos. y
     $b['i_c']   = '808080'; // info color
     $b['i_s']   = 6; // info font size
-    $b['i_x']   = 138; // info pos. x
+    $b['i_x']   = 130; // info pos. x
     $b['i_y']   = 63; // info pos. y
     $b['st_c']  = '000000'; // stroke color
     $b['b_c']   = 'FFFFFF'; // border color
@@ -592,7 +592,7 @@ function create_banner($lang, $file, $data, $mysql_tables) {
 
     // icon
     $icon = imagecreatefrompng('admin/img/' . $table . '.png');
-    imagecopy($banner, $icon, $b['w']-26, 6, 0, 0, 20, 20);
+    imagecopy($banner, $icon, $b['w']-26, 6, 0, 0, 18, 18);
 
     // border
     $border_color = imagecolorallocate($banner, $b_c['r'], $b_c['g'], $b_c['b']);
