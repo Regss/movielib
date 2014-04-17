@@ -26,7 +26,7 @@ if ($option == 'checksettings') {
     $settings = array();
     $settings['GD'] = (extension_loaded('gd') && function_exists('gd_info') ? 'On' : 'Off');
     $settings['CURL'] = (function_exists('curl_version') ? 'On' : 'Off');
-    $settings['ALLOW_URL_FOPEN'] = (ini_get('allow_url_fopen') == 1 ? $lang['a_setting_on'] : $lang['a_setting_off']);
+    $settings['ALLOW_URL_FOPEN'] = (ini_get('allow_url_fopen') == 1 ? 'On' : 'Off');
     $settings['MAX_EXECUTION_TIME'] = ini_get('max_execution_time');
     $settings['UPLOAD_MAX_FILESIZE'] = ini_get('upload_max_filesize');
     $settings['POST_MAX_SIZE'] = ini_get('post_max_size');
@@ -49,6 +49,11 @@ if ($token == $set['token']) {
         // check allow_url_fopen
         case 'checkallowurlfopen':
             echo (ini_get('allow_url_fopen') == 1 ? 'true' : 'false');
+            break;
+        
+        // generate banner
+        case 'generatebanner':
+            create_banner($lang, 'banner.jpg', $set['banner'], $mysql_tables);
             break;
         
         /* #########

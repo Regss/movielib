@@ -1,6 +1,6 @@
 <?PHP
 
-$version = '2.5.2';
+$version = '2.5.3';
 
 if (file_exists('db.php')) {
     require('db.php');
@@ -157,6 +157,7 @@ $config_table = array(
     'show_fanart'           => 'int(1) DEFAULT 1',
     'fadeout_fanart'        => 'int(1) DEFAULT 0',
     'show_trailer'          => 'int(1) DEFAULT 1',
+    'banner'                => 'varchar(110) DEFAULT 0',
     'protect_site'          => 'int(1) DEFAULT 0',
     'token'                 => 'varchar(6) DEFAULT ""',
     'version'               => 'varchar(6) DEFAULT "' . $version . '"'
@@ -185,6 +186,11 @@ $item = array(
     'sort',
     'filter',
     'filterid',
+    'meta_title',
+    'meta_originaltitle',
+    'meta_img',
+    'meta_url',
+    'meta_plot',
     'version',
     'panel_top',
     'panel_top_last_added',

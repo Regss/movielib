@@ -468,4 +468,176 @@ function panels_array($columns, $table) {
     return $panels_array;
 }
 
+/* #################
+ * # CREATE BANNER #
+ */#################
+function create_banner($lang, $file, $data, $mysql_tables) {
+    
+    $movie_sql = 'SELECT id, title, originaltitle, year, rating, runtime, genre, country, last_played FROM ' . $mysql_tables[0] . ' ORDER BY last_played DESC LIMIT 0, 1';
+    $movie_result = mysql_query($movie_sql);
+    $movie = mysql_fetch_assoc($movie_result);
+    
+    $episode_sql = 'SELECT episode, season, tvshow, title, last_played FROM ' . $mysql_tables[2] . ' ORDER BY last_played DESC LIMIT 0, 1';
+    $episode_result = mysql_query($episode_sql);
+    $episode = mysql_fetch_assoc($episode_result);
+    $episode['e_title'] = $episode['title'];
+    unset($episode['title']);
+    
+    if (isset($episode['last_played']) && $episode['last_played'] > $movie['last_played']) {
+        $tvshow_sql = 'SELECT id, title, originaltitle, rating, genre, last_played FROM ' . $mysql_tables[1] . ' WHERE id = ' . $episode['tvshow'];
+        $tvshow_result = mysql_query($tvshow_sql);
+        $tvshow = mysql_fetch_assoc($tvshow_result);
+        $ban = array_merge($tvshow, $episode);
+        $table = $mysql_tables[1];
+    } else {
+        $ban = $movie;
+        $table = $mysql_tables[0];
+    }
+
+    $b = array();
+    $b['w']     = 400; // banner width
+    $b['h']     = 70; // banner height
+    $b['bg_c']  = '141414'; // background color
+    $b['lw_c']  = 'FFFFFF'; // last watched color
+    $b['lw_s']  = 10; // last watched font size
+    $b['lw_x']  = 130; // last watched pos. x
+    $b['lw_y']  = 20; // last watched pos. y
+    $b['t_c']   = 'FFFFFF'; // title color
+    $b['t_s']   = 8; // title font size
+    $b['t_x']   = 136; // title pos. x
+    $b['t_y']   = 36; // title pos. y
+    $b['o_c']   = 'AAAAAA'; // title color
+    $b['o_s']   = 8; // title font size
+    $b['o_x']   = 136; // title pos. x
+    $b['o_y']   = 51; // title pos. y
+    $b['i_c']   = '808080'; // info color
+    $b['i_s']   = 6; // info font size
+    $b['i_x']   = 130; // info pos. x
+    $b['i_y']   = 63; // info pos. y
+    $b['st_c']  = '000000'; // stroke color
+    $b['b_c']   = 'FFFFFF'; // border color
+
+    if ($data !== '0') {
+        $banner_array = explode(';', $data);
+        $banner = array();
+        foreach ($banner_array as $val) {
+            $i = explode(':', $val);
+            $banner[$i[0]] = $i[1];
+        }
+        $b = $banner;
+    }
+    
+    $bg_c = hex2rgb($b['bg_c']);
+    $lw_c = hex2rgb($b['lw_c']);
+    $t_c  = hex2rgb($b['t_c']);
+    $o_c  = hex2rgb($b['o_c']);
+    $i_c  = hex2rgb($b['i_c']);
+    $st_c = hex2rgb($b['st_c']);
+    $b_c  = hex2rgb($b['b_c']);
+        
+    $font = 'admin/css/font/archivonarrow.ttf';
+
+    // background
+    $banner = imagecreatetruecolor($b['w'], $b['h']);
+    $bg_color = imagecolorallocate($banner, $bg_c['r'], $bg_c['g'], $bg_c['b']);
+    imagefill($banner, 0, 0, $bg_color);
+
+    // get poster and copy
+    if (file_exists('cache/' . $table . '_' . $ban['id'] . '_f.jpg')) {
+        $post = imagecreatefromjpeg('cache/' . $table . '_' . $ban['id'] . '_f.jpg');
+    } elseif (file_exists('cache/' . $table . '_' . $ban['id'] . '.jpg')) {
+        $post = imagecreatefromjpeg('cache/' . $table . '_' . $ban['id'] . '.jpg');
+    } else {
+        $post = imagecreatefromjpeg('templates/default/img/d_poster.jpg');
+    }
+    $width = imagesx($post);
+    $height = imagesy($post);
+    $new_height = $b['h'];
+    $new_width = $width / ($height / $new_height);
+    imagecopyresampled($banner, $post, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+
+    // add gradient
+    $width = $b['h'];
+    $gradient = imagecreatetruecolor($width, $b['h']);
+    $gradient_color = imagecolorallocatealpha($gradient, $bg_c['r'], $bg_c['g'], $bg_c['b'], 127);
+    imagefill($gradient, 0, 0, $gradient_color);
+    for ($x=0; $x < $width; ++$x) {
+        $alpha = 127 - $x*(127/$width);
+        $gradient_color = imagecolorallocatealpha($gradient, $bg_c['r'], $bg_c['g'], $bg_c['b'], $alpha);
+        imageline($gradient, $x, 0, $x, $b['h'], $gradient_color);
+    }
+    imagecopyresampled($banner, $gradient, $new_width-$width, 0, 0, 0, $width, $b['h'], $width, $b['h']);
+
+    // add text
+    $last_watched_color = imagecolorallocate($banner, $lw_c['r'], $lw_c['g'], $lw_c['b']);
+    $title_color = imagecolorallocate($banner, $t_c['r'], $t_c['g'], $t_c['b']);
+    $o_title_color = imagecolorallocate($banner, $o_c['r'], $o_c['g'], $o_c['b']);
+    $info_color = imagecolorallocate($banner, $i_c['r'], $i_c['g'], $i_c['b']);
+    $stroke_color = imagecolorallocate($banner, $st_c['r'], $st_c['g'], $st_c['b']);
+    imagettfstroketext($banner, $b['lw_s'], 0, $b['lw_x'], $b['lw_y'], $last_watched_color, $stroke_color, $font, $lang['i_last_played'], 1);
+    imagettfstroketext($banner, $b['t_s'], 0, $b['t_x'], $b['t_y'], $title_color, $stroke_color, $font, 
+        (isset($ban['title']) ? $ban['title'] : '') . 
+        (isset($ban['season']) ? ' - ' . $ban['season'] . 'x' : '') . 
+        (isset($ban['episode']) ? $ban['episode'] . ' ' : '') . 
+        (isset($ban['e_title']) ? $ban['e_title'] : '')
+        , 1);
+    imagettfstroketext($banner, $b['o_s'], 0, $b['o_x'], $b['o_y'], $o_title_color, $stroke_color, $font, (isset($ban['originaltitle']) ? $ban['originaltitle'] : ''), 1);
+    imagettfstroketext($banner, $b['i_s'], 0, $b['i_x'], $b['i_y'], $info_color, $stroke_color, $font, 
+        (isset($ban['year']) ? $ban['year'] : '') . ' | ' . 
+        (isset($ban['rating']) ? $ban['rating'] : '') . ' | ' . 
+        (isset($ban['runtime']) ? $ban['runtime'] . ' ' . $lang['i_minute'] : '') . ' | ' . 
+        (isset($ban['genre']) ? $ban['genre'] : '') . ' | ' . 
+        (isset($ban['country']) ? $ban['country'] : '')
+        , 1);
+
+    // icon
+    $icon = imagecreatefrompng('admin/img/' . $table . '.png');
+    imagecopy($banner, $icon, $b['w']-26, 6, 0, 0, 18, 18);
+
+    // border
+    $border_color = imagecolorallocate($banner, $b_c['r'], $b_c['g'], $b_c['b']);
+    imageline($banner, 0, 0, $b['w']-1, 0, $border_color);
+    imageline($banner, $b['w']-1, 0, $b['w']-1, $b['h']-1, $border_color);
+    imageline($banner, 0, $b['h']-1, $b['w']-1, $b['h']-1, $border_color);
+    imageline($banner, 0, 0, 0, $b['h']-1, $border_color);
+
+    // save as file
+    imagejpeg($banner, 'cache/' . $file, 100);
+    return $b;
+}
+
+/* ################
+ * # BANNER 2 STR #
+ */################
+function banner2str($array) {
+    $banner = '';
+    foreach ($array as $key => $val) {
+        $banner.= $key . ':' . strtoupper($val) . ';';
+    }
+    return substr($banner, 0, -1);
+}
+
+/* #############
+ * # HEX 2 RGB #
+ */#############
+function hex2rgb($hex) {
+    $match = preg_match('/^[0-9abcdefABCDEF]{6}$/', $hex);
+    if ($match == true) {
+        $rgb = str_split($hex, 2);
+        $rgb = array('r' => hexdec($rgb[0]), 'g' => hexdec($rgb[1]), 'b' => hexdec($rgb[2]));
+        return $rgb;
+    } else {
+        return False;
+    }
+}
+
+/* ##########################
+ * # STROKE FOR BANNER TEXT #
+ */##########################
+function imagettfstroketext(&$image, $size, $angle, $x, $y, &$textcolor, &$strokecolor, $fontfile, $text, $px) {
+    for($c1 = ($x-abs($px)); $c1 <= ($x+abs($px)); $c1++)
+        for($c2 = ($y-abs($px)); $c2 <= ($y+abs($px)); $c2++)
+            $banner = imagettftext($image, $size, $angle, $c1, $c2, $strokecolor, $fontfile, $text);
+    return imagettftext($image, $size, $angle, $x, $y, $textcolor, $fontfile, $text);
+}
 ?>

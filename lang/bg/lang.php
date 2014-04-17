@@ -132,6 +132,16 @@ $lang['a_admin_pass_min']               =   'Администраторскат�
 $lang['a_admin_pass_n_match']           =   'Администраторската парола не съвпада';
 $lang['a_token_change']                 =   'Промени';
 $lang['a_token_changed']                =   'Токенът е променен';
+$lang['a_error_form']                   =   'Error in form';
+$lang['a_reset']                        =   'Reset';
+$lang['a_banner_size']                  =   'Size';
+$lang['a_banner_bg']                    =   'Background';
+$lang['a_banner_last_played']           =   'Last Played';
+$lang['a_banner_title']                 =   'Title';
+$lang['a_banner_o_title']               =   'Originaltitle';
+$lang['a_banner_info']                  =   'Info';
+$lang['a_banner_stroke']                =   'Stroke';
+$lang['a_banner_border']                =   'Border';
 $lang['a_html_admin_panel']             =   'Администраторски панел';
 $lang['a_html_main_site']               =   'Основният сайт';
 $lang['a_html_movie_list']              =   'Списък с филми';
@@ -139,6 +149,7 @@ $lang['a_html_tvshow_list']             =   'Списък на ТВ Сериал
 $lang['a_html_settings']                =   'Настройки';
 $lang['a_html_change_password']         =   'Промяна на паролата';
 $lang['a_html_change_token']            =   'Токен';
+$lang['a_html_banner']                  =   'Banner';    
 $lang['a_html_logout']                  =   'Отписване';
 
 /* ###############

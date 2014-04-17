@@ -99,4 +99,21 @@ if ($option  == 'hidemovie' or $option  == 'hidetvshow' or $option  == 'visiblem
     $hide_sql = 'UPDATE `' . $table . '` SET hide = ' . $hide . ' WHERE id = "' . $id . '"';
     mysql_query($hide_sql);
 }
+
+// banner
+if ($option  == 'banner') {
+    // admin permission
+    if (!isset($_SESSION['logged_admin']) or $_SESSION['logged_admin'] !== true) {
+        die('no permission');
+    }
+    require('config.php');
+    require('function.php');
+    connect($mysql_ml);
+    $set = get_settings($mysql_tables);
+    require('lang/' . $set['language'] . '/lang.php');
+    $b = create_banner($lang, 'banner_v.jpg', $_GET['banner'], $mysql_tables);
+    
+    
+}
+
 ?>

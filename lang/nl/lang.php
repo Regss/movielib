@@ -133,6 +133,16 @@ $lang['a_admin_pass_min']               =   'wachtwoord moet minimaal 4 letters 
 $lang['a_admin_pass_n_match']           =   'wachtwoorden komen niet overeen';
 $lang['a_token_change']                 =   'Veranderen';
 $lang['a_token_changed']                =   'Token aangepast';
+$lang['a_error_form']                   =   'Error in form';
+$lang['a_reset']                        =   'Reset';
+$lang['a_banner_size']                  =   'Size';
+$lang['a_banner_bg']                    =   'Background';
+$lang['a_banner_last_played']           =   'Last Played';
+$lang['a_banner_title']                 =   'Title';
+$lang['a_banner_o_title']               =   'Originaltitle';
+$lang['a_banner_info']                  =   'Info';
+$lang['a_banner_stroke']                =   'Stroke';
+$lang['a_banner_border']                =   'Border';
 $lang['a_html_admin_panel']             =   'Admin Panel';
 $lang['a_html_main_site']               =   'Hoofd pagina';
 $lang['a_html_movie_list']              =   'Filmlijst';
@@ -140,6 +150,7 @@ $lang['a_html_tvshow_list']             =   'TVshow List';
 $lang['a_html_settings']                =   'instellingen';
 $lang['a_html_change_password']         =   'Wachtwoord aanpassen';
 $lang['a_html_change_token']            =   'Token';
+$lang['a_html_banner']                  =   'Banner';    
 $lang['a_html_logout']                  =   'uitloggen';
 
 /* ###############

@@ -6,6 +6,12 @@
         <!--[if IE]>
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
         <![endif]-->
+        <meta property="og:title" content="{meta_title} / {meta_originaltitle}" />
+        <meta property="og:type" content="video.movie" />
+        <meta property="og:url" content="{meta_url}" />
+        <meta property="og:site_name" content="{SET.site_name}" />
+        <meta property="og:image" content="{meta_img}" />
+        <meta property="og:description" content="{meta_plot}" />
         <link type="image/x-icon" href="templates/{SET.theme}/img/icon.ico" rel="icon" media="all" />
         <link type="text/css" href="templates/{SET.theme}/css/style.css" rel="stylesheet" media="all" />
         <link type="text/css" href="templates/{SET.theme}/css/{include_view}.css" rel="stylesheet" media="all" />
