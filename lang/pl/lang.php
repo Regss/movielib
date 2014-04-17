@@ -132,6 +132,16 @@ $lang['a_admin_pass_min']               =   'Hasło administratora musi składa�
 $lang['a_admin_pass_n_match']           =   'Hasło administratora nie zgadza się';
 $lang['a_token_change']                 =   'Zmień';
 $lang['a_token_changed']                =   'Token zmieniony';
+$lang['a_error_form']                   =   'Błąd w formularzu';
+$lang['a_reset']                        =   'Resetuj';
+$lang['a_banner_size']                  =   'Rozmiar';
+$lang['a_banner_bg']                    =   'Tło';
+$lang['a_banner_last_played']           =   'Ostatnio oglądane';
+$lang['a_banner_title']                 =   'Tytuł';
+$lang['a_banner_o_title']               =   'Tytuł oryginalny';
+$lang['a_banner_info']                  =   'Info';
+$lang['a_banner_stroke']                =   'Kontur';
+$lang['a_banner_border']                =   'Obramowanie';
 $lang['a_html_admin_panel']             =   'Panel Administracyjny';
 $lang['a_html_main_site']               =   'Strona Główna';
 $lang['a_html_movie_list']              =   'Lista Filmów';
@@ -139,6 +149,7 @@ $lang['a_html_tvshow_list']             =   'Lista Seriali';
 $lang['a_html_settings']                =   'Ustawienia';
 $lang['a_html_change_password']         =   'Zmień Hasło';
 $lang['a_html_change_token']            =   'Token';
+$lang['a_html_banner']                  =   'Baner';    
 $lang['a_html_logout']                  =   'Wyloguj';
 
 /* ###############

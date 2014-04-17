@@ -132,6 +132,16 @@ $lang['a_admin_pass_min']               =   'Admin Passwort muss aus min. 4 Buch
 $lang['a_admin_pass_n_match']           =   'Admin Passwort stimmt nicht überein';
 $lang['a_token_change']                 =   'Ändern';
 $lang['a_token_changed']                =   'Token geändert';
+$lang['a_error_form']                   =   'Error in form';
+$lang['a_reset']                        =   'Reset';
+$lang['a_banner_size']                  =   'Size';
+$lang['a_banner_bg']                    =   'Background';
+$lang['a_banner_last_played']           =   'Last Played';
+$lang['a_banner_title']                 =   'Title';
+$lang['a_banner_o_title']               =   'Originaltitle';
+$lang['a_banner_info']                  =   'Info';
+$lang['a_banner_stroke']                =   'Stroke';
+$lang['a_banner_border']                =   'Border';
 $lang['a_html_admin_panel']             =   'Admin-Bereich';
 $lang['a_html_main_site']               =   'Übersicht';
 $lang['a_html_movie_list']              =   'Film Liste';
@@ -139,6 +149,7 @@ $lang['a_html_tvshow_list']             =   'TVshow List';
 $lang['a_html_settings']                =   'Einstellungen';
 $lang['a_html_change_password']         =   'Passwort ändern';
 $lang['a_html_change_token']            =   'Token';
+$lang['a_html_banner']                  =   'Banner';    
 $lang['a_html_logout']                  =   'Ausloggen';
 
 /* ###############
