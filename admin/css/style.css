@@ -33,7 +33,7 @@ textarea { resize:none; background-color:#222; color:#dddddd; border:1px solid #
 .text_left { text-align:left; }
 .text_right { text-align:right; }
 
-.banner { margin-top:5px; margin-bottom:20px; }
+#banner { margin-top:5px; margin-bottom:20px; }
 .ban{ width:50px; }
 
 /* INSTALL */
