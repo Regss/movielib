@@ -5,17 +5,17 @@ header('Content-type: text/html; charset=utf-8');
 require('config.php');
 require('function.php');
 
+if (!file_exists('db.php')) {
+    header('Location:install.php');
+    die();
+}
+
 // connect to database
 connect($mysql_ml);
 
 // get settings from db
 $set = get_settings($mysql_tables);
 require('lang/' . $set['language'] . '/lang.php');
-
-if (file_exists('install.php') or !file_exists('db.php')) {
-    header('Location:install.php');
-    die();
-}
 
 /* ##################
  * # CHECK PASSWORD #

@@ -13,7 +13,6 @@ a:active { color:#FFF; text-decoration:none; }
 .orange { color:#ff7300; }
 .red { color:#FF0000; }
 .green { color:#0FE800; }
-
 .animate { cursor:pointer; }
 
 input, select  { resize:none; background-color:#222; color:#dddddd; border:1px solid #000; font-size:11px; width:160px; height:20px; }
@@ -22,10 +21,8 @@ textarea { resize:none; background-color:#222; color:#dddddd; border:1px solid #
 .panel_info { border:3px solid #00cc00; background-color:#66ff33; font-weight:bold; color:#000; padding:5px; }
 
 .container { background-color:#111; border:1px solid #333; width:800px; overflow:hidden; margin:auto; padding-bottom:20px; padding-top:10px; opacity:0.9; }
-.container_install { width:300px; margin:auto; background-color:#111; border:1px solid #333; margin-top:20px; padding:10px; text-align:center; }
 
 #panel_left { float:left; width:140px; margin-left:10px; margin-top:10px; }
-
 #panel_right { text-align:center; float:right; width:630px; margin-right:10px; margin-top:10px; }
 
 .box { display:block; width:100px; font-weight:bold; border:1px solid #333; background-color:#000; margin:auto; margin-bottom:10px; padding:3px; padding-left:10px; padding-right:10px; text-align:center; }
@@ -33,8 +30,15 @@ textarea { resize:none; background-color:#222; color:#dddddd; border:1px solid #
 .table { border:1px solid #222; text-align:left; width:100%; margin-bottom:10px; }
 .table td { background-color:#000; padding:2px 5px 2px 5px; }
 .table img { display:block; margin:auto; }
-
-#banner { margin-top:5px; margin-bottom:20px; }
-.ban{ width:50px; }
 .text_left { text-align:left; }
 .text_right { text-align:right; }
+
+.banner { margin-top:5px; margin-bottom:20px; }
+.ban{ width:50px; }
+
+/* INSTALL */
+.container_install { margin:auto; }
+.container_install input, .container_install select { display:block; margin:auto; background-color:#222; color:#dddddd; border:1px solid #000; font-size:11px; width:160px; height:20px; }
+.container_install textarea { display:block; width:600px; height:420px; background-color:#111; color:#fff; border:1px solid #333; margin:auto; margin-top:10px; margin-bottom:10px; resize:none; padding:10px; }
+.title { width:300px; margin:auto; background-color:#111; border:1px solid #333; margin-top:20px; margin-bottom:20px; padding:10px; text-align:center; font-size:14px; font-weight:bold; }
+.container_install table { margin:auto; border:1px solid #222; text-align:left; width:300px; margin-bottom:10px; margin-top:10px; }
