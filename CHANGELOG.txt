@@ -1,3 +1,6 @@
+v. 2.5.4
+- fixed install process
+
 v. 2.5.3
 - added banner with last played movie or tvshow
 

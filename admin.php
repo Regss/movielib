@@ -8,12 +8,15 @@ require('function.php');
 if ($option == 'delete_install') {
     unlink('install.php');
     header('Location:admin.php');
-    die();
+    die('Can\'t redirect to admin.php');
 }
 
 if (!file_exists('db.php')) {
-    header('Location:install.php');
-    die();
+    if (file_exists('install.php')) {
+        header('Location:install.php');
+        die('Can\'t redirect to install.php');
+    }
+    die('Copy install.php file to script directory');
 }
 
 // connect to database
@@ -33,7 +36,7 @@ if (file_exists('install.php')) {
  */######################
 if ($_SESSION['logged_admin'] !== true) {
     header('Location:login.php?login=admin');
-    die();
+    die('Cant\'t redirect to login.php');
 }
 
 /* #############
