@@ -52,11 +52,8 @@ switch ($option) {
         } else {
             $license = 'No license file.';
         }
-
+        $title = $lang['ins_license'];
         $output_panel = '
-        <div class="container_install">
-            <div class="title">' . $lang['ins_license'] . '</div>
-        </div>
         <form>
             <textarea class="textera" readonly="readonly">' . $license . '</textarea>
         </form>
@@ -69,27 +66,20 @@ switch ($option) {
          * # SET DATABASE #
          */################
          if (file_exists('db.php')) {
-            $db_exist = '<div class="panel_info">' . $lang['ins_db_exist'] . '</div>';
-        } else {
-            $db_exist = '';
+            $output_panel_info.= $lang['ins_db_exist'] . '<br />';
         }
-        
-        $output_panel = $db_exist . '
-        <div class="container_install">
-            <div class="title">' . $lang['inst_conn_db'] . '</div>
-        </div>
-        <div class="container_install">
+        $title = $lang['inst_conn_db'];
+        $output_panel = '
             <form action="install.php?option=success" method="post">
-                <table class="table">
+                <table>
                     <tr><td>' . $lang['inst_server'] . ':</td><td><input type="text" name="host" value="localhost"></td></tr>
                     <tr><td>' . $lang['inst_port'] . ':</td><td><input type="text" name="port" value="3306"></td></tr>
                     <tr><td>' . $lang['inst_login'] . ':</td><td><input type="text" name="login" value="xbmc"></td></tr>
                     <tr><td>' . $lang['inst_pass'] . ':</td><td><input type="password" name="pass" value=""></td></tr>
                     <tr><td>' . $lang['inst_database'] . ':</td><td><input type="text" name="database" value="movielib"></td></tr>
-                </table><br />
+                </table>
             <input id="ok" type="submit" value="OK" />
-            </form>
-        </div>';
+            </form>';
         break;
         
     case 'success':
@@ -110,12 +100,8 @@ switch ($option) {
         $to_write = '<?PHP $mysql_ml = array(\'' . $_POST['host'] . '\', \'' . $_POST['port'] . '\', \'' . $_POST['login'] . '\', \'' . $_POST['pass'] . '\', \'' . $_POST['database'] . '\'); ?>';
         fwrite($fp, $to_write);
         fclose($fp);
-
-        $output_panel = '
-        <div class="container_install">
-            <div class="title">' . $lang['ins_finished'] . '</div>
-        </div><br />
-        <a class="box" href="admin.php?option=delete_install">' . $lang['ins_admin'] . '</a>';
+        $title = $lang['ins_finished'];
+        $output_panel = '<a class="box" href="admin.php?option=delete_install">' . $lang['ins_admin'] . '</a>';
         
         // delete session var
         $_SESSION = array();
@@ -133,21 +119,25 @@ switch ($option) {
         }
         $fp = fopen($readme_file, 'r');
         $readme = fread($fp, 88192);
-
+        $title = $lang['ins_lang_file'];
         $output_panel = '
-        <div class="container_install">
-            <div class="title">' . $lang['ins_lang_file'] . '</div>
-            <form action="install.php" method="post"><BR />
-                <select onchange="this.form.submit()" name="install_lang">' . $output_install_lang . '</select><BR />
+            <form action="install.php" method="post">
+                <select onchange="this.form.submit()" name="install_lang">' . $output_install_lang . '</select>
             </form>
-        </div>
-        <form>
-            <textarea class="textera" readonly="readonly">' . $readme . '</textarea>
-        </form>
-        <a class="box" href="install.php?option=license">' . $lang['ins_next'] . '</a>
+            <form>
+                <textarea readonly="readonly">' . $readme . '</textarea>
+            </form>
+            <a class="box" href="install.php?option=license">' . $lang['ins_next'] . '</a>
         ';
         break;
         
+}
+
+/* ##############
+ * # PANEL INFO #
+ */##############
+if ($output_panel_info !== '') {
+    $output_panel_info = '<div class="panel_info">' . $output_panel_info . '</div>';
 }
 ?>
 <!DOCTYPE HTML>
@@ -164,6 +154,10 @@ switch ($option) {
         <script type="text/javascript" src="js/jquery.script.js"></script>
     </head>
     <body>
-        <?PHP echo $output_panel ?>
+        <?PHP echo $output_panel_info ?>
+        <div class="container_install">
+            <div class="title"><?PHP echo $title ?></div>
+            <?PHP echo $output_panel ?>
+        </div>
     </body>
 </html>

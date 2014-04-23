@@ -13,14 +13,14 @@ require('lang/' . $set['language'] . '/lang.php');
 
 if (!isset($_GET['login'])) {
     header('Location:login.php?login=user');
-    die();
+    die('Login script internal error');
 }
 
 // Logout
 if ($_GET['login'] === 'admin_logout') {
     unset($_SESSION['logged_admin']);
     header('Location:index.php');
-    die();
+    die('Login script internal error');
 }
 
 // Check password
@@ -34,7 +34,7 @@ if ($_GET['login'] === 'admin') {
         if (isset($_POST['movielib_admin_pass']) && md5($_POST['movielib_admin_pass']) == $admin_check['password']) {
             $_SESSION['logged_admin'] = true;
             header('Location:admin.php');
-            die();
+            die('Login script internal error');
         } else {
             if (isset($_POST['movielib_admin_pass'])) {
                 $output = '<div class="panel_info">' . $lang['l_wrong_pass'] . '</div>';
