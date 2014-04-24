@@ -1,4 +1,10 @@
 <div id="{mysql_table}_{id}" class="movie">
+    <div class="xbmc">
+        <div id="xbmc_movie_{id}" class="xbmc_hide">
+            <img id="play" class="animate" src="templates/{SET.theme}/img/play.png">
+        </div>
+        <img src="templates/{SET.theme}/img/xbmc_h.png">
+    </div>
     <div class="title">
         <a href="index.php?id={id}&video={video}&view={view}&sort={sort}&filter={filter}&filterid={filterid}">{title}</a>
     </div>

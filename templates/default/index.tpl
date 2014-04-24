@@ -23,6 +23,19 @@
     </head>
     <body>
         <img src="templates/{SET.theme}/img/bg.jpg" id="background" alt="">
+        {SHOW.panel_remote}
+        <div id="panel_remote">
+            <div id="r_left">
+                <img id="stop" class="animate" src="templates/{SET.theme}/img/stop.png">
+                <img id="pause" class="animate" src="templates/{SET.theme}/img/pause.png">
+                <img id="v_up" class="animate" src="templates/{SET.theme}/img/v_up.png">
+                <img id="v_down" class="animate" src="templates/{SET.theme}/img/v_down.png">
+            </div>
+            <div id="r_right">
+                <img src="templates/{SET.theme}/img/xbmc_v.png">
+            </div>
+        </div>
+        {/SHOW.panel_remote}
         <div class="container">
             <div id="select_media">
                 {select_media}

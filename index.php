@@ -244,13 +244,9 @@ if ($id > 0) {
 /* ##################
  * # CONTROL REMOTE #
  */##################
-echo '
-    <div id="panel_remote">
-        <span id="stop">stop</span>
-        <span id="pause">pause</span>
-        <span id="v_up">v_up</span>
-        <span id="v_down">v_down</span>
-    </div>';
+if (isset($_SESSION['logged_admin']) && $_SESSION['logged_admin'] == true) {
+    $show['panel_remote'] = 1;
+}
 
 /* ##############
  * # MOVIE LIST #

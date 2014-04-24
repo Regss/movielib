@@ -250,9 +250,21 @@ $(document).ready(function() {
     });
     
     // control remote
-    $('#panel_remote span').click(function(){
+    $('#panel_remote').mouseenter(function(){
+        $(this).animate({marginLeft: '10px'}, {queue: false, duration: 500});
+    });
+    $('#panel_remote').mouseleave(function(){
+        $(this).animate({marginLeft: '-76px'}, {queue: false, duration: 500});
+    });
+    $('#panel_remote img').click(function(){
         var act = $(this).attr('id');
         $.ajax({url: 'function.js.php?option=remote&f='+act});
+    });
+    $('.xbmc').mouseenter(function(){
+        $(this).children('div').show({queue: false, duration: 500});
+    });
+    $('.xbmc').mouseleave(function(){
+        $(this).children('div').hide({queue: false, duration: 500});
     });
     
     // admin visible - hidden

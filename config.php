@@ -200,6 +200,7 @@ $item = array(
     'overall_all',
     'overall_watched',
     'overall_unwatched',
+    'panel_remote',
     'panel_genre',
     'panel_year',
     'panel_country',
