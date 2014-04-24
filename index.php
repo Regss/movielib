@@ -241,6 +241,17 @@ if ($id > 0) {
     $show['panel_filter'] = 1;
 }
 
+/* ##################
+ * # CONTROL REMOTE #
+ */##################
+echo '
+    <div id="panel_remote">
+        <span id="stop">stop</span>
+        <span id="pause">pause</span>
+        <span id="v_up">v_up</span>
+        <span id="v_down">v_down</span>
+    </div>';
+
 /* ##############
  * # MOVIE LIST #
  */##############

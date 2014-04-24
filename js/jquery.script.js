@@ -249,6 +249,12 @@ $(document).ready(function() {
         $('.episode_plot').dequeue().hide();
     });
     
+    // control remote
+    $('#panel_remote span').click(function(){
+        var act = $(this).attr('id');
+        $.ajax({url: 'function.js.php?option=remote&f='+act});
+    });
+    
     // admin visible - hidden
     $(document).on('click', '.visible', function(){
         var id = $(this).parent().parent().attr('id');

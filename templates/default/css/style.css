@@ -62,4 +62,7 @@ input.search { width:250px; }
 
 #panel_list { overflow:hidden; }
 
+#panel_remote { width:100px; height:400px; background-color:#000; border:1px solid #333; position:fixed; }
+#panel_remote span { display:block; cursor:pointer; height:20px; }
+
 #panel_bottom { bottom:0px; text-align:right; color:#999; background-color:#111; margin-top:20px; padding:3px; padding-right:20px; }

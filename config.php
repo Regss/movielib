@@ -1,6 +1,6 @@
 <?PHP
 
-$version = '2.5.4';
+$version = '2.5.5';
 
 if (file_exists('db.php')) {
     require('db.php');
@@ -244,6 +244,14 @@ $item_desc = array(
     'seasons',
     'episodes',
     'episodes_plot'
+);
+
+// JSON function
+$json_f = array(
+    'stop'      => array('p' => '"playerid": 1', 'm' => 'Player.Stop'),
+    'pause'     => array('p' => '"playerid": 1', 'm' => 'Player.PlayPause'),
+    'v_up'      => array('p' => '"action": "volumeup"', 'm' => 'Input.ExecuteAction'),
+    'v_down'    => array('p' => '"action": "volumedown"', 'm' => 'Input.ExecuteAction')
 );
 
 // Set var

@@ -49,6 +49,19 @@ if ($option == 'searchmovie' or $option == 'searchtvshow') {
     echo json_encode($json_assoc);
 }
 
+// remote control
+if ($option  == 'remote') {
+    // admin permission
+    if (!isset($_SESSION['logged_admin']) or $_SESSION['logged_admin'] !== true) {
+        die('no permission');
+    }
+    require('config.php');
+    $f = $_GET['f'];
+    $json = urlencode('{"jsonrpc": "2.0", "params": {' . $json_f[$f]['p'] . '}, "method": "' . $json_f[$f]['m'] . '", "id": 1}');
+    $get = file_get_contents('http://xbmc:xbmc@192.168.1.201:8080/jsonrpc?request=' . $json);
+    file_put_contents('ble.txt', $json . "\n\r" . $get);
+}
+
 // delete movie or tvshow
 if ($option  == 'deletemovie' or $option  == 'deletetvshow') {
     // admin permission
@@ -112,8 +125,6 @@ if ($option  == 'banner') {
     $set = get_settings($mysql_tables);
     require('lang/' . $set['language'] . '/lang.php');
     $b = create_banner($lang, 'banner_v.jpg', $_GET['banner'], $mysql_tables);
-    
-    
 }
 
 ?>
