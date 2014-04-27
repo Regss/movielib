@@ -252,6 +252,7 @@ $(document).ready(function() {
     // control remote
     $('#panel_remote').mouseenter(function(){
         $(this).animate({marginLeft: '10px'}, {queue: false, duration: 500});
+        $.ajax({url: 'function.js.php?option=remote&f=playing'});
     });
     $('#panel_remote').mouseleave(function(){
         $(this).animate({marginLeft: '-76px'}, {queue: false, duration: 500});
@@ -265,6 +266,12 @@ $(document).ready(function() {
     });
     $('.xbmc').mouseleave(function(){
         $(this).children('div').hide({queue: false, duration: 500});
+    });
+    $('.xbmc_hide img').click(function(){
+        var act = $(this).attr('id');
+        var id = $(this).parent().attr('id');
+        alert(act + id);
+        $.ajax({url: 'function.js.php?option=remote&f='+act+'&id='+id});
     });
     
     // admin visible - hidden

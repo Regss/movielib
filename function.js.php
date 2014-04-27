@@ -56,10 +56,19 @@ if ($option  == 'remote') {
         die('no permission');
     }
     require('config.php');
+    require('function.php');
+    $set = get_settings($mysql_tables);
     $f = $_GET['f'];
-    $json = urlencode('{"jsonrpc": "2.0", "params": {' . $json_f[$f]['p'] . '}, "method": "' . $json_f[$f]['m'] . '", "id": 1}');
-    $get = file_get_contents('http://xbmc:xbmc@192.168.1.201:8080/jsonrpc?request=' . $json);
+    if ($f == 'play') {
+        $id = $_GET['id'];
+        $json = urlencode('{"jsonrpc": "2.0", "params": {"item": {"movieid": 457}}, "method": "' . $json_f[$f]['m'] . '", "id": 1}');
+    } else {
+        $json = urlencode('{"jsonrpc": "2.0", "params": {' . $json_f[$f]['p'] . '}, "method": "' . $json_f[$f]['m'] . '", "id": 1}');
+    }
+    $get = file_get_contents('http://xbmc:xbmc@' . $set['xbmc_host'] . ':' . $set['xbmc_port'] . '/jsonrpc?request=' . $json);
+    
     file_put_contents('ble.txt', $json . "\n\r" . $get);
+    return $get;
 }
 
 // delete movie or tvshow
@@ -70,15 +79,15 @@ if ($option  == 'deletemovie' or $option  == 'deletetvshow') {
     }
     require('config.php');
     require('function.php');
+    connect($mysql_ml);
     $id = $_GET['id'];
     if ($option  == 'deletemovie') {
         $table = $mysql_tables[0];
     } else {
         $table = $mysql_tables[1];
-        $delete_sql = 'DELETE FROM ' . $table . ' WHERE tvshow = "' . $id . '"';
+        $delete_sql = 'DELETE FROM ' . $mysql_tables[2] . ' WHERE tvshow = "' . $id . '"';
         mysql_query($delete_sql);
     }
-    connect($mysql_ml);
     $delete_sql = 'DELETE FROM ' . $table . ' WHERE id = "' . $id . '"';
     if (file_exists('cache/' . $table . '_' . $id . '.jpg')) {
         unlink('cache/' . $table . '_' . $id . '.jpg');

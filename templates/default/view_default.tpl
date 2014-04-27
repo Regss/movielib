@@ -1,6 +1,6 @@
 <div id="{mysql_table}_{id}" class="movie">
     <div class="xbmc">
-        <div id="xbmc_movie_{id}" class="xbmc_hide">
+        <div id="{id}" class="xbmc_hide">
             <img id="play" class="animate" src="templates/{SET.theme}/img/play.png">
         </div>
         <img src="templates/{SET.theme}/img/xbmc_h.png">

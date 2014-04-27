@@ -102,6 +102,7 @@ $movies_table = array(
     'v_duration'            => 'int(11) NOT NULL',
     'a_codec'               => 'varchar(255) NOT NULL',
     'a_chan'                => 'int(11) NOT NULL',
+    'file'                  => 'varchar(255) NOT NULL',
     'play_count'            => 'int(11) NOT NULL',
     'last_played'           => 'varchar(20) NOT NULL',
     'date_added'            => 'varchar(20) NOT NULL',
@@ -129,6 +130,7 @@ $episodes_table = array(
     'season'                => 'int(6) NOT NULL',
     'tvshow'                => 'int(6) NOT NULL',
     'firstaired'            => 'varchar(20) NOT NULL',
+    'file'                  => 'varchar(255) NOT NULL',
     'play_count'            => 'int(11) NOT NULL',
     'last_played'           => 'varchar(20) NOT NULL',
     'date_added'            => 'varchar(20) NOT NULL'
@@ -160,6 +162,8 @@ $config_table = array(
     'banner'                => 'varchar(200) DEFAULT 0',
     'protect_site'          => 'int(1) DEFAULT 0',
     'token'                 => 'varchar(6) DEFAULT ""',
+    'xbmc_host'             => 'varchar(30) DEFAULT ""',
+    'xbmc_port'             => 'varchar(5) DEFAULT ""',
     'version'               => 'varchar(6) DEFAULT "' . $version . '"'
 );
 $users_table = array(
@@ -249,10 +253,12 @@ $item_desc = array(
 
 // JSON function
 $json_f = array(
+    'play'      => array('p' => '', 'm' => 'Player.Open'),
     'stop'      => array('p' => '"playerid": 1', 'm' => 'Player.Stop'),
     'pause'     => array('p' => '"playerid": 1', 'm' => 'Player.PlayPause'),
     'v_up'      => array('p' => '"action": "volumeup"', 'm' => 'Input.ExecuteAction'),
-    'v_down'    => array('p' => '"action": "volumedown"', 'm' => 'Input.ExecuteAction')
+    'v_down'    => array('p' => '"action": "volumedown"', 'm' => 'Input.ExecuteAction'),
+    'playing'   => array('p' => '"playerid": 1', 'm' => 'Player.GetItem')
 );
 
 // Set var

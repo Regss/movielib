@@ -62,7 +62,7 @@ input.search { width:250px; }
 
 #panel_list { overflow:hidden; }
 
-#panel_remote { width:100px; background-color:#000; border:1px solid #333; position:fixed; margin-top:100px; margin-left:-76px; border-top-left-radius:10px; border-top-right-radius:10px; border-bottom-right-radius:10px; border-bottom-left-radius:10px; }
+#panel_remote { width:100px; background-color:#000; border:1px solid #333; position:fixed; margin-top:100px; margin-left:-76px; z-index:4; border-top-left-radius:10px; border-top-right-radius:10px; border-bottom-right-radius:10px; border-bottom-left-radius:10px; }
 #panel_remote img { display:block; cursor:pointer; float:left; padding:2px; }
 #r_left { float:left; padding:4px; width:60px; }
 #r_right { float:right; padding:4px; }
