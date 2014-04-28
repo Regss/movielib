@@ -1,7 +1,9 @@
 <div id="{mysql_table}_{id}" class="movie">
     <div class="xbmc">
         <div id="{id}" class="xbmc_hide">
-            <img id="play" class="animate" src="templates/{SET.theme}/img/play.png">
+            <img class="play animate" src="templates/{SET.theme}/img/play.png">
+            <a href="{file}"><img class="download animate" src="templates/{SET.theme}/img/download.png"></a>
+            <a id="{file}" href="cache/list.m3u"><img class="list animate" src="templates/{SET.theme}/img/list.png"></a>
         </div>
         <img src="templates/{SET.theme}/img/xbmc_h.png">
     </div>

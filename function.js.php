@@ -58,17 +58,44 @@ if ($option  == 'remote') {
     require('config.php');
     require('function.php');
     $set = get_settings($mysql_tables);
-    $f = $_GET['f'];
-    if ($f == 'play') {
+    if ($_GET['f'] == 'list') {
+        file_put_contents('cache/list.m3u', $_GET['file']);
+    } elseif ($_GET['f'] == 'play') {
         $id = $_GET['id'];
-        $json = urlencode('{"jsonrpc": "2.0", "params": {"item": {"movieid": 457}}, "method": "' . $json_f[$f]['m'] . '", "id": 1}');
+        $json = urlencode('{"jsonrpc": "2.0", "params": {"item": {"movieid": ' . $id . '}}, "method": "' . $json_f[$f]['m'] . '", "id": 1}');
     } else {
         $json = urlencode('{"jsonrpc": "2.0", "params": {' . $json_f[$f]['p'] . '}, "method": "' . $json_f[$f]['m'] . '", "id": 1}');
     }
-    $get = file_get_contents('http://xbmc:xbmc@' . $set['xbmc_host'] . ':' . $set['xbmc_port'] . '/jsonrpc?request=' . $json);
     
-    file_put_contents('ble.txt', $json . "\n\r" . $get);
-    return $get;
+    switch ($_GET['f']) {
+        case 'list':
+            file_put_contents('cache/list.m3u', $_GET['file']);
+            break;
+        case 'play':
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"item": {"movieid": ' . $_GET['id'] . '}}, "method": "Player.Open", "id": 1}');
+            break;
+        case 'stop':
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"playerid": 1}, "method": "Player.Stop", "id": 1}');
+            break;
+        case 'pause':
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"playerid": 1}, "method": "Player.PlayPause');
+            break;
+        case 'v_up':
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"action": "volumeup"}, "method": "Input.ExecuteAction');
+            break;
+        case 'v_down':
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"action": "volumedown"}, "method": "Input.ExecuteAction');
+            break;
+        case 'playing':
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"playerid": 1}, "method": "Player.GetItem');
+            break;
+    }
+    if (isset($json)) {
+        $get = file_get_contents('http://xbmc:xbmc@' . $set['xbmc_host'] . ':' . $set['xbmc_port'] . '/jsonrpc?request=' . $json);
+        
+        file_put_contents('ble.txt', $json . "\n\r" . $get);
+        echo $get;
+    }
 }
 
 // delete movie or tvshow

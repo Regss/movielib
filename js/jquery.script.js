@@ -252,26 +252,41 @@ $(document).ready(function() {
     // control remote
     $('#panel_remote').mouseenter(function(){
         $(this).animate({marginLeft: '10px'}, {queue: false, duration: 500});
-        $.ajax({url: 'function.js.php?option=remote&f=playing'});
+        $.getJSON('function.js.php?option=remote&f=playing', function(data){
+            if ('result' in data) {
+                $('#now_playing').html('<img src="cache/' + data['result']['item']['type'] + 's_' + data['result']['item']['id'] + '.jpg">');
+            } else {
+                $('#now_playing').html('');
+            }
+        });
+        
     });
     $('#panel_remote').mouseleave(function(){
         $(this).animate({marginLeft: '-76px'}, {queue: false, duration: 500});
+        $('#now_playing').html('');
     });
     $('#panel_remote img').click(function(){
         var act = $(this).attr('id');
         $.ajax({url: 'function.js.php?option=remote&f='+act});
     });
     $('.xbmc').mouseenter(function(){
-        $(this).children('div').show({queue: false, duration: 500});
+        $(this).children('div').toggle({queue: false, duration: 500});
     });
     $('.xbmc').mouseleave(function(){
-        $(this).children('div').hide({queue: false, duration: 500});
+        $(this).children('div').toggle({queue: false, duration: 500});
     });
-    $('.xbmc_hide img').click(function(){
-        var act = $(this).attr('id');
-        var id = $(this).parent().attr('id');
-        alert(act + id);
-        $.ajax({url: 'function.js.php?option=remote&f='+act+'&id='+id});
+    
+    // create list.m3u
+    $('.list').mouseenter(function(){
+        var file = $(this).parent().attr('id');
+        var id = $(this).parent().parent().attr('id');
+        $.ajax({url: 'function.js.php?option=remote&f=list&id='+id+'&file='+file});
+    });
+    
+    // play movie in xbmc
+    $('.play').click(function(){
+        var id = $(this).parent().parent().attr('id');
+        $.ajax({url: 'function.js.php?option=remote&f=play&id='+id});
     });
     
     // admin visible - hidden

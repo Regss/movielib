@@ -229,6 +229,7 @@ $item_desc = array(
     'filterid',
     'title',
     'originaltitle',
+    'file',
     'watched_img',
     'genre',
     'rating',

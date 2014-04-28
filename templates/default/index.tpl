@@ -34,6 +34,7 @@
             <div id="r_right">
                 <img src="templates/{SET.theme}/img/xbmc_v.png">
             </div>
+            <div id="now_playing"></div>
         </div>
         {/SHOW.panel_remote}
         <div class="container">

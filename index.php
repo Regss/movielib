@@ -299,6 +299,9 @@ while ($list = mysql_fetch_array($list_result)) {
         $output_desc['originaltitle'] = $list['originaltitle'];
     }
     
+    // file
+    $output_desc['file'] = 'http://' . $set['xbmc_host'] . ':' . $set['xbmc_port'] . '/vfs/' . urlencode($list['file']);
+    
     // poster
     $poster = 'cache/' . $mysql_table . '_' . $list['id'] . '.jpg';
     if (!file_exists($poster)) {
