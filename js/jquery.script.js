@@ -251,19 +251,20 @@ $(document).ready(function() {
     
     // control remote
     $('#panel_remote').mouseenter(function(){
-        $(this).animate({marginLeft: '10px'}, {queue: false, duration: 500});
         $.getJSON('function.js.php?option=remote&f=playing', function(data){
-            if ('result' in data) {
-                $('#now_playing').html('<img src="cache/' + data['result']['item']['type'] + 's_' + data['result']['item']['id'] + '.jpg">');
-            } else {
-                $('#now_playing').html('');
-            }
+            $('#panel_remote').animate({marginLeft: '10px'}, {queue: false, duration: 500, complete: function(){
+                if ('result' in data) {
+                    $('#now_playing').html('<img src="cache/' + data['result']['item']['type'] + 's_' + data['result']['item']['id'] + '.jpg">');
+                    $('#now_playing').animate({opacity: '1'}, {queue: false, duration: 200});
+                }
+            }});
         });
-        
     });
     $('#panel_remote').mouseleave(function(){
-        $(this).animate({marginLeft: '-76px'}, {queue: false, duration: 500});
-        $('#now_playing').html('');
+        $(this).animate({marginLeft: '-76px'}, {queue: false, duration: 500, complete: function(){
+            $('#now_playing').animate({opacity: '0'}, {queue: false, duration: 200});
+        }});
+        
     });
     $('#panel_remote img').click(function(){
         var act = $(this).attr('id');
@@ -285,7 +286,7 @@ $(document).ready(function() {
     
     // play movie in xbmc
     $('.play').click(function(){
-        var id = $(this).parent().parent().attr('id');
+        var id = $(this).parent().attr('id');
         $.ajax({url: 'function.js.php?option=remote&f=play&id='+id});
     });
     

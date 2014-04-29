@@ -30,12 +30,18 @@
                 <img id="pause" class="animate" src="templates/{SET.theme}/img/pause.png">
                 <img id="v_up" class="animate" src="templates/{SET.theme}/img/v_up.png">
                 <img id="v_down" class="animate" src="templates/{SET.theme}/img/v_down.png">
+                <img id="stepback" class="animate" src="templates/{SET.theme}/img/stepback.png">
+                <img id="stepforward" class="animate" src="templates/{SET.theme}/img/stepforward.png">
+                <img id="bigstepback" class="animate" src="templates/{SET.theme}/img/bigstepback.png">
+                <img id="bigstepforward" class="animate" src="templates/{SET.theme}/img/bigstepforward.png">
             </div>
             <div id="r_right">
                 <img src="templates/{SET.theme}/img/xbmc_v.png">
             </div>
-            <div id="now_playing"></div>
+            
         </div>
+        <div id="now_playing"></div>
+        
         {/SHOW.panel_remote}
         <div class="container">
             <div id="select_media">

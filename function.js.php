@@ -58,14 +58,6 @@ if ($option  == 'remote') {
     require('config.php');
     require('function.php');
     $set = get_settings($mysql_tables);
-    if ($_GET['f'] == 'list') {
-        file_put_contents('cache/list.m3u', $_GET['file']);
-    } elseif ($_GET['f'] == 'play') {
-        $id = $_GET['id'];
-        $json = urlencode('{"jsonrpc": "2.0", "params": {"item": {"movieid": ' . $id . '}}, "method": "' . $json_f[$f]['m'] . '", "id": 1}');
-    } else {
-        $json = urlencode('{"jsonrpc": "2.0", "params": {' . $json_f[$f]['p'] . '}, "method": "' . $json_f[$f]['m'] . '", "id": 1}');
-    }
     
     switch ($_GET['f']) {
         case 'list':
@@ -78,21 +70,33 @@ if ($option  == 'remote') {
             $json = urlencode('{"jsonrpc": "2.0", "params": {"playerid": 1}, "method": "Player.Stop", "id": 1}');
             break;
         case 'pause':
-            $json = urlencode('{"jsonrpc": "2.0", "params": {"playerid": 1}, "method": "Player.PlayPause');
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"playerid": 1}, "method": "Player.PlayPause", "id": 1}');
             break;
         case 'v_up':
-            $json = urlencode('{"jsonrpc": "2.0", "params": {"action": "volumeup"}, "method": "Input.ExecuteAction');
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"action": "volumeup"}, "method": "Input.ExecuteAction", "id": 1}');
             break;
         case 'v_down':
-            $json = urlencode('{"jsonrpc": "2.0", "params": {"action": "volumedown"}, "method": "Input.ExecuteAction');
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"action": "volumedown"}, "method": "Input.ExecuteAction", "id": 1}');
+            break;
+        case 'stepforward':
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"action": "stepforward"}, "method": "Input.ExecuteAction", "id": 1}');
+            break;
+        case 'stepback':
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"action": "stepback"}, "method": "Input.ExecuteAction", "id": 1}');
+            break;
+        case 'bigstepforward':
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"action": "bigstepforward"}, "method": "Input.ExecuteAction", "id": 1}');
+            break;
+        case 'bigstepback':
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"action": "bigstepback"}, "method": "Input.ExecuteAction", "id": 1}');
             break;
         case 'playing':
-            $json = urlencode('{"jsonrpc": "2.0", "params": {"playerid": 1}, "method": "Player.GetItem');
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"playerid": 1}, "method": "Player.GetItem", "id": 1}');
             break;
     }
+    
     if (isset($json)) {
         $get = file_get_contents('http://xbmc:xbmc@' . $set['xbmc_host'] . ':' . $set['xbmc_port'] . '/jsonrpc?request=' . $json);
-        
         file_put_contents('ble.txt', $json . "\n\r" . $get);
         echo $get;
     }
