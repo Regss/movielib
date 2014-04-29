@@ -230,6 +230,7 @@ $item_desc = array(
     'title',
     'originaltitle',
     'file',
+    'xbmc',
     'watched_img',
     'genre',
     'rating',

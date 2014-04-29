@@ -93,6 +93,10 @@ if ($option  == 'remote') {
         case 'playing':
             $json = urlencode('{"jsonrpc": "2.0", "params": {"playerid": 1}, "method": "Player.GetItem", "id": 1}');
             break;
+        case 'check':
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"labels": ["System.BuildVersion"]}, "method": "XBMC.GetInfoLabels", "id": 1}');
+            break;
+            
     }
     
     if (isset($json)) {

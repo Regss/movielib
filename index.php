@@ -293,6 +293,11 @@ while ($list = mysql_fetch_array($list_result)) {
     $show_desc['video']           = 1;
     $show_desc['title']           = 1;
     
+    if (isset($_SESSION['logged_admin']) && $_SESSION['logged_admin'] == true) {
+        $show_desc['xbmc'] = 1;
+    }
+
+    
     // originaltitle
     if ($list['originaltitle'] !== '') {
         $show_desc['originaltitle'] = 1;

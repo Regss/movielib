@@ -251,30 +251,37 @@ $(document).ready(function() {
     
     // control remote
     $('#panel_remote').mouseenter(function(){
-        $.getJSON('function.js.php?option=remote&f=playing', function(data){
-            $('#panel_remote').animate({marginLeft: '10px'}, {queue: false, duration: 500, complete: function(){
+        $('#panel_remote').animate({marginLeft: '10px'}, {queue: false, duration: 500, complete: function(){
+            var theme = $('#r_right img').attr('id');
+            $('#r_right img').attr('src', 'templates/'+theme+'/img/xbmc_vd.png');
+            $.getJSON('function.js.php?option=remote&f=playing', function(data){
+                $('#r_right img').attr('src', 'templates/'+theme+'/img/xbmc_v.png');
                 if ('result' in data) {
                     $('#now_playing').html('<img src="cache/' + data['result']['item']['type'] + 's_' + data['result']['item']['id'] + '.jpg">');
                     $('#now_playing').animate({opacity: '1'}, {queue: false, duration: 200});
                 }
-            }});
-        });
+            });
+        }});
     });
     $('#panel_remote').mouseleave(function(){
-        $(this).animate({marginLeft: '-76px'}, {queue: false, duration: 500, complete: function(){
+        $(this).animate({marginLeft: '-70px'}, {queue: false, duration: 500, complete: function(){
             $('#now_playing').animate({opacity: '0'}, {queue: false, duration: 200});
         }});
         
     });
+    
+    // button remote
     $('#panel_remote img').click(function(){
         var act = $(this).attr('id');
         $.ajax({url: 'function.js.php?option=remote&f='+act});
     });
+    
+    // panel desc
     $('.xbmc').mouseenter(function(){
-        $(this).children('div').toggle({queue: false, duration: 500});
+        $(this).children('div').animate({height: '30px'}, {queue: false, duration: 500});
     });
     $('.xbmc').mouseleave(function(){
-        $(this).children('div').toggle({queue: false, duration: 500});
+        $(this).children('div').animate({height: '0px'}, {queue: false, duration: 500});
     });
     
     // create list.m3u

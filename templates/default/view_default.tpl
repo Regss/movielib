@@ -1,4 +1,5 @@
 <div id="{mysql_table}_{id}" class="movie">
+    {SHOW.xbmc}
     <div class="xbmc">
         <div id="{id}" class="xbmc_hide">
             <img class="play animate" src="templates/{SET.theme}/img/play.png">
@@ -7,6 +8,7 @@
         </div>
         <img src="templates/{SET.theme}/img/xbmc_h.png">
     </div>
+    {/SHOW.xbmc}
     <div class="title">
         <a href="index.php?id={id}&video={video}&view={view}&sort={sort}&filter={filter}&filterid={filterid}">{title}</a>
     </div>

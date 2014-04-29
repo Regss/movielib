@@ -36,7 +36,7 @@
                 <img id="bigstepforward" class="animate" src="templates/{SET.theme}/img/bigstepforward.png">
             </div>
             <div id="r_right">
-                <img src="templates/{SET.theme}/img/xbmc_v.png">
+                <img id="{SET.theme}" src="templates/{SET.theme}/img/xbmc_vd.png">
             </div>
             
         </div>
