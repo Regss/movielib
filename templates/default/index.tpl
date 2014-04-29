@@ -36,12 +36,10 @@
                 <img id="bigstepforward" class="animate" src="templates/{SET.theme}/img/bigstepforward.png">
             </div>
             <div id="r_right">
-                <img id="{SET.theme}" src="templates/{SET.theme}/img/xbmc_vd.png">
+                <img src="templates/{SET.theme}/img/xbmc_vd.png">
             </div>
-            
         </div>
-        <div id="now_playing"></div>
-        
+        <div id="now_playing"><span>Now Playing...</span><div></div></div>
         {/SHOW.panel_remote}
         <div class="container">
             <div id="select_media">

@@ -66,7 +66,8 @@ input.search { width:250px; }
 #r_left { float:left; margin:6px; width:60px; }
 #r_left img { display:block; cursor:pointer; float:left; margin:2px; }
 #r_right { float:right; margin-top:8px; margin-right:8px; }
-#now_playing { opacity:0; width:100px; background-color:#000; border:1px solid #333; position:fixed; margin-top:250px; margin-left:10px; z-index:4; border-top-left-radius:10px; border-top-right-radius:10px; border-bottom-right-radius:10px; border-bottom-left-radius:10px; }
-#now_playing img { display:block; width:80px; border: 1px solid #fff; margin:auto; margin-top:10px; margin-bottom:10px; }
+#now_playing { width:100px; background-color:#000; border:1px solid #333; position:fixed; margin-top:250px; margin-left:-110px; z-index:4; border-top-left-radius:10px; border-top-right-radius:10px; border-bottom-right-radius:10px; border-bottom-left-radius:10px; }
+#now_playing img { display:block; width:80px; border: 1px solid #fff; margin:auto; margin-top:5px; margin-bottom:10px; }
+#now_playing span { display:block; margin:5px 10px 0px 10px; font-weight:bold; color:#ff7300; }
 
 #panel_bottom { bottom:0px; text-align:right; color:#999; background-color:#111; margin-top:20px; padding:3px; padding-right:20px; }

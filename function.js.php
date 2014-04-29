@@ -11,7 +11,8 @@ if ($option == 'settings') {
     $set_js = array(
         'show_fanart'       => $set['show_fanart'],
         'fadeout_fanart'    => $set['fadeout_fanart'],
-        'panel_top_time'    => $set['panel_top_time']
+        'panel_top_time'    => $set['panel_top_time'],
+        'theme'             => $set['theme']
     );
     echo json_encode($set_js);
 }
@@ -91,14 +92,30 @@ if ($option  == 'remote') {
             $json = urlencode('{"jsonrpc": "2.0", "params": {"action": "bigstepback"}, "method": "Input.ExecuteAction", "id": 1}');
             break;
         case 'playing':
-            $json = urlencode('{"jsonrpc": "2.0", "params": {"playerid": 1}, "method": "Player.GetItem", "id": 1}');
+            $json2 = urlencode('{"jsonrpc": "2.0", "params": {"playerid": 1}, "method": "Player.GetItem", "id": 1}');
+            $get = file_get_contents('http://xbmc:xbmc@' . $set['xbmc_host'] . ':' . $set['xbmc_port'] . '/jsonrpc?request=' . $json2);
+            $j = json_decode($get, true);
+            if ($j['result']['item']['type'] == 'episode') {
+                $json2 = urlencode('{"jsonrpc": "2.0", "params": {"episodeid": ' . $j['result']['item']['id'] . ', "properties": ["tvshowid", "title"]}, "method": "VideoLibrary.GetEpisodeDetails", "id": 1}');
+                $get = file_get_contents('http://xbmc:xbmc@' . $set['xbmc_host'] . ':' . $set['xbmc_port'] . '/jsonrpc?request=' . $json2);
+                $j2 = json_decode($get, true);
+                $j['result']['item']['type'] = 'tvshows';
+                $j['result']['item']['id'] = $j2['result']['episodedetails']['tvshowid'];
+                $j['result']['item']['title'] = $j2['result']['episodedetails']['title'];
+                echo json_encode($j);
+            } else {
+                $json2 = urlencode('{"jsonrpc": "2.0", "params": {"movieid": ' . $j['result']['item']['id'] . ', "properties": ["title"]}, "method": "VideoLibrary.GetMovieDetails", "id": 1}');
+                $get = file_get_contents('http://xbmc:xbmc@' . $set['xbmc_host'] . ':' . $set['xbmc_port'] . '/jsonrpc?request=' . $json2);
+                $j2 = json_decode($get, true);
+                $j['result']['item']['type'] = 'movies';
+                $j['result']['item']['title'] = $j2['result']['moviedetails']['title'];
+                echo json_encode($j);
+            }
             break;
         case 'check':
             $json = urlencode('{"jsonrpc": "2.0", "params": {"labels": ["System.BuildVersion"]}, "method": "XBMC.GetInfoLabels", "id": 1}');
-            break;
-            
+            break;       
     }
-    
     if (isset($json)) {
         $get = file_get_contents('http://xbmc:xbmc@' . $set['xbmc_host'] . ':' . $set['xbmc_port'] . '/jsonrpc?request=' . $json);
         file_put_contents('ble.txt', $json . "\n\r" . $get);
