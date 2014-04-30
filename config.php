@@ -164,6 +164,8 @@ $config_table = array(
     'token'                 => 'varchar(6) DEFAULT ""',
     'xbmc_host'             => 'varchar(30) DEFAULT ""',
     'xbmc_port'             => 'varchar(5) DEFAULT ""',
+    'xbmc_login'            => 'varchar(30) DEFAULT ""',
+    'xbmc_pass'             => 'varchar(30) DEFAULT ""',
     'version'               => 'varchar(6) DEFAULT "' . $version . '"'
 );
 $users_table = array(
@@ -231,6 +233,7 @@ $item_desc = array(
     'originaltitle',
     'file',
     'xbmc',
+    'xbmc_episode',
     'watched_img',
     'genre',
     'rating',

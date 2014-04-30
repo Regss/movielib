@@ -138,7 +138,7 @@
                     <a href="index.php?video={video}&view={view}&sort={sort}&filter={filter}&filterid={filterid}"><img id="filter_delete_img" class="animate" src="templates/{SET.theme}/img/delete.png" title="{LANG.i_del_result}" alt=""></a>
                 </div>
                 {/SHOW.panel_filter}
-                <div id="panel_list">
+                <div id="panel_list" class="{video}">
                     {panel_list}
                 </div>
                 <div id="panel_nav">

@@ -237,16 +237,16 @@ $(document).ready(function() {
     });
     
     // episode plot toggle
-    $('.episode').mouseenter(function(){
-        var e_id = $(this).attr('id');
-        $(this).mousemove(function(event) {
+    $('.plot').mouseenter(function(){
+        var e_id = $(this).parent().attr('id');
+        $(this).parent().mousemove(function(event) {
             var posX = event.pageX;
             var posY = event.pageY;
             $('#plot_'+e_id).css({'top': posY+10, 'left': posX-100});
         });
         $('#plot_'+e_id).delay(500).show(0);
     });
-    $('.episode').mouseleave(function(){
+    $('.plot').mouseleave(function(){
         $('.episode_plot').dequeue().hide();
     });
     
@@ -257,8 +257,10 @@ $(document).ready(function() {
             $.getJSON('function.js.php?option=remote&f=playing', function(data){
                 check = true;
                 if ('result' in data) {
-                    $('#now_playing div').html('<img src="cache/' + data['result']['item']['type'] + '_' + data['result']['item']['id'] + '.jpg" title="' + data['result']['item']['title'] + '">');
-                    $('#now_playing').animate({marginLeft: '10px'}, {queue: false, duration: 500});
+                    $.ajax({url: 'cache/' + data['result']['item']['type'] + '_' + data['result']['item']['id'] + '.jpg', success: function(){
+                        $('#now_playing div').html('<img src="cache/' + data['result']['item']['type'] + '_' + data['result']['item']['id'] + '.jpg" title="' + data['result']['item']['title'] + '">');
+                        $('#now_playing').animate({marginLeft: '10px'}, {queue: false, duration: 500});
+                    }});
                 }
             });
         }});
@@ -307,7 +309,8 @@ $(document).ready(function() {
     // play movie in xbmc
     $('.play').click(function(){
         var id = $(this).parent().attr('id');
-        $.ajax({url: 'function.js.php?option=remote&f=play&id='+id});
+        var video = $('#panel_list').attr('class');
+        $.ajax({url: 'function.js.php?option=remote&f=play&id='+id+'&video='+video});
     });
     
     // admin visible - hidden

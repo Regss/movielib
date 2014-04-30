@@ -293,10 +293,12 @@ while ($list = mysql_fetch_array($list_result)) {
     $show_desc['video']           = 1;
     $show_desc['title']           = 1;
     
-    if (isset($_SESSION['logged_admin']) && $_SESSION['logged_admin'] == true) {
+    if (isset($_SESSION['logged_admin']) && $_SESSION['logged_admin'] == true && $video == 'movies') {
         $show_desc['xbmc'] = 1;
     }
-
+    if (isset($_SESSION['logged_admin']) && $_SESSION['logged_admin'] == true && $video == 'tvshows') {
+        $show_desc['xbmc_episode'] = 1;
+    }
     
     // originaltitle
     if ($list['originaltitle'] !== '') {
@@ -305,7 +307,9 @@ while ($list = mysql_fetch_array($list_result)) {
     }
     
     // file
-    $output_desc['file'] = 'http://xbmc:xbmc@' . $set['xbmc_host'] . ':' . $set['xbmc_port'] . '/vfs/' . urlencode($list['file']);
+    if ($video == 'movies') {
+        $output_desc['file'] = 'http://' . $set['xbmc_login'] . ':' . $set['xbmc_pass'] . '@' . $set['xbmc_host'] . ':' . $set['xbmc_port'] . '/vfs/' . urlencode($list['file']);
+    }
     
     // poster
     $poster = 'cache/' . $mysql_table . '_' . $list['id'] . '.jpg';
@@ -484,11 +488,21 @@ while ($list = mysql_fetch_array($list_result)) {
         $episodes_array = array();
         if ($id <> 0) {
             $show_desc['episodes'] = 1;
-            $episodes_sql = 'SELECT title, episode, season, plot, firstaired, play_count, last_played FROM ' . $mysql_tables[2] . ' WHERE tvshow = "' . $list['id'] . '" ORDER BY season, episode ASC';
+            $episodes_sql = 'SELECT title, episode, season, plot, firstaired, file, play_count, last_played FROM ' . $mysql_tables[2] . ' WHERE tvshow = "' . $list['id'] . '" ORDER BY season, episode ASC';
             $episodes_result = mysql_query($episodes_sql);
             $i = 0;
             $output_desc['episodes'].= '<table class="table">';
             while ($episodes = mysql_fetch_assoc($episodes_result)) {
+                if ($show_desc['xbmc_episode'] == 1) {
+                    $e_xbmc = '
+                    <div class="xbmc_e">
+                        <img class="play animate" src="templates/{SET.theme}/img/play.png">
+                        <a href="http://' . $set['xbmc_login'] . ':' . $set['xbmc_pass'] . '@' . $set['xbmc_host'] . ':' . $set['xbmc_port'] . '/vfs/' . urlencode($episodes['file']) . '"><img class="download animate" src="templates/{SET.theme}/img/download.png"></a>
+                        <a id="http://' . $set['xbmc_login'] . ':' . $set['xbmc_pass'] . '@' . $set['xbmc_host'] . ':' . $set['xbmc_port'] . '/vfs/' . urlencode($episodes['file']) . '" href="cache/list.m3u"><img class="list animate" src="templates/{SET.theme}/img/list.png"></a>
+                    </div>';
+                } else {
+                    $e_xbmc = '';
+                }
                 if ($episodes['plot'] !== '') {
                     $output_episodes_plot = '
                         <div class="episode_plot" id="plot_season_' . $episodes['season'] . '_episode_' . $episodes['episode'] . '">
@@ -502,14 +516,16 @@ while ($list = mysql_fetch_array($list_result)) {
                             <td class="orange bold text_left" id="season_' . $episodes['season'] . '">' . $lang['i_season'] . ' ' . $episodes['season'] . '</td>
                             <td class="orange bold text_left aired">' . $lang['i_aired'] . '</td>
                             <td></td>
+                            <td></td>
                         </tr>';
                 }
                 $output_desc['episodes'].= '
                     <tr class="episode" id="season_' . $episodes['season'] . '_episode_' . $episodes['episode'] . '">
                         <td class="left"></td>
-                        <td class="right">' . $episodes['episode'] . '. ' . $episodes['title'] . $output_episodes_plot . '</td>
+                        <td class="right plot">' . $episodes['episode'] . '. ' . $episodes['title'] . $output_episodes_plot . '</td>
                         <td>' . $episodes['firstaired'] . '</td>
                         <td>' . ($episodes['play_count'] > 0 ? '<img class="watched_episode" src="templates/' . $set['theme'] . '/img/watched.png" title="' . $lang['i_last_played'] . ': ' . $episodes['last_played'] . '" alt="">' : '') . '</td>
+                        <td>' . $e_xbmc . '</td>
                     </tr>';
                 $i = $episodes['season'];
             }

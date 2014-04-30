@@ -608,6 +608,8 @@ if ($option == 'xbmc') {
                 <tr><td class="bold orange">' . $lang['a_xbmc_settings'] . '</td><td></td></tr>
                 <tr><td>' . $lang['a_xbmc_host'] . '</td><td><input type="input" name="xbmc_host" value="' . $set['xbmc_host'] . '" /></td></tr>
                 <tr><td>' . $lang['a_xbmc_port'] . '</td><td><input type="input" name="xbmc_port" value="' . $set['xbmc_port'] . '" /></td></tr>
+                <tr><td>' . $lang['a_xbmc_login'] . '</td><td><input type="input" name="xbmc_login" value="' . $set['xbmc_login'] . '" /></td></tr>
+                <tr><td>' . $lang['a_xbmc_pass'] . '</td><td><input type="input" name="xbmc_pass" value="' . $set['xbmc_pass'] . '" /></td></tr>
             </table><br />
                 <input type="submit" value="' . $lang['a_save'] . '" />
         </form>
@@ -616,7 +618,11 @@ if ($option == 'xbmc') {
 
 // Save password
 if ($option == 'xbmc_save') {
-    $xbmc_update_sql = 'UPDATE ' . $mysql_tables[3] . ' SET xbmc_host = "' . $_POST['xbmc_host'] . '", xbmc_port = "' . $_POST['xbmc_port'] . '"';
+    $xbmc_update_sql = 'UPDATE ' . $mysql_tables[3] . ' SET 
+        xbmc_host = "' . $_POST['xbmc_host'] . '", 
+        xbmc_port = "' . $_POST['xbmc_port'] . '",
+        xbmc_login = "' . $_POST['xbmc_login'] . '", 
+        xbmc_pass = "' . $_POST['xbmc_pass'] . '"';
     mysql_query($xbmc_update_sql);
     $output_panel_info.= $lang['a_xbmc_saved'] . '<br />';
     $_SESSION = array();
