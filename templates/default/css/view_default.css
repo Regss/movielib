@@ -7,6 +7,7 @@
 .title a:active { font-size:20px; font-weight:bold; color:#ff7300; }
 .title a:hover { font-size:20px; font-weight:bold; color:#ff7300; text-decoration:underline; }
 .xbmc { position:absolute; text-align:center; background-color:#000; border:1px solid #333; border-top:0px; padding:4px; margin-left:500px; margin-top:-5px; border-bottom-right-radius:10px; border-bottom-left-radius:10px; }
+.xbmc_hide { height:0px; overflow:hidden; opacity:0 }
 .xbmc_e { width:50px; }
 .xbmc_e  img { width:14px; height:14px; coursor:pointer; }
 .title_org { font-size:11px; font-weight:bold; color:#aaa; }

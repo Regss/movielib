@@ -52,6 +52,12 @@ $(document).ready(function() {
     $('#view_menu').mouseleave(function () {
         $('#views').hide();
     });
+    $('#watch_menu').mouseenter(function () {
+        $('#watch').show();
+    });
+    $('#watch_menu').mouseleave(function () {
+        $('#watch').hide();
+    });
     
     // Default value for search input
     $('input').focus(function () {
@@ -256,26 +262,32 @@ $(document).ready(function() {
         $('#panel_remote').animate({marginLeft: '10px'}, {queue: false, duration: 500, complete: function(){
             $.getJSON('function.js.php?option=remote&f=playing', function(data){
                 check = true;
-                if ('result' in data) {
-                    $.ajax({url: 'cache/' + data['result']['item']['type'] + '_' + data['result']['item']['id'] + '.jpg', success: function(){
-                        $('#now_playing div').html('<img src="cache/' + data['result']['item']['type'] + '_' + data['result']['item']['id'] + '.jpg" title="' + data['result']['item']['title'] + '">');
-                        $('#now_playing').animate({marginLeft: '10px'}, {queue: false, duration: 500});
+                if ('type' in data) {
+                    $.ajax({url: 'cache/' + data['type'] + '_' + data['id'] + '.jpg', success: function(){
+                        $('#np_img').html('<img src="cache/' + data['type'] + '_' + data['id'] + '.jpg"><div id="bar"><div id="prog"></div></div>');
+                        var w = (80 * (parseInt(data['percentage']) / 100));
+                        $('#prog').css('width', w+'px');
+                        $('#now_playing').animate({marginLeft: '10px'}, {queue: false, duration: 500, complete: function(){
+                            $('#np_details').animate({opacity: '1'}, {queue: false, duration: 200});
+                        }});
+                        $('#np_details').html(data['details']);
                     }});
                 }
             });
         }});
-        
         setTimeout(function() {
             if (check == true) {
                 $('#r_right img').attr('src', 'templates/'+theme+'/img/xbmc_v.png');
             } else {
                 $('#r_right img').attr('src', 'templates/'+theme+'/img/xbmc_vd.png');
             }
-        }, 2000);
+        }, 3000);
     });
     $('#panel_remote').mouseleave(function(){
         $(this).animate({marginLeft: '-70px'}, {queue: false, duration: 500, complete: function(){
-            $('#now_playing').animate({marginLeft: '-110px'}, {queue: false, duration: 500});
+            $('#np_details').animate({opacity: '0'}, {queue: false, duration: 200, complete: function(){
+                $('#now_playing').animate({marginLeft: '-110px'}, {queue: false, duration: 500});
+            }});
         }});
         
     });

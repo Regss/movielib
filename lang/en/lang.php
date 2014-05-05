@@ -12,6 +12,10 @@ $lang['i_rating']                       =   'Rating';
 $lang['i_added']                        =   'Added';
 $lang['i_last_played']                  =   'Last Played';
 $lang['i_most_watched']                 =   'Most Watched';
+$lang['i_watched_status']               =   'Watched Status';
+$lang['i_all']                          =   'All';
+$lang['i_watched']                      =   'Watched';
+$lang['i_unwatched']                    =   'Unwatched';
 $lang['i_view']                         =   'View';
 $lang['i_view_default']                 =   'Default';
 $lang['i_view_list']                    =   'List';
@@ -46,6 +50,7 @@ $lang['i_a_codec']                      =   'Audio Codec';
 $lang['i_a_chan']                       =   'Audio Channels';
 $lang['i_last_added']                   =   'Last Added';
 $lang['i_top_rated']                    =   'Top Rated';
+$lang['i_now_playing']                  =   'Now Playing';
 
 /* #############
  * # LOGIN.PHP #

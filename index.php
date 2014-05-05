@@ -66,6 +66,7 @@ $output['version'] = $version;
 $output['view'] = $view;
 $output['include_view'] = $views[$include_view];
 $output['video'] = $video;
+$output['watch'] = $watch;
 
 /* ################
  * # SELECT MEDIA #
@@ -86,7 +87,7 @@ if ($set['panel_top'] == 1) {
     $top_panel_sql = array(
         'top_item_last_added' => 'SELECT id, title, date_added, hide FROM ' . $mysql_table . ' WHERE hide=0 ORDER BY date_added DESC LIMIT ' . $set['panel_top_limit'],
         'top_item_most_watched' => 'SELECT id, title, hide FROM ' . $mysql_table . ' WHERE hide=0 ORDER BY play_count DESC LIMIT ' . $set['panel_top_limit'],
-        'top_item_last_played' => 'SELECT id, title, last_played, hide FROM ' . $mysql_table . ' WHERE hide=0 AND play_count > 0 ORDER BY last_played DESC LIMIT ' . $set['panel_top_limit'],
+        'top_item_last_played' => 'SELECT id, title, last_played, hide FROM ' . $mysql_table . ' WHERE hide=0 ORDER BY last_played DESC LIMIT ' . $set['panel_top_limit'],
         'top_item_top_rated' => 'SELECT id, title, rating, hide FROM ' . $mysql_table . ' WHERE hide=0 ORDER BY rating DESC LIMIT ' . $set['panel_top_limit']
     );
     foreach ($top_panel_sql as $name => $item_top_sql) {
@@ -147,7 +148,7 @@ foreach ($menu_array as $menu_name) {
             if ($filter == $menu_name && $filterid == $key) {
                 $output['panel_' . $menu_name].= '<li>' . $val . '</li>';
             } else {
-                $output['panel_' . $menu_name].= '<li><a href="index.php?video=' . $video . '&view=' . $view . '&sort=' . $sort . '&filter=' . $menu_name . '&filterid=' . $key . '">' . $val . '</a></li>';
+                $output['panel_' . $menu_name].= '<li><a href="index.php?video=' . $video . '&view=' . $view . '&watch=' . $watch . '&sort=' . $sort . '&filter=' . $menu_name . '&filterid=' . $key . '">' . $val . '</a></li>';
             }
         }
     }
@@ -163,28 +164,49 @@ if ($video == 'tvshows') {
     $sort_array = array(1 => $lang['i_title'], $lang['i_year'], $lang['i_rating'], $lang['i_added'], $lang['i_runtime'], $lang['i_last_played'], $lang['i_most_watched']);
     $sort_mysql = array(1 => 'title ASC', 'year DESC', 'rating DESC', 'date_added DESC', ' CAST( runtime AS DECIMAL( 10, 2 ) ) DESC', 'last_played DESC', 'play_count DESC');
 }
-$play_count_mysql = ($sort == 6 ? ' > 0' : 'LIKE "%"');
 $output['panel_sort'] = '';
 foreach ($sort_array as $key => $val) {
     $output['panel_sort'].= ($sort == $key ? 
     '<span>' . $val . '</span>' : 
-    '<a href="index.php?video=' . $video . '&view=' . $view . '&sort=' . $key .
+    '<a href="index.php?video=' . $video . '&view=' . $view . '&watch=' . $watch . '&sort=' . $key .
     '&filter=' . $filter .
     '&filterid=' . $filterid .
     '" title="' . $lang['i_sort'] . '">' . $val . '</a>');
 }
+
+/* #########
+ * # WATCH #
+ */#########
+$show['panel_watch'] = 1;
+$watch_arr = array(0 => 'all', 1 => 'watched', 2 => 'unwatched');
+$output['panel_watch'].= '<div id="watch_menu"><div id="watch_title">' . $lang['i_watched_status'] . ': ' . $lang['i_' . $watch_arr[$watch]] . '</div><div id="watch">';
+foreach ($watch_arr as $key => $val) {
+        if ($watch == $key) {
+            $output['panel_watch'].= '<span>' . $lang['i_' . $val] . '</span>';
+        } else {
+            $output['panel_watch'].= '<a href="index.php?id=' . $id . '&video=' . $video . '&view=' . $view . '&watch=' . $key . '&sort=' . $sort . '&filter=' . $filter . '&filterid=' . $filterid . '">' . $lang['i_' . $val] . '</a>';
+        }
+}
+if ($watch == 1) {
+    $watch_mysql = ' > 0';
+} elseif ($watch == 2) {
+    $watch_mysql = ' = 0';
+} else {
+    $watch_mysql = ' >= 0';
+}
+$output['panel_watch'].= '</div></div>';
 
 /* ########
  * # VIEW #
  */########
 if ($set['panel_view'] > 0) {
     $show['panel_view'] = 1;
-    $output['panel_view'].= '<div id="view_menu"><div id="view_title">' . $lang['i_view'] . '</div><div id="views">';
+    $output['panel_view'].= '<div id="view_menu"><div id="view_title">' . $lang['i_view'] . ': ' . $lang['i_' . $views[$view]] . '</div><div id="views">';
     foreach ($views as $key => $val) {
             if ($view == $key) {
                 $output['panel_view'].= '<span>' . $lang['i_' . $val] . '</span>';
             } else {
-                $output['panel_view'].= '<a href="index.php?id=' . $id . '&video=' . $video . '&view=' . $key . '&sort=' . $sort . '&filter=' . $filter . '&filterid=' . $filterid . '">' . $lang['i_' . $val] . '</a>';
+                $output['panel_view'].= '<a href="index.php?id=' . $id . '&video=' . $video . '&view=' . $key . '&watch=' . $watch . '&sort=' . $sort . '&filter=' . $filter . '&filterid=' . $filterid . '">' . $lang['i_' . $val] . '</a>';
             }
     }
     $output['panel_view'].= '</div></div>';
@@ -207,7 +229,7 @@ $nav_sql = 'SELECT id FROM ' . $mysql_table . ' WHERE
     ' . $filter_mysql . '
     title LIKE "%' . $search_mysql . '%" AND
     id LIKE "' . $id_mysql . '" AND
-    play_count ' . $play_count_mysql . ' AND
+    play_count ' . $watch_mysql . ' AND
     hide=0
     ORDER BY ' . $sort_mysql[$sort];
 $nav_result = mysql_query($nav_sql);
@@ -217,9 +239,9 @@ if ($set['per_page'] == 0) {
     $output['panel_nav'] = '';
 } else {
     $i_pages = (ceil($row / $set['per_page']));
-    $output['panel_nav'] = ($page == 1 ? '<span>' . $lang['i_previous'] . '</span>' : '<a href="index.php?video=' . $video . '&view=' . $view . '&sort=' . $sort . '&page=' . ($page - 1) . '&filter=' . $filter . '&filterid=' . $filterid . '&search=' . $search . '">' . $lang['i_previous'] . '</a>')
+    $output['panel_nav'] = ($page == 1 ? '<span>' . $lang['i_previous'] . '</span>' : '<a href="index.php?video=' . $video . '&view=' . $view . '&watch=' . $watch . '&sort=' . $sort . '&page=' . ($page - 1) . '&filter=' . $filter . '&filterid=' . $filterid . '&search=' . $search . '">' . $lang['i_previous'] . '</a>')
              . ' <span>' . $lang['i_page'] . ' ' . $page . ' / ' . $i_pages . '</span> ' .
-            ($page == $i_pages ? '<span>' . $lang['i_next'] . '</span>' : '<a href="index.php?video=' . $video . '&view=' . $view . '&sort=' . $sort . '&page=' . ($page + 1) . '&filter=' . $filter . '&filterid=' . $filterid . '&search=' . $search . '">' . $lang['i_next'] . '</a>');
+            ($page == $i_pages ? '<span>' . $lang['i_next'] . '</span>' : '<a href="index.php?video=' . $video . '&view=' . $view . '&watch=' . $watch . '&sort=' . $sort . '&page=' . ($page + 1) . '&filter=' . $filter . '&filterid=' . $filterid . '&search=' . $search . '">' . $lang['i_next'] . '</a>');
     if ($row == 0) {
         $output['panel_nav'] = '';
     }
@@ -262,7 +284,7 @@ $list_sql = 'SELECT * FROM ' . $mysql_table . ' WHERE
     ' . $filter_mysql . '
     title LIKE "%' . $search_mysql . '%" AND
     id LIKE "' . $id_mysql . '" AND
-    play_count ' . $play_count_mysql . ' AND
+    play_count ' . $watch_mysql . ' AND
     hide=0
     ORDER BY ' . $sort_mysql[$sort] . $limit_sql;
 $list_result = mysql_query($list_sql);
@@ -327,7 +349,7 @@ while ($list = mysql_fetch_array($list_result)) {
     // genre
     $output_genre_array = array();
     foreach (explode(' / ', $list['genre']) as $val) {
-        $output_genre_array[] = '<a href="index.php?video=' . $video . '&view=' . $view . '&sort=' . $sort . '&filter=genre&filterid=' . array_search($val, $panels_array['genre']) . '">' . $val . '</a>';
+        $output_genre_array[] = '<a href="index.php?video=' . $video . '&view=' . $view . '&watch=' . $watch . '&sort=' . $sort . '&filter=genre&filterid=' . array_search($val, $panels_array['genre']) . '">' . $val . '</a>';
     }
     if ($list['genre'] !== '') {
         $show_desc['genre'] = 1;
@@ -349,7 +371,7 @@ while ($list = mysql_fetch_array($list_result)) {
             } else {
                 $actor_thumb = '';
             }
-            $output_cast_array[] = '<a class="actor_img" href="index.php?video=' . $video . '&view=' . $view . '&sort=' . $sort . '&filter=cast&filterid=' . array_search($val, $panels_array['cast']) . '" alt="' . substr(md5($val), 0, 10) . '">' . $actor_thumb . $val . '</a>';
+            $output_cast_array[] = '<a class="actor_img" href="index.php?video=' . $video . '&view=' . $view . '&watch=' . $watch . '&sort=' . $sort . '&filter=cast&filterid=' . array_search($val, $panels_array['cast']) . '" alt="' . substr(md5($val), 0, 10) . '">' . $actor_thumb . $val . '</a>';
         }
     }
     if ($list['cast'] !== '') {
@@ -369,13 +391,13 @@ while ($list = mysql_fetch_array($list_result)) {
         // year
         if ($list['year'] !== '') {
             $show_desc['year'] = 1;
-            $output_desc['year'] = '<a href="index.php?video=' . $video . '&view=' . $view . '&sort=' . $sort . '&filter=year&filterid=' . array_search($list['year'], $panels_array['year']) . '">' . $list['year'] . '</a>';
+            $output_desc['year'] = '<a href="index.php?video=' . $video . '&view=' . $view . '&watch=' . $watch . '&sort=' . $sort . '&filter=year&filterid=' . array_search($list['year'], $panels_array['year']) . '">' . $list['year'] . '</a>';
         }
         
         // country
         $output_country_array = array();
         foreach (explode(' / ', $list['country']) as $val) {
-            $output_country_array[] = '<a href="index.php?video=' . $video . '&view=' . $view . '&sort=' . $sort . '&filter=country&filterid=' . array_search($val, $panels_array['country']) . '">' . $val . '</a>';
+            $output_country_array[] = '<a href="index.php?video=' . $video . '&view=' . $view . '&watch=' . $watch . '&sort=' . $sort . '&filter=country&filterid=' . array_search($val, $panels_array['country']) . '">' . $val . '</a>';
         }
         if ($list['country'] !== '') {
             $show_desc['country'] = 1;
@@ -391,13 +413,13 @@ while ($list = mysql_fetch_array($list_result)) {
         // director
         if ($list['director'] !== '') {
             $show_desc['director'] = 1;
-            $output_desc['director'] = '<a href="index.php?video=' . $video . '&view=' . $view . '&sort=' . $sort . '&filter=director&filterid=' . array_search($list['director'], $panels_array['director']) . '">' . $list['director'] . '</a>';
+            $output_desc['director'] = '<a href="index.php?video=' . $video . '&view=' . $view . '&watch=' . $watch . '&sort=' . $sort . '&filter=director&filterid=' . array_search($list['director'], $panels_array['director']) . '">' . $list['director'] . '</a>';
         }
         
         // sets
         if ($list['sets'] !== '') {
             $show_desc['sets'] = 1;
-            $output_desc['sets'] = '<a href="index.php?video=' . $video . '&view=' . $view . '&sort=' . $sort . '&filter=sets&filterid=' . array_search($list['sets'], $panels_array['sets']) . '">' . $list['sets'] . '</a>';
+            $output_desc['sets'] = '<a href="index.php?video=' . $video . '&view=' . $view . '&watch=' . $watch . '&sort=' . $sort . '&filter=sets&filterid=' . array_search($list['sets'], $panels_array['sets']) . '">' . $list['sets'] . '</a>';
         }
         
         // video resolution
@@ -430,7 +452,7 @@ while ($list = mysql_fetch_array($list_result)) {
 
         // trailer
         if ($list['trailer'] !== '' && $set['show_trailer'] == 1) {
-            $output_desc['trailer_img'] = '<a href="index.php?id=' . $list['id'] . '&video=' . $video . '&view=' . $view . '&sort=' . $sort . '&filter=' . $filter . '&filterid=' . $filterid . '#trailer"><img class="trailer_img" src="templates/' . $set['theme'] . '/img/trailer.png" alt=""></a>';
+            $output_desc['trailer_img'] = '<a href="index.php?id=' . $list['id'] . '&video=' . $video . '&view=' . $view . '&watch=' . $watch . '&sort=' . $sort . '&filter=' . $filter . '&filterid=' . $filterid . '#trailer"><img class="trailer_img" src="templates/' . $set['theme'] . '/img/trailer.png" alt=""></a>';
         }
         if ($list['trailer'] !== '' && $set['show_trailer'] == 1 && $id <> 0) {
             $show_desc['trailer'] = 1;
@@ -488,14 +510,14 @@ while ($list = mysql_fetch_array($list_result)) {
         $episodes_array = array();
         if ($id <> 0) {
             $show_desc['episodes'] = 1;
-            $episodes_sql = 'SELECT title, episode, season, plot, firstaired, file, play_count, last_played FROM ' . $mysql_tables[2] . ' WHERE tvshow = "' . $list['id'] . '" ORDER BY season, episode ASC';
+            $episodes_sql = 'SELECT id, title, episode, season, plot, firstaired, file, play_count, last_played FROM ' . $mysql_tables[2] . ' WHERE tvshow = "' . $list['id'] . '" ORDER BY season, episode ASC';
             $episodes_result = mysql_query($episodes_sql);
             $i = 0;
             $output_desc['episodes'].= '<table class="table">';
             while ($episodes = mysql_fetch_assoc($episodes_result)) {
                 if ($show_desc['xbmc_episode'] == 1) {
                     $e_xbmc = '
-                    <div class="xbmc_e">
+                    <div id="' . $episodes['id'] . '" class="xbmc_e">
                         <img class="play animate" src="templates/{SET.theme}/img/play.png">
                         <a href="http://' . $set['xbmc_login'] . ':' . $set['xbmc_pass'] . '@' . $set['xbmc_host'] . ':' . $set['xbmc_port'] . '/vfs/' . urlencode($episodes['file']) . '"><img class="download animate" src="templates/{SET.theme}/img/download.png"></a>
                         <a id="http://' . $set['xbmc_login'] . ':' . $set['xbmc_pass'] . '@' . $set['xbmc_host'] . ':' . $set['xbmc_port'] . '/vfs/' . urlencode($episodes['file']) . '" href="cache/list.m3u"><img class="list animate" src="templates/{SET.theme}/img/list.png"></a>

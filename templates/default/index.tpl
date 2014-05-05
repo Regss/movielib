@@ -39,7 +39,7 @@
                 <img src="templates/{SET.theme}/img/xbmc_vd.png">
             </div>
         </div>
-        <div id="now_playing"><span>Now Playing...</span><div></div></div>
+        <div id="now_playing"><div id="np_details"></div><span id="np_title">{LANG.i_now_playing}...</span><div id="np_img"></div></div>
         {/SHOW.panel_remote}
         <div class="container">
             <div id="select_media">
@@ -115,9 +115,12 @@
             </div>
             <div id="panel_right">
                 <div id="panel_sort">{panel_sort}</div>
-                {SHOW.panel_view}
-                <div id="panel_view">{panel_view}</div>
-                {/SHOW.panel_view}
+                <div id="panel_view">
+                    {panel_watch}
+                    {SHOW.panel_view}
+                    {panel_view}
+                    {/SHOW.panel_view}
+                </div>
                 <div id="panel_search">
                     <form method="get" action="index.php" autocomplete="off">
                         <div id="panel_input_search">
@@ -135,7 +138,7 @@
                 {SHOW.panel_filter}
                 <div id="panel_filter">
                     <div id="filter_text">{panel_filter}</div>
-                    <a href="index.php?video={video}&view={view}&sort={sort}&filter={filter}&filterid={filterid}"><img id="filter_delete_img" class="animate" src="templates/{SET.theme}/img/delete.png" title="{LANG.i_del_result}" alt=""></a>
+                    <a href="index.php?video={video}&view={view}&watch={watch}&sort={sort}&filter={filter}&filterid={filterid}"><img id="filter_delete_img" class="animate" src="templates/{SET.theme}/img/delete.png" title="{LANG.i_del_result}" alt=""></a>
                 </div>
                 {/SHOW.panel_filter}
                 <div id="panel_list" class="{video}">
