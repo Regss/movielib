@@ -106,22 +106,45 @@ if ($option  == 'remote') {
                 $player_status = json_decode($get_player_status, true);
                 $item = array_merge($player['result']['item'], $player_status['result']);
                 connect($mysql_ml);
+                require('lang/' . $set['language'] . '/lang.php');
                 if ($item['type'] == 'episode') {
                     $episode_sql = 'SELECT tvshow, season, episode, title FROM ' . $mysql_tables[2] . ' WHERE id = "' . $item['id'] . '"';
                     $episode_result = mysql_query($episode_sql);
                     $episode = mysql_fetch_assoc($episode_result);
-                    $tvshow_sql = 'SELECT title FROM ' . $mysql_tables[1] . ' WHERE id = "' . $episode['tvshow'] . '"';
+                    $tvshow_sql = 'SELECT title, genre, rating FROM ' . $mysql_tables[1] . ' WHERE id = "' . $episode['tvshow'] . '"';
                     $tvshow_result = mysql_query($tvshow_sql);
                     $tvshow = mysql_fetch_assoc($tvshow_result);
                     $item['type'] = 'tvshows';
                     $item['id'] = $episode['tvshow'];
-                    $item['details'] = '<div id="np_d_title">' . $tvshow['title'] . '<br>' . str_pad($episode['season'], 2, 0, STR_PAD_LEFT) . 'x' . str_pad($episode['episode'], 2, 0, STR_PAD_LEFT) . ' ' . $episode['title'] . '</div>';
+                    $item['details'] = '
+                        <div id="np_d_title">' . $tvshow['title'] . '</div>
+                        <div id="np_d_otitle">' . zero($episode['season']) . 'x' . zero($episode['episode']) . ' ' . $episode['title'] . '</div>
+                        <div id="bar"><div id="prog"></div></div>
+                        <div id="np_d_time">' . zero($item['time']['hours']) . ':' . zero($item['time']['minutes']) . ':' . zero($item['time']['seconds']) . ' / ' . zero($item['totaltime']['hours']) . ':' . zero($item['totaltime']['minutes']) . ':' . zero($item['totaltime']['seconds']) . '</div>
+                        ' . (file_exists('cache/' . $$mysql_tables[1] . '_' . $item['id'] . '.jpg') ? '<img src="cache/' . $$mysql_tables[1] . '_' . $item['id'] . '.jpg">' : '') . '
+                        <div id="np_d_det">
+                            <div><span>' . $lang['i_rating'] . ':</span> ' . $tvshow['rating'] . '</div>
+                            <div><span>' . $lang['i_genre'] . ':</span> ' . $tvshow['genre'] . '</div>
+                        </div>';
                 } else {
-                    $movie_sql = 'SELECT title, originaltitle FROM ' . $mysql_tables[0] . ' WHERE id = "' . $item['id'] . '"';
+                    $movie_sql = 'SELECT title, originaltitle, year, country, genre, rating, runtime, director FROM ' . $mysql_tables[0] . ' WHERE id = "' . $item['id'] . '"';
                     $movie_result = mysql_query($movie_sql);
                     $movie = mysql_fetch_assoc($movie_result);
                     $item['type'] = 'movies';
-                    $item['details'] = '<div id="np_d_title">' . $movie['title'] . '</div><div id="np_d_otitle">' . $movie['originaltitle'] . '</div>';
+                    $item['details'] = '
+                        <div id="np_d_title">' . $movie['title'] . '</div>
+                        <div id="np_d_otitle">' . $movie['originaltitle'] . '</div>
+                        <div id="bar"><div id="prog"></div></div>
+                        <div id="np_d_time">' . zero($item['time']['hours']) . ':' . zero($item['time']['minutes']) . ':' . zero($item['time']['seconds']) . ' / ' . zero($item['totaltime']['hours']) . ':' . zero($item['totaltime']['minutes']) . ':' . zero($item['totaltime']['seconds']) . '</div>
+                        ' . (file_exists('cache/' . $$mysql_tables[0] . '_' . $item['id'] . '.jpg') ? '<img src="cache/' . $$mysql_tables[0] . '_' . $item['id'] . '.jpg">' : '') . '
+                        <div id="np_d_det">
+                            <div><span>' . $lang['i_year'] . ':</span> ' . $movie['year'] . '</div>
+                            <div><span>' . $lang['i_rating'] . ':</span> ' . $movie['rating'] . '</div>
+                            <div><span>' . $lang['i_runtime'] . ':</span> ' . $movie['runtime'] . ' ' . $lang['i_minute'] . '</div>
+                            <div><span>' . $lang['i_genre'] . ':</span> ' . $movie['genre'] . '</div>
+                            <div><span>' . $lang['i_country'] . ':</span> ' . $movie['country'] . '</div>
+                            <div><span>' . $lang['i_director'] . ':</span> ' . $movie['director'] . '</div>
+                        </div>';
                 }
                 echo json_encode($item);
             } else {

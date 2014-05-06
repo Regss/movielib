@@ -66,13 +66,17 @@ input.search { width:250px; }
 #r_left { float:left; margin:6px; width:60px; }
 #r_left img { display:block; cursor:pointer; float:left; margin:2px; }
 #r_right { float:right; margin-top:8px; margin-right:8px; }
-#now_playing { width:100px; background-color:#000; border:1px solid #333; position:fixed; margin-top:250px; margin-left:-110px; z-index:4; border-top-left-radius:10px; border-top-right-radius:10px; border-bottom-right-radius:10px; border-bottom-left-radius:10px; }
-#now_playing img { display:block; width:80px; border: 1px solid #fff; margin:auto; margin-top:5px; margin-bottom:5px; }
-#bar { width:80px; height:2px; border:1px solid #fff; margin:auto; margin-bottom:10px; }
-#prog { height:2px; background-color:#fff; }
-#np_title { display:block; margin:5px 10px 0px 10px; font-weight:bold; color:#ff7300; }
-#np_details { position:absolute; min-width:100px; opacity:0; margin-left:110px; padding:10px; background-color:#000; border:1px solid #333; border-top-left-radius:10px; border-top-right-radius:10px; border-bottom-right-radius:10px; border-bottom-left-radius:10px; }
-#np_d_title { font-size:12px; font-weight:bold; color:#ff7300; }
-#np_d_otitle { font-size:10px; font-weight:bold; color:#555; }
+
+#now_playing { max-width:500px; background-color:#000; border:1px solid #333; position:fixed; margin-top:250px; margin-left:-300px; padding:10px; z-index:4; border-top-left-radius:10px; border-top-right-radius:10px; border-bottom-right-radius:10px; border-bottom-left-radius:10px; }
+#now_playing img { display:block; width:80px; border: 1px solid #fff; float:left; margin-top:5px; margin-bottom:5px; }
+#bar { height:4px; background-color:#444; margin:4px; }
+#prog { height:4px; background-color:#aaa; }
+#np_d_time {font-size:14px; font-weight:bold; text-align:center; }
+#np_title { font-weight:bold; color:#ff7300; }
+#np_d_title { font-size:20px; font-weight:bold; color:#ff7300; }
+#np_d_otitle { font-size:16px; font-weight:bold; color:#555; }
+#np_d_det { font-size:14px; float:left; max-width:400px; margin:5px; }
+#np_d_det div { margin-bottom:2px; }
+#np_d_det span { color:#ff7300; font-weight:bold; }
 
 #panel_bottom { bottom:0px; text-align:right; color:#999; background-color:#111; margin-top:20px; padding:3px; padding-right:20px; }

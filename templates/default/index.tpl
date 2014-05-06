@@ -39,7 +39,7 @@
                 <img src="templates/{SET.theme}/img/xbmc_vd.png">
             </div>
         </div>
-        <div id="now_playing"><div id="np_details"></div><span id="np_title">{LANG.i_now_playing}...</span><div id="np_img"></div></div>
+        <div id="now_playing"><div id="np_title">{LANG.i_now_playing}...</div><div id="np_details"></div></div>
         {/SHOW.panel_remote}
         <div class="container">
             <div id="select_media">

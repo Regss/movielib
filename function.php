@@ -640,4 +640,12 @@ function imagettfstroketext(&$image, $size, $angle, $x, $y, &$textcolor, &$strok
             $banner = imagettftext($image, $size, $angle, $c1, $c2, $strokecolor, $fontfile, $text);
     return imagettftext($image, $size, $angle, $x, $y, $textcolor, $fontfile, $text);
 }
+
+/* #################
+ * # ADD 0 TO LEFT #
+ */#################
+function zero($dig) {
+    return str_pad($dig, 2, 0, STR_PAD_LEFT);
+}
+
 ?>

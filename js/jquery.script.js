@@ -257,21 +257,17 @@ $(document).ready(function() {
     });
     
     // control remote
-    $('#panel_remote').mouseenter(function(){
+    $('#panel_remote').on('mouseenter click', function(){
         var check = false;
         $('#panel_remote').animate({marginLeft: '10px'}, {queue: false, duration: 500, complete: function(){
             $.getJSON('function.js.php?option=remote&f=playing', function(data){
                 check = true;
                 if ('type' in data) {
-                    $.ajax({url: 'cache/' + data['type'] + '_' + data['id'] + '.jpg', success: function(){
-                        $('#np_img').html('<img src="cache/' + data['type'] + '_' + data['id'] + '.jpg"><div id="bar"><div id="prog"></div></div>');
-                        var w = (80 * (parseInt(data['percentage']) / 100));
-                        $('#prog').css('width', w+'px');
-                        $('#now_playing').animate({marginLeft: '10px'}, {queue: false, duration: 500, complete: function(){
-                            $('#np_details').animate({opacity: '1'}, {queue: false, duration: 200});
-                        }});
-                        $('#np_details').html(data['details']);
-                    }});
+                    $('#np_details').html(data['details']);
+                    var width = parseInt($('#bar').css('width'));
+                    var w = (width * (parseInt(data['percentage']) / 100));
+                    $('#prog').css('width', w+'px');
+                    $('#now_playing').animate({marginLeft: '10px'}, {queue: false, duration: 500});
                 }
             });
         }});
@@ -283,13 +279,13 @@ $(document).ready(function() {
             }
         }, 3000);
     });
-    $('#panel_remote').mouseleave(function(){
-        $(this).animate({marginLeft: '-70px'}, {queue: false, duration: 500, complete: function(){
-            $('#np_details').animate({opacity: '0'}, {queue: false, duration: 200, complete: function(){
-                $('#now_playing').animate({marginLeft: '-110px'}, {queue: false, duration: 500});
-            }});
+    $('#panel_remote, #now_playing').mouseleave(function(){
+        $('#panel_remote').animate({marginLeft: '-70px'}, {queue: false, duration: 500, complete: function(){
+            $('#now_playing').animate({marginLeft: '-500px'}, {queue: false, duration: 500});
         }});
-        
+    });
+    $('#stop').click(function(){
+        $('#now_playing').animate({marginLeft: '-500px'}, {queue: false, duration: 500});
     });
     
     // button remote
