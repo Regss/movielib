@@ -1,6 +1,6 @@
 <?PHP
 
-$version = '2.5.5';
+$version = '2.6.0';
 
 if (file_exists('db.php')) {
     require('db.php');

@@ -15,7 +15,7 @@ class HASH:
         fileTable = []
         dir = os.listdir(self.path)
         for file in dir:
-            if file[-3:] == 'php':
+            if (file[-3:] == 'php') and (file != 'install.php'):
                 fileTable.append([self.path, file])
         
         dir = os.listdir(self.path + '/js')
@@ -30,7 +30,7 @@ class HASH:
             md5 = hashlib.md5(open(file[0]+'/'+file[1], 'rb').read()).hexdigest()
             toWrite.append(file[1] + ':' + md5)
         
-        fp = open(self.path + '/md5.checksum', 'w')
+        fp = open(self.path + '/files.md5', 'w')
         fp.write(';'.join(toWrite))
         fp.close()
         

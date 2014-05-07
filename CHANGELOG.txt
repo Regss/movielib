@@ -1,4 +1,4 @@
-v. 2.5.5
+v. 2.6.0
 - added remote control XBMC
 - added filter watched/unwatched
 

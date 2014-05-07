@@ -606,11 +606,12 @@ if ($option == 'xbmc') {
         <form action="admin.php?option=xbmc_save" method="post">
             <table class="table">
                 <tr><td class="bold orange">' . $lang['a_xbmc_settings'] . '</td><td></td></tr>
-                <tr><td>' . $lang['a_xbmc_host'] . '</td><td><input type="input" name="xbmc_host" value="' . $set['xbmc_host'] . '" /></td></tr>
-                <tr><td>' . $lang['a_xbmc_port'] . '</td><td><input type="input" name="xbmc_port" value="' . $set['xbmc_port'] . '" /></td></tr>
-                <tr><td>' . $lang['a_xbmc_login'] . '</td><td><input type="input" name="xbmc_login" value="' . $set['xbmc_login'] . '" /></td></tr>
-                <tr><td>' . $lang['a_xbmc_pass'] . '</td><td><input type="input" name="xbmc_pass" value="' . $set['xbmc_pass'] . '" /></td></tr>
-            </table><br />
+                <tr><td>' . $lang['a_xbmc_host'] . '</td><td><input id="xbmc_host" type="input" name="xbmc_host" value="' . $set['xbmc_host'] . '" /></td></tr>
+                <tr><td>' . $lang['a_xbmc_port'] . '</td><td><input id="xbmc_port" type="input" name="xbmc_port" value="' . $set['xbmc_port'] . '" /></td></tr>
+                <tr><td>' . $lang['a_xbmc_login'] . '</td><td><input id="xbmc_login" type="input" name="xbmc_login" value="' . $set['xbmc_login'] . '" /></td></tr>
+                <tr><td>' . $lang['a_xbmc_pass'] . '</td><td><input id="xbmc_pass" type="input" name="xbmc_pass" value="' . $set['xbmc_pass'] . '" /></td></tr>
+            </table>
+                <div id="xbmc_test" class="box">TEST</div>
                 <input type="submit" value="' . $lang['a_save'] . '" />
         </form>
     ';
