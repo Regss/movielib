@@ -452,7 +452,7 @@ while ($list = mysql_fetch_array($list_result)) {
 
         // trailer
         if ($list['trailer'] !== '' && $set['show_trailer'] == 1) {
-            $output_desc['trailer_img'] = '<a href="index.php?id=' . $list['id'] . '&video=' . $video . '&view=' . $view . '&watch=' . $watch . '&sort=' . $sort . '&filter=' . $filter . '&filterid=' . $filterid . '#trailer"><img class="trailer_img" src="templates/' . $set['theme'] . '/img/trailer.png" alt=""></a>';
+            $output_desc['trailer_img'] = '<a href="index.php?id=' . $list['id'] . '&video=' . $video . '&view=' . $view . '&watch=' . $watch . '&sort=' . $sort . '&filter=' . $filter . '&filterid=' . $filterid . '#trailer"><img class="trailer_img animate" src="templates/' . $set['theme'] . '/img/trailer.png" title="' . $lang['i_show_trailer'] . '" alt=""></a>';
         }
         if ($list['trailer'] !== '' && $set['show_trailer'] == 1 && $id <> 0) {
             $show_desc['trailer'] = 1;
@@ -518,9 +518,9 @@ while ($list = mysql_fetch_array($list_result)) {
                 if ($show_desc['xbmc_episode'] == 1) {
                     $e_xbmc = '
                     <div id="' . $episodes['id'] . '" class="xbmc_e">
-                        <img class="play animate" src="templates/{SET.theme}/img/play.png">
-                        <a href="http://' . $set['xbmc_login'] . ':' . $set['xbmc_pass'] . '@' . $set['xbmc_host'] . ':' . $set['xbmc_port'] . '/vfs/' . urlencode($episodes['file']) . '"><img class="download animate" src="templates/{SET.theme}/img/download.png"></a>
-                        <a id="http://' . $set['xbmc_login'] . ':' . $set['xbmc_pass'] . '@' . $set['xbmc_host'] . ':' . $set['xbmc_port'] . '/vfs/' . urlencode($episodes['file']) . '" href="cache/list.m3u"><img class="list animate" src="templates/{SET.theme}/img/list.png"></a>
+                        <img class="play animate" src="templates/{SET.theme}/img/play.png" title="' . $lang['i_xbmc_play'] . '">
+                        <a href="http://' . $set['xbmc_login'] . ':' . $set['xbmc_pass'] . '@' . $set['xbmc_host'] . ':' . $set['xbmc_port'] . '/vfs/' . urlencode($episodes['file']) . '"><img class="download animate" src="templates/{SET.theme}/img/download.png" title="' . $lang['i_xbmc_download'] . '"></a>
+                        <a id="http://' . $set['xbmc_login'] . ':' . $set['xbmc_pass'] . '@' . $set['xbmc_host'] . ':' . $set['xbmc_port'] . '/vfs/' . urlencode($episodes['file']) . '" href="cache/list.m3u"><img class="list animate" src="templates/{SET.theme}/img/list.png" title="' . $lang['i_xbmc_m3u'] . '"></a>
                     </div>';
                 } else {
                     $e_xbmc = '';

@@ -206,15 +206,7 @@ $(document).ready(function() {
     $('.animate').mouseleave(function(){
         $(this).css('opacity', '1');
     });
-    
-    // animate trailer button
-    $('.trailer_img').mouseenter(function(){
-        $(this).css('opacity', '1');
-    });
-    $('.trailer_img').mouseleave(function(){
-        $(this).css('opacity', '.8');
-    });
-    
+        
     // delete movie
     $('.delete_row').click(function(){
         var id = $(this).parent().parent().attr('id');
@@ -256,12 +248,21 @@ $(document).ready(function() {
         $('.episode_plot').dequeue().hide();
     });
     
-    // control remote
+    // control remote - check connection and change logo
+    $.ajax({url: 'function.js.php?option=remote&f=playing', dataType: 'json', timeout: 2000,
+    success: function(){
+      $('#r_right img').attr('src', 'templates/'+theme+'/img/xbmc_v.png');
+    },
+    error: function(){
+      $('#r_right img').attr('src', 'templates/'+theme+'/img/xbmc_vd.png');
+    }});
+    
+    // show remote and now playing
     $('#panel_remote').on('mouseenter click', function(){
-        var check = false;
         $('#panel_remote').animate({marginLeft: '10px'}, {queue: false, duration: 500, complete: function(){
-            $.getJSON('function.js.php?option=remote&f=playing', function(data){
-                check = true;
+            $.ajax({url: 'function.js.php?option=remote&f=playing', dataType: 'json', timeout: 2000,
+            success: function(data){
+                $('#r_right img').attr('src', 'templates/'+theme+'/img/xbmc_v.png');
                 if ('type' in data) {
                     $('#np_details').html(data['details']);
                     var width = parseInt($('#bar').css('width'));
@@ -269,42 +270,37 @@ $(document).ready(function() {
                     $('#prog').css('width', w+'px');
                     $('#now_playing').animate({marginLeft: '10px'}, {queue: false, duration: 500});
                 }
-            });
-        }});
-        setTimeout(function() {
-            if (check == true) {
-                $('#r_right img').attr('src', 'templates/'+theme+'/img/xbmc_v.png');
-            } else {
+            },
+            error: function(){
                 $('#r_right img').attr('src', 'templates/'+theme+'/img/xbmc_vd.png');
-            }
-        }, 3000);
+            }});
+        }});
     });
+    
+    // hide remote and now playing
     $('#panel_remote, #now_playing').mouseleave(function(){
         $('#panel_remote').animate({marginLeft: '-70px'}, {queue: false, duration: 500, complete: function(){
             $('#now_playing').animate({marginLeft: '-500px'}, {queue: false, duration: 500});
         }});
     });
+    
+    // hide now playing on stop button
     $('#stop').click(function(){
         $('#now_playing').animate({marginLeft: '-500px'}, {queue: false, duration: 500});
     });
     
-    // button remote
+    // button remote action
     $('#panel_remote img').click(function(){
         var act = $(this).attr('id');
         $.ajax({url: 'function.js.php?option=remote&f='+act});
     });
     
     // panel desc
-    $('.xbmc').mouseenter(function(){
-        $(this).children('div').animate({height: '30px'}, {queue: false, duration: 500, complete: function(){
-            $(this).animate({opacity: '1'}, {queue: false, duration: 500});
-        }});
+    $('.movie').mouseenter(function(){
+        $(this).children('.xbmc_hide').animate({opacity: 1}, {queue: false, duration: 300});
     });
-    $('.xbmc').mouseleave(function(){
-        $(this).children('div').animate({opacity: '0'}, {queue: false, duration: 500, complete: function(){
-            $(this).animate({height: '0px'}, {queue: false, duration: 500});
-        }});
-        
+    $('.movie').mouseleave(function(){
+        $(this).children('.xbmc_hide').animate({opacity: .3}, {queue: false, duration: 300});
     });
     
     // create list.m3u
