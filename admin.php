@@ -611,7 +611,7 @@ if ($option == 'xbmc') {
                 <tr><td>' . $lang['a_xbmc_login'] . '</td><td><input id="xbmc_login" type="input" name="xbmc_login" value="' . $set['xbmc_login'] . '" /></td></tr>
                 <tr><td>' . $lang['a_xbmc_pass'] . '</td><td><input id="xbmc_pass" type="input" name="xbmc_pass" value="' . $set['xbmc_pass'] . '" /></td></tr>
             </table>
-                <div id="xbmc_test" class="box">TEST</div>
+                <div id="xbmc_test" class="box"><div></div>' . $lang['a_xmbc_test'] . '</div>
                 <input type="submit" value="' . $lang['a_save'] . '" />
         </form>
     ';

@@ -166,6 +166,7 @@ $lang['a_xbmc_port']                    =   'Port';
 $lang['a_xbmc_login']                   =   'Login';
 $lang['a_xbmc_pass']                    =   'Password';
 $lang['a_xbmc_saved']                   =   'XBMC Settings saved';
+$lang['a_xmbc_test']                    =   'Test';
 $lang['a_html_admin_panel']             =   'Admin Panel';
 $lang['a_html_main_site']               =   'Main Site';
 $lang['a_html_overall']                 =   'Overall';

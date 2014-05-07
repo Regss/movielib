@@ -161,8 +161,12 @@ if ($option  == 'remote') {
             break;
         case 'xbmc_test':
             $json_test = urlencode('{"jsonrpc": "2.0", "params": {"labels": ["System.BuildVersion"]}, "method": "XBMC.GetInfoLabels", "id": 1}');
-            $get_test = file_get_contents('http://' . $_GET['xbmc_login'] . ':' . $_GET['xbmc_pass'] . '@' . $_GET['xbmc_host'] . ':' . $_GET['xbmc_port'] . '/jsonrpc?request=' . $json_test);
-            echo $get_test;
+            $get_test = @file_get_contents('http://' . $_GET['xbmc_login'] . ':' . $_GET['xbmc_pass'] . '@' . $_GET['xbmc_host'] . ':' . $_GET['xbmc_port'] . '/jsonrpc?request=' . $json_test);
+            if (!$get_test) {
+                echo '{"stop": "stop"}';
+            } else {
+                echo $get_test;
+            }
     }
     if (isset($json)) {
         $get = @file_get_contents('http://' . $set['xbmc_login'] . ':' . $set['xbmc_pass'] . '@' . $set['xbmc_host'] . ':' . $set['xbmc_port'] . '/jsonrpc?request=' . $json);

@@ -368,24 +368,16 @@ $(document).ready(function() {
         var xbmc_port = $('#xbmc_port').val();
         var xbmc_login = $('#xbmc_login').val();
         var xbmc_pass = $('#xbmc_pass').val();
-        $.ajax({
-            url: 'http://xbmc:xbmc@127.0.0.1:90/jsonrpc',
-            success: function(){
-                alert();
-            }
-        });
-        
-        /*
         $.ajax({url: 'function.js.php?option=remote&f=xbmc_test&xbmc_host='+xbmc_host+'&xbmc_port='+xbmc_port+'&xbmc_login='+xbmc_login+'&xbmc_pass='+xbmc_pass, dataType: 'json', timeout: 2000, success: function(d){
             if ('result' in d) {
-                $('#xbmc_test').html('<img src="admin/img/exist.png">');
+                $('#xbmc_test div').html('<img src="admin/img/exist.png">');
                 $('#xbmc_test').css({'border': '2px solid #0FE800'});
-                $('#xbmc_test img').css({'display': 'block', 'float': 'right'});
+                $('#xbmc_test img').css({'display': 'block', 'position': 'absolute', 'margin-left': '120px'});
             } else {
-                $('#xbmc_test').html('<img src="admin/img/delete.png">');
+                $('#xbmc_test div').html('<img src="admin/img/delete.png">');
                 $('#xbmc_test').css('border', '2px solid #FF0000');
-                $('#xbmc_test img').css({'display': 'block', 'float': 'right'});
-            }}});
-            */
+                $('#xbmc_test img').css({'display': 'block', 'position': 'absolute', 'margin-left': '120px'});
+            }
+        }});
     });
 });
