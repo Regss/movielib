@@ -1,3 +1,7 @@
+v. 2.5.5
+- added remote control XBMC
+- added filter watched/unwatched
+
 v. 2.5.4
 - fixed install process
 - added Danish language

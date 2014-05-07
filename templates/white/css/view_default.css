@@ -6,11 +6,15 @@
 .title a:visited { font-size:20px; font-weight:bold; color:#414141; }
 .title a:active { font-size:20px; font-weight:bold; color:#414141; }
 .title a:hover { font-size:20px; font-weight:bold; color:#414141; text-decoration:underline; }
+.xbmc_hide { width:22px; position:absolute; opacity:.3; margin-top:10px; margin-left:5px; }
+.xbmc_hide img { cursor:pointer; }
+.xbmc_e { width:48px; }
+.xbmc_e  img { width:14px; height:14px; cursor:pointer; }
 .title_org { font-size:11px; font-weight:bold; color:#888; }
 .watched_img { display:block; position:absolute; margin-left:102px; margin-top:-44px; }
 .watched_episode { width:10px; height:10px; }
 .episode_plot { display: none; position: absolute; width:380px; border:1px solid #fff; background-color:#ddd; padding:5px; text-align:left; }
-.trailer_img { position:absolute; margin-left:94px; margin-top:8px; display:block; opacity: .8; }
+.trailer_img { position:absolute; margin-left:94px; margin-top:8px; display:block; }
 .flag { margin-left:3px; }
 .desc { text-align:center; margin-left:150px; margin-top:5px; min-height: 220px; }
 .desc a:link { color:#555; text-decoration:none; }

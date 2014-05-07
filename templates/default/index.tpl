@@ -26,14 +26,14 @@
         {SHOW.panel_remote}
         <div id="panel_remote">
             <div id="r_left">
-                <img id="stop" class="animate" src="templates/{SET.theme}/img/stop.png">
-                <img id="pause" class="animate" src="templates/{SET.theme}/img/pause.png">
-                <img id="v_up" class="animate" src="templates/{SET.theme}/img/v_up.png">
-                <img id="v_down" class="animate" src="templates/{SET.theme}/img/v_down.png">
-                <img id="stepback" class="animate" src="templates/{SET.theme}/img/stepback.png">
-                <img id="stepforward" class="animate" src="templates/{SET.theme}/img/stepforward.png">
-                <img id="bigstepback" class="animate" src="templates/{SET.theme}/img/bigstepback.png">
-                <img id="bigstepforward" class="animate" src="templates/{SET.theme}/img/bigstepforward.png">
+                <img id="stop" class="animate" src="templates/{SET.theme}/img/stop.png" title="{LANG.i_xbmc_stop}">
+                <img id="pause" class="animate" src="templates/{SET.theme}/img/pause.png" title="{LANG.i_xbmc_pause}">
+                <img id="v_up" class="animate" src="templates/{SET.theme}/img/v_up.png" title="{LANG.i_xbmc_v_up}">
+                <img id="v_down" class="animate" src="templates/{SET.theme}/img/v_down.png" title="{LANG.i_xbmc_v_down}">
+                <img id="stepback" class="animate" src="templates/{SET.theme}/img/stepback.png" title="{LANG.i_xbmc_stepback}">
+                <img id="stepforward" class="animate" src="templates/{SET.theme}/img/stepforward.png" title="{LANG.i_xbmc_stepforward}">
+                <img id="bigstepback" class="animate" src="templates/{SET.theme}/img/bigstepback.png" title="{LANG.i_xbmc_bigstepback}">
+                <img id="bigstepforward" class="animate" src="templates/{SET.theme}/img/bigstepforward.png" title="{LANG.i_xbmc_bigstepforward}">
             </div>
             <div id="r_right">
                 <img src="templates/{SET.theme}/img/xbmc_vd.png">
