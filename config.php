@@ -1,6 +1,6 @@
 <?PHP
 
-$version = '2.5.4';
+$version = '2.6.0';
 
 if (file_exists('db.php')) {
     require('db.php');
@@ -84,7 +84,7 @@ $mysql_tables = array('movies', 'tvshows', 'episodes', 'config', 'users');
 $movies_table = array(
     'id'                    => 'int(6) NOT NULL',
     'title'                 => 'varchar(100) NOT NULL',
-    'plot'                  => 'text NOT NULL',
+    'plot'                  => 'varchar(5000) NOT NULL',
     'rating'                => 'float NOT NULL',
     'year'                  => 'int(4) NOT NULL',
     'trailer'               => 'varchar(255) NOT NULL',
@@ -93,42 +93,44 @@ $movies_table = array(
     'director'              => 'varchar(255) NOT NULL',
     'originaltitle'         => 'varchar(255) NOT NULL',
     'country'               => 'varchar(255) NOT NULL',
-    'cast'                  => 'varchar(255) NOT NULL',
+    'cast'                  => 'varchar(3000) NOT NULL',
     'sets'                  => 'varchar(255) NOT NULL',
     'v_codec'               => 'varchar(255) NOT NULL',
-    'v_aspect'              => 'float NOT NULL',
+    'v_aspect'              => 'varchar(10) NOT NULL',
     'v_width'               => 'int(11) NOT NULL',
     'v_height'              => 'int(11) NOT NULL',
     'v_duration'            => 'int(11) NOT NULL',
     'a_codec'               => 'varchar(255) NOT NULL',
     'a_chan'                => 'int(11) NOT NULL',
+    'file'                  => 'varchar(255) NOT NULL',
     'play_count'            => 'int(11) NOT NULL',
     'last_played'           => 'varchar(20) NOT NULL',
     'date_added'            => 'varchar(20) NOT NULL',
-    'hide'                  => 'int(1) NOT NULL'
+    'hide'                  => 'int(1) NOT NULL DEFAULT 0'
 );
 $tvshows_table = array(
     'id'                    => 'int(6) NOT NULL',
     'title'                 => 'varchar(100) NOT NULL',
-    'plot'                  => 'text NOT NULL',
+    'plot'                  => 'varchar(5000) NOT NULL',
     'rating'                => 'float NOT NULL',
     'genre'                 => 'varchar(255) NOT NULL',
     'originaltitle'         => 'varchar(255) NOT NULL',
-    'cast'                  => 'varchar(255) NOT NULL',
+    'cast'                  => 'varchar(3000) NOT NULL',
     'premiered'             => 'varchar(20) NOT NULL',
     'play_count'            => 'int(11) NOT NULL',
     'last_played'           => 'varchar(20) NOT NULL',
     'date_added'            => 'varchar(20) NOT NULL',
-    'hide'                  => 'int(1) NOT NULL'
+    'hide'                  => 'int(1) NOT NULL DEFAULT 0'
 );
 $episodes_table = array(
     'id'                    => 'int(6) NOT NULL',
     'title'                 => 'varchar(100) NOT NULL',
-    'plot'                  => 'text NOT NULL',
+    'plot'                  => 'varchar(5000) NOT NULL',
     'episode'               => 'int(6) NOT NULL',
     'season'                => 'int(6) NOT NULL',
     'tvshow'                => 'int(6) NOT NULL',
     'firstaired'            => 'varchar(20) NOT NULL',
+    'file'                  => 'varchar(255) NOT NULL',
     'play_count'            => 'int(11) NOT NULL',
     'last_played'           => 'varchar(20) NOT NULL',
     'date_added'            => 'varchar(20) NOT NULL'
@@ -160,6 +162,10 @@ $config_table = array(
     'banner'                => 'varchar(200) DEFAULT 0',
     'protect_site'          => 'int(1) DEFAULT 0',
     'token'                 => 'varchar(6) DEFAULT ""',
+    'xbmc_host'             => 'varchar(30) DEFAULT ""',
+    'xbmc_port'             => 'varchar(5) DEFAULT ""',
+    'xbmc_login'            => 'varchar(30) DEFAULT ""',
+    'xbmc_pass'             => 'varchar(30) DEFAULT ""',
     'version'               => 'varchar(6) DEFAULT "' . $version . '"'
 );
 $users_table = array(
@@ -184,6 +190,7 @@ $item = array(
     'view',
     'include_view',
     'sort',
+    'watch',
     'filter',
     'filterid',
     'meta_title',
@@ -200,6 +207,7 @@ $item = array(
     'overall_all',
     'overall_watched',
     'overall_unwatched',
+    'panel_remote',
     'panel_genre',
     'panel_year',
     'panel_country',
@@ -210,6 +218,7 @@ $item = array(
     'panel_live_search',
     'panel_sort',
     'panel_view',
+    'panel_watch',
     'panel_nav',
     'panel_filter'
 );
@@ -224,6 +233,9 @@ $item_desc = array(
     'filterid',
     'title',
     'originaltitle',
+    'file',
+    'xbmc',
+    'xbmc_episode',
     'watched_img',
     'genre',
     'rating',
@@ -246,10 +258,21 @@ $item_desc = array(
     'episodes_plot'
 );
 
+// JSON function
+$json_f = array(
+    'play'      => array('p' => '', 'm' => 'Player.Open'),
+    'stop'      => array('p' => '"playerid": 1', 'm' => 'Player.Stop'),
+    'pause'     => array('p' => '"playerid": 1', 'm' => 'Player.PlayPause'),
+    'v_up'      => array('p' => '"action": "volumeup"', 'm' => 'Input.ExecuteAction'),
+    'v_down'    => array('p' => '"action": "volumedown"', 'm' => 'Input.ExecuteAction'),
+    'playing'   => array('p' => '"playerid": 1', 'm' => 'Player.GetItem')
+);
+
 // Set var
 $var = array(
     'id'        =>  0,
     'sort'      =>  1,
+    'watch'     =>  0,
     'search'    =>  '',
     'page'      =>  1,
     'token'     =>  '',

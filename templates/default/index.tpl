@@ -23,6 +23,24 @@
     </head>
     <body>
         <img src="templates/{SET.theme}/img/bg.jpg" id="background" alt="">
+        {SHOW.panel_remote}
+        <div id="panel_remote">
+            <div id="r_left">
+                <img id="stop" class="animate" src="templates/{SET.theme}/img/stop.png" title="{LANG.i_xbmc_stop}">
+                <img id="pause" class="animate" src="templates/{SET.theme}/img/pause.png" title="{LANG.i_xbmc_pause}">
+                <img id="v_up" class="animate" src="templates/{SET.theme}/img/v_up.png" title="{LANG.i_xbmc_v_up}">
+                <img id="v_down" class="animate" src="templates/{SET.theme}/img/v_down.png" title="{LANG.i_xbmc_v_down}">
+                <img id="stepback" class="animate" src="templates/{SET.theme}/img/stepback.png" title="{LANG.i_xbmc_stepback}">
+                <img id="stepforward" class="animate" src="templates/{SET.theme}/img/stepforward.png" title="{LANG.i_xbmc_stepforward}">
+                <img id="bigstepback" class="animate" src="templates/{SET.theme}/img/bigstepback.png" title="{LANG.i_xbmc_bigstepback}">
+                <img id="bigstepforward" class="animate" src="templates/{SET.theme}/img/bigstepforward.png" title="{LANG.i_xbmc_bigstepforward}">
+            </div>
+            <div id="r_right">
+                <img src="templates/{SET.theme}/img/xbmc_vd.png">
+            </div>
+        </div>
+        <div id="now_playing"><div id="np_title">{LANG.i_now_playing}...</div><div id="np_details"></div></div>
+        {/SHOW.panel_remote}
         <div class="container">
             <div id="select_media">
                 {select_media}
@@ -97,9 +115,12 @@
             </div>
             <div id="panel_right">
                 <div id="panel_sort">{panel_sort}</div>
-                {SHOW.panel_view}
-                <div id="panel_view">{panel_view}</div>
-                {/SHOW.panel_view}
+                <div id="panel_view">
+                    {panel_watch}
+                    {SHOW.panel_view}
+                    {panel_view}
+                    {/SHOW.panel_view}
+                </div>
                 <div id="panel_search">
                     <form method="get" action="index.php" autocomplete="off">
                         <div id="panel_input_search">
@@ -117,10 +138,10 @@
                 {SHOW.panel_filter}
                 <div id="panel_filter">
                     <div id="filter_text">{panel_filter}</div>
-                    <a href="index.php?video={video}&view={view}&sort={sort}&filter={filter}&filterid={filterid}"><img id="filter_delete_img" class="animate" src="templates/{SET.theme}/img/delete.png" title="{LANG.i_del_result}" alt=""></a>
+                    <a href="index.php?video={video}&view={view}&watch={watch}&sort={sort}&filter={filter}&filterid={filterid}"><img id="filter_delete_img" class="animate" src="templates/{SET.theme}/img/delete.png" title="{LANG.i_del_result}" alt=""></a>
                 </div>
                 {/SHOW.panel_filter}
-                <div id="panel_list">
+                <div id="panel_list" class="{video}">
                     {panel_list}
                 </div>
                 <div id="panel_nav">

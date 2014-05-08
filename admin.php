@@ -34,7 +34,7 @@ if (file_exists('install.php')) {
 /* ######################
  * CHECK ADMIN PASSWORD #
  */######################
-if ($_SESSION['logged_admin'] !== true) {
+if (!isset($_SESSION['logged_admin']) or $_SESSION['logged_admin'] !== true) {
     header('Location:login.php?login=admin');
     die('Cant\'t redirect to login.php');
 }
@@ -598,6 +598,38 @@ if ($option == 'banner') {
     $output_panel.= '<textarea readonly="readonly">' . $url . 'cache/banner.jpg</textarea>';
 }
 
+/* ########
+ * # XBMC #
+ */########
+if ($option == 'xbmc') {
+    $output_panel.= '
+        <form action="admin.php?option=xbmc_save" method="post">
+            <table class="table">
+                <tr><td class="bold orange">' . $lang['a_xbmc_settings'] . '</td><td></td></tr>
+                <tr><td>' . $lang['a_xbmc_host'] . '</td><td><input id="xbmc_host" type="input" name="xbmc_host" value="' . $set['xbmc_host'] . '" /></td></tr>
+                <tr><td>' . $lang['a_xbmc_port'] . '</td><td><input id="xbmc_port" type="input" name="xbmc_port" value="' . $set['xbmc_port'] . '" /></td></tr>
+                <tr><td>' . $lang['a_xbmc_login'] . '</td><td><input id="xbmc_login" type="input" name="xbmc_login" value="' . $set['xbmc_login'] . '" /></td></tr>
+                <tr><td>' . $lang['a_xbmc_pass'] . '</td><td><input id="xbmc_pass" type="input" name="xbmc_pass" value="' . $set['xbmc_pass'] . '" /></td></tr>
+            </table>
+                <div id="xbmc_test" class="box"><div></div>' . $lang['a_xmbc_test'] . '</div>
+                <input type="submit" value="' . $lang['a_save'] . '" />
+        </form>
+    ';
+}
+
+// Save password
+if ($option == 'xbmc_save') {
+    $xbmc_update_sql = 'UPDATE ' . $mysql_tables[3] . ' SET 
+        xbmc_host = "' . $_POST['xbmc_host'] . '", 
+        xbmc_port = "' . $_POST['xbmc_port'] . '",
+        xbmc_login = "' . $_POST['xbmc_login'] . '", 
+        xbmc_pass = "' . $_POST['xbmc_pass'] . '"';
+    mysql_query($xbmc_update_sql);
+    $output_panel_info.= $lang['a_xbmc_saved'] . '<br />';
+    $_SESSION = array();
+    $_SESSION['logged_admin'] = true;
+}
+
 /* ##############
  * # PANEL INFO #
  */##############
@@ -622,13 +654,15 @@ if ($output_panel_info !== '') {
         <?PHP echo $output_panel_info ?>
         <div class="container">
             <div id="panel_left">
-                <a class="box" href="admin.php"><?PHP echo $lang['a_html_main_site'] ?></a>
+                <a class="box" href="admin.php"><?PHP echo $lang['a_html_overall'] ?></a>
+                <a class="box" href="index.php"><?PHP echo $lang['a_html_library'] ?></a>
                 <a class="box" href="admin.php?option=movieslist"><?PHP echo $lang['a_html_movie_list'] ?></a>
                 <a class="box" href="admin.php?option=tvshowslist"><?PHP echo $lang['a_html_tvshow_list'] ?></a>
                 <a class="box" href="admin.php?option=settings"><?PHP echo $lang['a_html_settings'] ?></a>
-                <a class="box" href="admin.php?option=password"><?PHP echo $lang['a_html_change_password'] ?></a>
+                <a class="box" href="admin.php?option=password"><?PHP echo $lang['a_html_password'] ?></a>
                 <a class="box" href="admin.php?option=token"><?PHP echo $lang['a_html_change_token'] ?></a>
                 <a class="box" href="admin.php?option=banner"><?PHP echo $lang['a_html_banner'] ?></a>
+                <a class="box" href="admin.php?option=xbmc">XBMC</a>
                 <a class="box" href="login.php?login=admin_logout"><?PHP echo $lang['a_html_logout'] ?></a>
             </div>
             <div id="panel_right">

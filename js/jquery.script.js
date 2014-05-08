@@ -10,6 +10,7 @@ $.ajax({
         show_fanart = set['show_fanart'];
         fadeout_fanart = set['fadeout_fanart'];
         panel_top_time = set['panel_top_time'];
+        theme = set['theme'];
     }
 });
 
@@ -50,6 +51,12 @@ $(document).ready(function() {
     });
     $('#view_menu').mouseleave(function () {
         $('#views').hide();
+    });
+    $('#watch_menu').mouseenter(function () {
+        $('#watch').show();
+    });
+    $('#watch_menu').mouseleave(function () {
+        $('#watch').hide();
     });
     
     // Default value for search input
@@ -144,12 +151,15 @@ $(document).ready(function() {
         $('.movie').mouseenter(function(){
             var movie_id = $(this).attr('id');
             $.ajax({
-                url: 'cache/'+movie_id+'_f.jpg',
+                url: 'function.js.php?option=fexist&id='+movie_id,
+                dataType: 'json',
                 success: function(data){
-                    $('#background').fadeOut(500, function(){
-                        $(this).delay(100).attr('src', 'cache/'+movie_id+'_f.jpg');
-                        $(this).fadeIn(500);
-                    });
+                    if (data['fexist'] == 'exist') {
+                        $('#background').fadeOut(500, function(){
+                            $(this).delay(100).attr('src', 'cache/'+movie_id+'_f.jpg');
+                            $(this).fadeIn(500);
+                        });
+                    }
                 }
             });
         });
@@ -199,15 +209,7 @@ $(document).ready(function() {
     $('.animate').mouseleave(function(){
         $(this).css('opacity', '1');
     });
-    
-    // animate trailer button
-    $('.trailer_img').mouseenter(function(){
-        $(this).css('opacity', '1');
-    });
-    $('.trailer_img').mouseleave(function(){
-        $(this).css('opacity', '.8');
-    });
-    
+        
     // delete movie
     $('.delete_row').click(function(){
         var id = $(this).parent().parent().attr('id');
@@ -236,17 +238,88 @@ $(document).ready(function() {
     });
     
     // episode plot toggle
-    $('.episode').mouseenter(function(){
-        var e_id = $(this).attr('id');
-        $(this).mousemove(function(event) {
+    $('.plot').mouseenter(function(){
+        var e_id = $(this).parent().attr('id');
+        $(this).parent().mousemove(function(event) {
             var posX = event.pageX;
             var posY = event.pageY;
             $('#plot_'+e_id).css({'top': posY+10, 'left': posX-100});
         });
         $('#plot_'+e_id).delay(500).show(0);
     });
-    $('.episode').mouseleave(function(){
+    $('.plot').mouseleave(function(){
         $('.episode_plot').dequeue().hide();
+    });
+    
+    // control remote - check connection and change logo
+    $.ajax({url: 'function.js.php?option=remote&f=check', dataType: 'json', success: function(data){
+        if ('result' in data) {
+            $('#r_right img').attr('src', 'templates/'+theme+'/img/xbmc_v.png');
+        } else {
+            $('#r_right img').attr('src', 'templates/'+theme+'/img/xbmc_vd.png');
+        }
+    }});
+    
+    // show remote and now playing
+    $('#panel_remote').on('mouseenter click', function(){
+        $.ajax({url: 'function.js.php?option=remote&f=check', dataType: 'json', success: function(data){
+            if ('result' in data) {
+                $('#r_right img').attr('src', 'templates/'+theme+'/img/xbmc_v.png');
+            } else {
+                $('#r_right img').attr('src', 'templates/'+theme+'/img/xbmc_vd.png');
+            }
+        }});
+        $('#panel_remote').animate({marginLeft: '10px'}, {queue: false, duration: 500, complete: function(){
+            $.ajax({url: 'function.js.php?option=remote&f=playing', dataType: 'json', success: function(data){
+                if ('type' in data) {
+                    $('#np_details').html(data['details']);
+                    var width = parseInt($('#bar').css('width'));
+                    var w = (width * (parseInt(data['percentage']) / 100));
+                    $('#prog').css('width', w+'px');
+                    $('#now_playing').animate({marginLeft: '10px'}, {queue: false, duration: 500});
+                }
+            }});
+        }});
+    });
+    
+    // hide remote and now playing
+    $('#panel_remote, #now_playing').mouseleave(function(){
+        $('#panel_remote').animate({marginLeft: '-70px'}, {queue: false, duration: 500, complete: function(){
+            $('#now_playing').animate({marginLeft: '-500px'}, {queue: false, duration: 500});
+        }});
+    });
+    
+    // hide now playing on stop button
+    $('#stop').click(function(){
+        $('#now_playing').animate({marginLeft: '-500px'}, {queue: false, duration: 500});
+    });
+    
+    // button remote action
+    $('#panel_remote img').click(function(){
+        var act = $(this).attr('id');
+        $.ajax({url: 'function.js.php?option=remote&f='+act});
+    });
+    
+    // panel desc
+    $('.movie').mouseenter(function(){
+        $(this).children('.xbmc_hide').animate({opacity: 1}, {queue: false, duration: 300});
+    });
+    $('.movie').mouseleave(function(){
+        $(this).children('.xbmc_hide').animate({opacity: .3}, {queue: false, duration: 300});
+    });
+    
+    // create list.m3u
+    $('.list').mouseenter(function(){
+        var file = $(this).parent().attr('id');
+        var id = $(this).parent().parent().attr('id');
+        $.ajax({url: 'function.js.php?option=remote&f=list&id='+id+'&file='+file});
+    });
+    
+    // play movie in xbmc
+    $('.play').click(function(){
+        var id = $(this).parent().attr('id');
+        var video = $('#panel_list').attr('class');
+        $.ajax({url: 'function.js.php?option=remote&f=play&id='+id+'&video='+video});
     });
     
     // admin visible - hidden
@@ -292,5 +365,26 @@ $(document).ready(function() {
                 }
             });
         }
+    });
+    
+    // test XBMC conn
+    $('#xbmc_test').click(function(){
+        var xbmc_host = $('#xbmc_host').val();
+        var xbmc_port = $('#xbmc_port').val();
+        var xbmc_login = $('#xbmc_login').val();
+        var xbmc_pass = $('#xbmc_pass').val();
+        $.ajax({url: 'function.js.php?option=remote&f=xbmc_test&xbmc_host='+xbmc_host+'&xbmc_port='+xbmc_port+'&xbmc_login='+xbmc_login+'&xbmc_pass='+xbmc_pass,
+        dataType: 'json',
+        success: function(data){
+            if ('result' in data) {
+                $('#xbmc_test div').html('<img src="admin/img/exist.png">');
+                $('#xbmc_test').css({'border': '2px solid #0FE800'});
+                $('#xbmc_test img').css({'display': 'block', 'position': 'absolute', 'margin-left': '120px'});
+            } else {
+                $('#xbmc_test div').html('<img src="admin/img/delete.png">');
+                $('#xbmc_test').css('border', '2px solid #FF0000');
+                $('#xbmc_test img').css({'display': 'block', 'position': 'absolute', 'margin-left': '120px'});
+            }
+        }});
     });
 });

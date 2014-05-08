@@ -9,9 +9,10 @@ if ($option == 'settings') {
     require('function.php');
     $set = get_settings($mysql_tables);
     $set_js = array(
-        'show_fanart'       => $set['show_fanart'],
-        'fadeout_fanart'    => $set['fadeout_fanart'],
-        'panel_top_time'    => $set['panel_top_time']
+        'show_fanart'       => (isset($set['show_fanart']) ? $set['show_fanart'] : ''),
+        'fadeout_fanart'    => (isset($set['fadeout_fanart']) ? $set['fadeout_fanart'] : ''),
+        'panel_top_time'    => (isset($set['panel_top_time']) ? $set['panel_top_time'] : ''),
+        'theme'             => (isset($set['theme']) ? $set['theme'] : '')
     );
     echo json_encode($set_js);
 }
@@ -49,6 +50,136 @@ if ($option == 'searchmovie' or $option == 'searchtvshow') {
     echo json_encode($json_assoc);
 }
 
+// remote control
+if ($option  == 'remote') {
+    // admin permission
+    if (!isset($_SESSION['logged_admin']) or $_SESSION['logged_admin'] !== true) {
+        die('no permission');
+    }
+    require('config.php');
+    require('function.php');
+    $set = get_settings($mysql_tables);
+    
+    switch ($_GET['f']) {
+        case 'list':
+            file_put_contents('cache/list.m3u', $_GET['file']);
+            break;
+        case 'play':
+            if ($_GET['video'] == 'tvshows') {
+                $video = 'episodeid';
+            } else {
+                $video = 'movieid';
+            }
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"item": {"' . $video . '": ' . $_GET['id'] . '}}, "method": "Player.Open", "id": 1}');
+            break;
+        case 'stop':
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"playerid": 1}, "method": "Player.Stop", "id": 1}');
+            break;
+        case 'pause':
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"playerid": 1}, "method": "Player.PlayPause", "id": 1}');
+            break;
+        case 'v_up':
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"action": "volumeup"}, "method": "Input.ExecuteAction", "id": 1}');
+            break;
+        case 'v_down':
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"action": "volumedown"}, "method": "Input.ExecuteAction", "id": 1}');
+            break;
+        case 'stepforward':
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"action": "stepforward"}, "method": "Input.ExecuteAction", "id": 1}');
+            break;
+        case 'stepback':
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"action": "stepback"}, "method": "Input.ExecuteAction", "id": 1}');
+            break;
+        case 'bigstepforward':
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"action": "bigstepforward"}, "method": "Input.ExecuteAction", "id": 1}');
+            break;
+        case 'bigstepback':
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"action": "bigstepback"}, "method": "Input.ExecuteAction", "id": 1}');
+            break;
+        case 'playing':
+            // get player status
+            $json_player = urlencode('{"jsonrpc": "2.0", "params": {"playerid": 1}, "method": "Player.GetItem", "id": 1}');
+            $get_player = @file_get_contents('http://' . $set['xbmc_login'] . ':' . $set['xbmc_pass'] . '@' . $set['xbmc_host'] . ':' . $set['xbmc_port'] . '/jsonrpc?request=' . $json_player);
+            $player = json_decode($get_player, true);
+            if (isset($player['result'])) {
+                $json_player_status = urlencode('{"jsonrpc": "2.0", "params": {"playerid": 1, "properties": ["percentage", "time", "totaltime"]}, "method": "Player.GetProperties", "id": 1}');
+                $get_player_status = file_get_contents('http://' . $set['xbmc_login'] . ':' . $set['xbmc_pass'] . '@' . $set['xbmc_host'] . ':' . $set['xbmc_port'] . '/jsonrpc?request=' . $json_player_status);
+                $player_status = json_decode($get_player_status, true);
+                $item = array_merge($player['result']['item'], $player_status['result']);
+                connect($mysql_ml);
+                require('lang/' . $set['language'] . '/lang.php');
+                if ($item['type'] == 'episode') {
+                    $episode_sql = 'SELECT tvshow, season, episode, title, plot FROM ' . $mysql_tables[2] . ' WHERE id = "' . $item['id'] . '"';
+                    $episode_result = mysql_query($episode_sql);
+                    $episode = mysql_fetch_assoc($episode_result);
+                    $tvshow_sql = 'SELECT title, genre, rating FROM ' . $mysql_tables[1] . ' WHERE id = "' . $episode['tvshow'] . '"';
+                    $tvshow_result = mysql_query($tvshow_sql);
+                    $tvshow = mysql_fetch_assoc($tvshow_result);
+                    $item['type'] = 'tvshows';
+                    $item['id'] = $episode['tvshow'];
+                    $item['details'] = '
+                        <div id="np_d_title">' . $tvshow['title'] . '</div>
+                        <div id="np_d_otitle">' . zero($episode['season']) . 'x' . zero($episode['episode']) . ' ' . $episode['title'] . '</div>
+                        <div id="bar"><div id="prog"></div></div>
+                        <div id="np_d_time">' . zero($item['time']['hours']) . ':' . zero($item['time']['minutes']) . ':' . zero($item['time']['seconds']) . ' / ' . zero($item['totaltime']['hours']) . ':' . zero($item['totaltime']['minutes']) . ':' . zero($item['totaltime']['seconds']) . '</div>
+                        ' . (file_exists('cache/' . $mysql_tables[1] . '_' . $item['id'] . '.jpg') ? '<img src="cache/' . $mysql_tables[1] . '_' . $item['id'] . '.jpg">' : '') . '
+                        <div id="np_d_det">
+                            <div><span>' . $lang['i_season'] . ':</span> ' . $episode['season'] . '</div>
+                            <div><span>' . $lang['i_episode'] . ':</span> ' . $episode['episode'] . '</div>
+                            <div><span>' . $lang['i_rating'] . ':</span> ' . $tvshow['rating'] . '</div>
+                            <div><span>' . $lang['i_genre'] . ':</span> ' . $tvshow['genre'] . '</div>
+                            <div><span>' . $lang['i_plot'] . ':</span> ' . $episode['plot'] . '</div>
+                        </div>';
+                } else {
+                    $movie_sql = 'SELECT title, originaltitle, year, country, genre, rating, runtime, director, plot FROM ' . $mysql_tables[0] . ' WHERE id = "' . $item['id'] . '"';
+                    $movie_result = mysql_query($movie_sql);
+                    $movie = mysql_fetch_assoc($movie_result);
+                    $item['type'] = 'movies';
+                    $item['details'] = '
+                        <div id="np_d_title">' . $movie['title'] . '</div>
+                        <div id="np_d_otitle">' . $movie['originaltitle'] . '</div>
+                        <div id="bar"><div id="prog"></div></div>
+                        <div id="np_d_time">' . zero($item['time']['hours']) . ':' . zero($item['time']['minutes']) . ':' . zero($item['time']['seconds']) . ' / ' . zero($item['totaltime']['hours']) . ':' . zero($item['totaltime']['minutes']) . ':' . zero($item['totaltime']['seconds']) . '</div>
+                        ' . (file_exists('cache/' . $mysql_tables[0] . '_' . $item['id'] . '.jpg') ? '<img src="cache/' . $mysql_tables[0] . '_' . $item['id'] . '.jpg">' : '') . '
+                        <div id="np_d_det">
+                            <div><span>' . $lang['i_year'] . ':</span> ' . $movie['year'] . '</div>
+                            <div><span>' . $lang['i_rating'] . ':</span> ' . $movie['rating'] . '</div>
+                            <div><span>' . $lang['i_runtime'] . ':</span> ' . $movie['runtime'] . ' ' . $lang['i_minute'] . '</div>
+                            <div><span>' . $lang['i_genre'] . ':</span> ' . $movie['genre'] . '</div>
+                            <div><span>' . $lang['i_country'] . ':</span> ' . $movie['country'] . '</div>
+                            <div><span>' . $lang['i_director'] . ':</span> ' . $movie['director'] . '</div>
+                            <div><span>' . $lang['i_plot'] . ':</span> ' . $movie['plot'] . '</div>
+                        </div>';
+                }
+                echo json_encode($item);
+            } else {
+                echo '{"stop": "stop"}';
+            }
+            break;
+        case 'check':
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"labels": ["System.BuildVersion"]}, "method": "XBMC.GetInfoLabels", "id": 1}');
+            break;
+        case 'xbmc_test':
+            $time_assoc['http'] = array('timeout' => 2);
+            $timeout = stream_context_create($time_assoc);
+            $json_test = urlencode('{"jsonrpc": "2.0", "params": {"labels": ["System.BuildVersion"]}, "method": "XBMC.GetInfoLabels", "id": 1}');
+            $get_test = @file_get_contents('http://' . $_GET['xbmc_login'] . ':' . $_GET['xbmc_pass'] . '@' . $_GET['xbmc_host'] . ':' . $_GET['xbmc_port'] . '/jsonrpc?request=' . $json_test, 0, $timeout);
+            if (!$get_test) {
+                echo '{"error": "error"}';
+            } else {
+                echo $get_test;
+            }
+    }
+    if (isset($json)) {
+        $get = @file_get_contents('http://' . $set['xbmc_login'] . ':' . $set['xbmc_pass'] . '@' . $set['xbmc_host'] . ':' . $set['xbmc_port'] . '/jsonrpc?request=' . $json);
+        if (!$get) {
+            echo '{"error": "error"}';
+        } else {
+            echo $get;
+        }
+    }
+}
+
 // delete movie or tvshow
 if ($option  == 'deletemovie' or $option  == 'deletetvshow') {
     // admin permission
@@ -57,15 +188,15 @@ if ($option  == 'deletemovie' or $option  == 'deletetvshow') {
     }
     require('config.php');
     require('function.php');
+    connect($mysql_ml);
     $id = $_GET['id'];
     if ($option  == 'deletemovie') {
         $table = $mysql_tables[0];
     } else {
         $table = $mysql_tables[1];
-        $delete_sql = 'DELETE FROM ' . $table . ' WHERE tvshow = "' . $id . '"';
+        $delete_sql = 'DELETE FROM ' . $mysql_tables[2] . ' WHERE tvshow = "' . $id . '"';
         mysql_query($delete_sql);
     }
-    connect($mysql_ml);
     $delete_sql = 'DELETE FROM ' . $table . ' WHERE id = "' . $id . '"';
     if (file_exists('cache/' . $table . '_' . $id . '.jpg')) {
         unlink('cache/' . $table . '_' . $id . '.jpg');
@@ -112,8 +243,15 @@ if ($option  == 'banner') {
     $set = get_settings($mysql_tables);
     require('lang/' . $set['language'] . '/lang.php');
     $b = create_banner($lang, 'banner_v.jpg', $_GET['banner'], $mysql_tables);
-    
-    
+}
+
+// fanart exist
+if ($option == 'fexist') {
+    if (file_exists('cache/' . $_GET['id'] . '_f.jpg')) {
+        echo '{"fexist": "exist"}';
+    } else {
+        echo '{"fexist": "notexist"}';
+    }
 }
 
 ?>
