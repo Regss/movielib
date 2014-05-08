@@ -25,7 +25,7 @@ textarea { resize:none; background-color:#222; color:#dddddd; border:1px solid #
 #panel_left { float:left; width:140px; margin-left:10px; margin-top:10px; }
 #panel_right { text-align:center; float:right; width:630px; margin-right:10px; margin-top:10px; }
 
-.box { display:block; width:100px; font-weight:bold; border:1px solid #333; background-color:#000; margin:auto; margin-bottom:10px; padding:3px; padding-left:10px; padding-right:10px; text-align:center; }
+.box { display:block; width:100px; font-weight:bold; border:1px solid #333; background-color:#000; margin:auto; margin-bottom:10px; padding:3px; padding-left:10px; padding-right:10px; text-align:center; cursor:pointer; }
 
 .table { border:1px solid #222; text-align:left; width:100%; margin-bottom:10px; }
 .table td { background-color:#000; padding:2px 5px 2px 5px; }

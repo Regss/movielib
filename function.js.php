@@ -9,10 +9,10 @@ if ($option == 'settings') {
     require('function.php');
     $set = get_settings($mysql_tables);
     $set_js = array(
-        'show_fanart'       => $set['show_fanart'],
-        'fadeout_fanart'    => $set['fadeout_fanart'],
-        'panel_top_time'    => $set['panel_top_time'],
-        'theme'             => $set['theme']
+        'show_fanart'       => (isset($set['show_fanart']) ? $set['show_fanart'] : ''),
+        'fadeout_fanart'    => (isset($set['fadeout_fanart']) ? $set['fadeout_fanart'] : ''),
+        'panel_top_time'    => (isset($set['panel_top_time']) ? $set['panel_top_time'] : ''),
+        'theme'             => (isset($set['theme']) ? $set['theme'] : '')
     );
     echo json_encode($set_js);
 }
@@ -99,7 +99,7 @@ if ($option  == 'remote') {
         case 'playing':
             // get player status
             $json_player = urlencode('{"jsonrpc": "2.0", "params": {"playerid": 1}, "method": "Player.GetItem", "id": 1}');
-            $get_player = file_get_contents('http://' . $set['xbmc_login'] . ':' . $set['xbmc_pass'] . '@' . $set['xbmc_host'] . ':' . $set['xbmc_port'] . '/jsonrpc?request=' . $json_player);
+            $get_player = @file_get_contents('http://' . $set['xbmc_login'] . ':' . $set['xbmc_pass'] . '@' . $set['xbmc_host'] . ':' . $set['xbmc_port'] . '/jsonrpc?request=' . $json_player);
             $player = json_decode($get_player, true);
             if (isset($player['result'])) {
                 $json_player_status = urlencode('{"jsonrpc": "2.0", "params": {"playerid": 1, "properties": ["percentage", "time", "totaltime"]}, "method": "Player.GetProperties", "id": 1}');
@@ -160,17 +160,23 @@ if ($option  == 'remote') {
             $json = urlencode('{"jsonrpc": "2.0", "params": {"labels": ["System.BuildVersion"]}, "method": "XBMC.GetInfoLabels", "id": 1}');
             break;
         case 'xbmc_test':
+            $time_assoc['http'] = array('timeout' => 2);
+            $timeout = stream_context_create($time_assoc);
             $json_test = urlencode('{"jsonrpc": "2.0", "params": {"labels": ["System.BuildVersion"]}, "method": "XBMC.GetInfoLabels", "id": 1}');
-            $get_test = @file_get_contents('http://' . $_GET['xbmc_login'] . ':' . $_GET['xbmc_pass'] . '@' . $_GET['xbmc_host'] . ':' . $_GET['xbmc_port'] . '/jsonrpc?request=' . $json_test);
+            $get_test = @file_get_contents('http://' . $_GET['xbmc_login'] . ':' . $_GET['xbmc_pass'] . '@' . $_GET['xbmc_host'] . ':' . $_GET['xbmc_port'] . '/jsonrpc?request=' . $json_test, 0, $timeout);
             if (!$get_test) {
-                echo '{"stop": "stop"}';
+                echo '{"error": "error"}';
             } else {
                 echo $get_test;
             }
     }
     if (isset($json)) {
         $get = @file_get_contents('http://' . $set['xbmc_login'] . ':' . $set['xbmc_pass'] . '@' . $set['xbmc_host'] . ':' . $set['xbmc_port'] . '/jsonrpc?request=' . $json);
-        echo $get;
+        if (!$get) {
+            echo '{"error": "error"}';
+        } else {
+            echo $get;
+        }
     }
 }
 
@@ -237,6 +243,15 @@ if ($option  == 'banner') {
     $set = get_settings($mysql_tables);
     require('lang/' . $set['language'] . '/lang.php');
     $b = create_banner($lang, 'banner_v.jpg', $_GET['banner'], $mysql_tables);
+}
+
+// fanart exist
+if ($option == 'fexist') {
+    if (file_exists('cache/' . $_GET['id'] . '_f.jpg')) {
+        echo '{"fexist": "exist"}';
+    } else {
+        echo '{"fexist": "notexist"}';
+    }
 }
 
 ?>

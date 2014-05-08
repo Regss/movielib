@@ -1,5 +1,7 @@
 v. 2.6.0
 - added remote control XBMC
+- added support for download video file
+- added support for playing video directly
 - added filter watched/unwatched
 
 v. 2.5.4

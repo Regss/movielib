@@ -68,10 +68,12 @@ function get_settings($mysql_tables) {
     // if settings in session not exists get it from database
     if (!isset($_SESSION) or count($_SESSION) < 10) {
         $set_sql = 'SELECT * FROM ' . $mysql_tables[3];
-        $set_result = mysql_query($set_sql);
-        $get_set = mysql_fetch_assoc($set_result);
-        foreach($get_set as $key => $val) {
-            $_SESSION[$key] = $val;
+        $set_result = @mysql_query($set_sql);
+        if ($set_result) {
+            $get_set = mysql_fetch_assoc($set_result);
+            foreach($get_set as $key => $val) {
+                $_SESSION[$key] = $val;
+            }
         }
     }
     return $_SESSION;

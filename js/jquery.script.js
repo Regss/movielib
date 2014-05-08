@@ -151,12 +151,15 @@ $(document).ready(function() {
         $('.movie').mouseenter(function(){
             var movie_id = $(this).attr('id');
             $.ajax({
-                url: 'cache/'+movie_id+'_f.jpg',
+                url: 'function.js.php?option=fexist&id='+movie_id,
+                dataType: 'json',
                 success: function(data){
-                    $('#background').fadeOut(500, function(){
-                        $(this).delay(100).attr('src', 'cache/'+movie_id+'_f.jpg');
-                        $(this).fadeIn(500);
-                    });
+                    if (data['fexist'] == 'exist') {
+                        $('#background').fadeOut(500, function(){
+                            $(this).delay(100).attr('src', 'cache/'+movie_id+'_f.jpg');
+                            $(this).fadeIn(500);
+                        });
+                    }
                 }
             });
         });
@@ -249,20 +252,25 @@ $(document).ready(function() {
     });
     
     // control remote - check connection and change logo
-    $.ajax({url: 'function.js.php?option=remote&f=playing', dataType: 'json', timeout: 2000,
-    success: function(){
-      $('#r_right img').attr('src', 'templates/'+theme+'/img/xbmc_v.png');
-    },
-    error: function(){
-      $('#r_right img').attr('src', 'templates/'+theme+'/img/xbmc_vd.png');
+    $.ajax({url: 'function.js.php?option=remote&f=check', dataType: 'json', success: function(data){
+        if ('result' in data) {
+            $('#r_right img').attr('src', 'templates/'+theme+'/img/xbmc_v.png');
+        } else {
+            $('#r_right img').attr('src', 'templates/'+theme+'/img/xbmc_vd.png');
+        }
     }});
     
     // show remote and now playing
     $('#panel_remote').on('mouseenter click', function(){
-        $('#panel_remote').animate({marginLeft: '10px'}, {queue: false, duration: 500, complete: function(){
-            $.ajax({url: 'function.js.php?option=remote&f=playing', dataType: 'json', timeout: 2000,
-            success: function(data){
+        $.ajax({url: 'function.js.php?option=remote&f=check', dataType: 'json', success: function(data){
+            if ('result' in data) {
                 $('#r_right img').attr('src', 'templates/'+theme+'/img/xbmc_v.png');
+            } else {
+                $('#r_right img').attr('src', 'templates/'+theme+'/img/xbmc_vd.png');
+            }
+        }});
+        $('#panel_remote').animate({marginLeft: '10px'}, {queue: false, duration: 500, complete: function(){
+            $.ajax({url: 'function.js.php?option=remote&f=playing', dataType: 'json', success: function(data){
                 if ('type' in data) {
                     $('#np_details').html(data['details']);
                     var width = parseInt($('#bar').css('width'));
@@ -270,9 +278,6 @@ $(document).ready(function() {
                     $('#prog').css('width', w+'px');
                     $('#now_playing').animate({marginLeft: '10px'}, {queue: false, duration: 500});
                 }
-            },
-            error: function(){
-                $('#r_right img').attr('src', 'templates/'+theme+'/img/xbmc_vd.png');
             }});
         }});
     });
@@ -368,8 +373,10 @@ $(document).ready(function() {
         var xbmc_port = $('#xbmc_port').val();
         var xbmc_login = $('#xbmc_login').val();
         var xbmc_pass = $('#xbmc_pass').val();
-        $.ajax({url: 'function.js.php?option=remote&f=xbmc_test&xbmc_host='+xbmc_host+'&xbmc_port='+xbmc_port+'&xbmc_login='+xbmc_login+'&xbmc_pass='+xbmc_pass, dataType: 'json', timeout: 2000, success: function(d){
-            if ('result' in d) {
+        $.ajax({url: 'function.js.php?option=remote&f=xbmc_test&xbmc_host='+xbmc_host+'&xbmc_port='+xbmc_port+'&xbmc_login='+xbmc_login+'&xbmc_pass='+xbmc_pass,
+        dataType: 'json',
+        success: function(data){
+            if ('result' in data) {
                 $('#xbmc_test div').html('<img src="admin/img/exist.png">');
                 $('#xbmc_test').css({'border': '2px solid #0FE800'});
                 $('#xbmc_test img').css({'display': 'block', 'position': 'absolute', 'margin-left': '120px'});

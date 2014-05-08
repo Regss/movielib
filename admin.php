@@ -34,7 +34,7 @@ if (file_exists('install.php')) {
 /* ######################
  * CHECK ADMIN PASSWORD #
  */######################
-if ($_SESSION['logged_admin'] !== true) {
+if (!isset($_SESSION['logged_admin']) or $_SESSION['logged_admin'] !== true) {
     header('Location:login.php?login=admin');
     die('Cant\'t redirect to login.php');
 }
@@ -654,12 +654,12 @@ if ($output_panel_info !== '') {
         <?PHP echo $output_panel_info ?>
         <div class="container">
             <div id="panel_left">
-                <a class="box" href="index.php"><?PHP echo $lang['a_html_main_site'] ?></a>
                 <a class="box" href="admin.php"><?PHP echo $lang['a_html_overall'] ?></a>
+                <a class="box" href="index.php"><?PHP echo $lang['a_html_library'] ?></a>
                 <a class="box" href="admin.php?option=movieslist"><?PHP echo $lang['a_html_movie_list'] ?></a>
                 <a class="box" href="admin.php?option=tvshowslist"><?PHP echo $lang['a_html_tvshow_list'] ?></a>
                 <a class="box" href="admin.php?option=settings"><?PHP echo $lang['a_html_settings'] ?></a>
-                <a class="box" href="admin.php?option=password"><?PHP echo $lang['a_html_change_password'] ?></a>
+                <a class="box" href="admin.php?option=password"><?PHP echo $lang['a_html_password'] ?></a>
                 <a class="box" href="admin.php?option=token"><?PHP echo $lang['a_html_change_token'] ?></a>
                 <a class="box" href="admin.php?option=banner"><?PHP echo $lang['a_html_banner'] ?></a>
                 <a class="box" href="admin.php?option=xbmc">XBMC</a>

@@ -530,6 +530,8 @@ while ($list = mysql_fetch_array($list_result)) {
                         <div class="episode_plot" id="plot_season_' . $episodes['season'] . '_episode_' . $episodes['episode'] . '">
                             <span class="orange bold">' . $lang['i_plot'] . ':</span> ' . $episodes['plot'] . '
                         </div>';
+                } else {
+                    $output_episodes_plot = '';
                 }
                 if ($episodes['season'] <> $i) {
                     $output_desc['episodes'].= '
