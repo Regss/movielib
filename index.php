@@ -107,7 +107,7 @@ if ($set['panel_top'] == 1) {
 if ($video == 'tvshows') {
     $columns = array('genre', 'premiered', 'cast');
 } else {
-    $columns = array('genre', 'year', 'country', 'director', 'sets', 'cast', 'v_codec', 'a_codec', 'a_chan');
+    $columns = array('genre', 'year', 'country', 'director', 'sets', 'studio', 'cast', 'v_codec', 'a_codec', 'a_chan');
 }
 $panels_array = panels_array($columns, $mysql_table);
 
@@ -139,7 +139,7 @@ if ($set['panel_overall'] > 0) {
 }
 
 // menu panel
-$menu_array = array('genre', 'year', 'country', 'sets', 'v_codec', 'a_codec', 'a_chan');
+$menu_array = array('genre', 'year', 'country', 'sets', 'studio', 'v_codec', 'a_codec', 'a_chan');
 foreach ($menu_array as $menu_name) {
     $output['panel_' . $menu_name] = '';
     if ($set['panel_' . $menu_name] <> 0 && isset($panels_array[$menu_name]) && count($panels_array[$menu_name]) > 0) {
@@ -420,6 +420,16 @@ while ($list = mysql_fetch_array($list_result)) {
         if ($list['sets'] !== '') {
             $show_desc['sets'] = 1;
             $output_desc['sets'] = '<a href="index.php?video=' . $video . '&view=' . $view . '&watch=' . $watch . '&sort=' . $sort . '&filter=sets&filterid=' . array_search($list['sets'], $panels_array['sets']) . '">' . $list['sets'] . '</a>';
+        }
+        
+        // studio
+        if ($list['studio'] !== '') {
+            $show_desc['studio'] = 1;
+            $output_desc['studio'] = '<a href="index.php?video=' . $video . '&view=' . $view . '&watch=' . $watch . '&sort=' . $sort . '&filter=studio&filterid=' . array_search($list['studio'], $panels_array['studio']) . '">' . $list['studio'] . '</a>';
+        }
+        if (file_exists('templates/' . $set['theme'] . '/img/studios/' . $list['studio'] . '.png')) {
+            $show_desc['studio_art'] = 1;
+            $output_desc['studio_art'] = '<img class="studio" src="templates/' . $set['theme'] . '/img/studios/' . $list['studio'] . '.png">';
         }
         
         // video resolution

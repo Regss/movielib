@@ -315,6 +315,7 @@ if ($option == 'settings') {
     $output_panel_year = '';
     $output_panel_country = '';
     $output_panel_sets = '';
+    $output_panel_studio = '';
     $output_panel_v_codec = '';
     $output_panel_a_codec = '';
     $output_panel_a_chan = '';
@@ -383,7 +384,9 @@ if ($option == 'settings') {
         $output_panel_country.= '<option' . ($set['panel_country'] == $key ? ' selected="selected"' : '') . ' value="' . $key . '">' . $val . '</option>';
         // set panel sets input
         $output_panel_sets.= '<option' . ($set['panel_sets'] == $key ? ' selected="selected"' : '') . ' value="' . $key . '">' . $val . '</option>';
-        // set panel v_codec input
+        // set panel studio input
+        $output_panel_studio.= '<option' . ($set['panel_studio'] == $key ? ' selected="selected"' : '') . ' value="' . $key . '">' . $val . '</option>';
+        /// set panel v_codec input
         $output_panel_v_codec.= '<option' . ($set['panel_v_codec'] == $key ? ' selected="selected"' : '') . ' value="' . $key . '">' . $val . '</option>';
         // set panel a_codec input
         $output_panel_a_codec.= '<option' . ($set['panel_a_codec'] == $key ? ' selected="selected"' : '') . ' value="' . $key . '">' . $val . '</option>';
@@ -426,6 +429,7 @@ if ($option == 'settings') {
                 <tr><td>' . $lang['a_panel_year'] . ':</td><td><select name="panel_year">' . $output_panel_year . '</select></td></tr>
                 <tr><td>' . $lang['a_panel_country'] . ':</td><td><select name="panel_country">' . $output_panel_country . '</select></td></tr>
                 <tr><td>' . $lang['a_panel_sets'] . ':</td><td><select name="panel_sets">' . $output_panel_sets . '</select></td></tr>
+                <tr><td>' . $lang['a_panel_studio'] . ':</td><td><select name="panel_studio">' . $output_panel_studio . '</select></td></tr>
                 <tr><td>' . $lang['a_panel_v_codec'] . ':</td><td><select name="panel_v_codec">' . $output_panel_v_codec . '</select></td></tr>
                 <tr><td>' . $lang['a_panel_a_codec'] . ':</td><td><select name="panel_a_codec">' . $output_panel_a_codec . '</select></td></tr>
                 <tr><td>' . $lang['a_panel_a_chan'] . ':</td><td><select name="panel_a_chan">' . $output_panel_a_chan . '</select></td></tr>
@@ -457,6 +461,7 @@ if ($option == 'settings_save') {
         panel_year = "' . $_POST['panel_year'] . '",
         panel_country = "' . $_POST['panel_country'] . '",
         panel_sets = "' . $_POST['panel_sets'] . '",
+        panel_studio = "' . $_POST['panel_studio'] . '",
         panel_v_codec = "' . $_POST['panel_v_codec'] . '",
         panel_a_codec = "' . $_POST['panel_a_codec'] . '",
         panel_a_chan = "' . $_POST['panel_a_chan'] . '",

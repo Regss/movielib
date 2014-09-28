@@ -94,6 +94,12 @@
                     <ul>{panel_sets}</ul>
                 </div>
                 {/SHOW.panel_sets}
+                {SHOW.panel_studio}
+                <div id="studio" class="panel_box_title">{LANG.i_studio}</div>
+                <div id="panel_studio" class="panel_box {SET.panel_studio}">
+                    <ul>{panel_studio}</ul>
+                </div>
+                {/SHOW.panel_studio}
                 {SHOW.panel_v_codec}
                 <div id="v_codec" class="panel_box_title">{LANG.i_v_codec}</div>
                 <div id="panel_v_codec" class="panel_box {SET.panel_v_codec}">

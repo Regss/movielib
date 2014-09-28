@@ -253,7 +253,7 @@ function sync_add($tables, $table) {
                 if ($size[0] > $size[1]) {
                     gd_convert('cache/' . $table . '_' . $_POST['id'] . '.jpg', $poster, 140, 35);
                 } else {
-                    gd_convert('cache/' . $table . '_' . $_POST['id'] . '.jpg', $poster, 140, 198);
+                    gd_convert('cache/' . $table . '_' . $_POST['id'] . '.jpg', $poster, 180, 265);
                 }
             } else {
                 $fp = fopen('cache/temp_' . $table . '_' . $_POST['id'], 'wb');
@@ -263,7 +263,7 @@ function sync_add($tables, $table) {
                 if ($size[0] > $size[1]) {
                     gd_convert('cache/' . $table . '_' . $_POST['id'] . '.jpg', 'cache/temp_' . $table . '_' . $_POST['id'], 140, 35);
                 } else {
-                    gd_convert('cache/' . $table . '_' . $_POST['id'] . '.jpg', 'cache/temp_' . $table . '_' . $_POST['id'], 140, 198);
+                    gd_convert('cache/' . $table . '_' . $_POST['id'] . '.jpg', 'cache/temp_' . $table . '_' . $_POST['id'], 180, 265);
                 }
                 unlink('cache/temp_' . $table . '_' . $_POST['id']);
             }
@@ -463,6 +463,7 @@ function panels_array($columns, $table) {
     if (isset($panels_array['year'])) { rsort($panels_array['year']); }
     if (isset($panels_array['country'])) { sort($panels_array['country']); }
     if (isset($panels_array['sets'])) { sort($panels_array['sets']); }
+    if (isset($panels_array['studio'])) { sort($panels_array['studio']); }
     if (isset($panels_array['v_codec'])) { sort($panels_array['v_codec']); }
     if (isset($panels_array['a_codec'])) { sort($panels_array['a_codec']); }
     if (isset($panels_array['a_chan'])) { sort($panels_array['a_chan']); }

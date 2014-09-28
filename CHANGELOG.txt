@@ -1,3 +1,8 @@
+v. 2.6.1
+- added studio panel
+- added studio flags
+- added language: Spanish, Italian
+
 v. 2.6.0
 - added remote control XBMC
 - added support for download video file

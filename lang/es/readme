@@ -1,0 +1,11 @@
+El script se sincroniza automáticamente y muestra la librería de XBMC.
+
+Requisitos:
+- Servidor con Apache Server, PHP 5, MySql 5
+- Extensión "Movielib" para XBMC https://raw.github.com/Regss/xbmc-regss-repository/master/repo/repository.regss/repository.regss-1.2.1.zip 
+
+Contraseñas por defecto:
+Acceso al sitio: user
+Acceso al panel de administración: admin
+
+In Panel Admin section you need to generate token and put it to addon settings with URL to script.

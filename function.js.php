@@ -131,7 +131,7 @@ if ($option  == 'remote') {
                             <div><span>' . $lang['i_plot'] . ':</span> ' . $episode['plot'] . '</div>
                         </div>';
                 } else {
-                    $movie_sql = 'SELECT title, originaltitle, year, country, genre, rating, runtime, director, plot FROM ' . $mysql_tables[0] . ' WHERE id = "' . $item['id'] . '"';
+                    $movie_sql = 'SELECT title, originaltitle, year, country, genre, rating, runtime, director, plot, sets, studio FROM ' . $mysql_tables[0] . ' WHERE id = "' . $item['id'] . '"';
                     $movie_result = mysql_query($movie_sql);
                     $movie = mysql_fetch_assoc($movie_result);
                     $item['type'] = 'movies';
@@ -141,14 +141,16 @@ if ($option  == 'remote') {
                         <div id="bar"><div id="prog"></div></div>
                         <div id="np_d_time">' . zero($item['time']['hours']) . ':' . zero($item['time']['minutes']) . ':' . zero($item['time']['seconds']) . ' / ' . zero($item['totaltime']['hours']) . ':' . zero($item['totaltime']['minutes']) . ':' . zero($item['totaltime']['seconds']) . '</div>
                         ' . (file_exists('cache/' . $mysql_tables[0] . '_' . $item['id'] . '.jpg') ? '<img src="cache/' . $mysql_tables[0] . '_' . $item['id'] . '.jpg">' : '') . '
-                        <div id="np_d_det">
-                            <div><span>' . $lang['i_year'] . ':</span> ' . $movie['year'] . '</div>
-                            <div><span>' . $lang['i_rating'] . ':</span> ' . $movie['rating'] . '</div>
-                            <div><span>' . $lang['i_runtime'] . ':</span> ' . $movie['runtime'] . ' ' . $lang['i_minute'] . '</div>
-                            <div><span>' . $lang['i_genre'] . ':</span> ' . $movie['genre'] . '</div>
-                            <div><span>' . $lang['i_country'] . ':</span> ' . $movie['country'] . '</div>
-                            <div><span>' . $lang['i_director'] . ':</span> ' . $movie['director'] . '</div>
-                            <div><span>' . $lang['i_plot'] . ':</span> ' . $movie['plot'] . '</div>
+                        <div id="np_d_det">'
+                             . ($movie['year'] == '' ? '' : '<div><span>' . $lang['i_year'] . ':</span> ' . $movie['year'] . '</div>')
+                             . ($movie['rating'] == '' ? '' : '<div><span>' . $lang['i_rating'] . ':</span> ' . $movie['rating'] . '</div>')
+                             . ($movie['runtime'] == '' ? '' : '<div><span>' . $lang['i_runtime'] . ':</span> ' . $movie['runtime'] . ' ' . $lang['i_minute'] . '</div>')
+                             . ($movie['genre'] == '' ? '' : '<div><span>' . $lang['i_genre'] . ':</span> ' . $movie['genre'] . '</div>')
+                             . ($movie['country'] == '' ? '' : '<div><span>' . $lang['i_country'] . ':</span> ' . $movie['country'] . '</div>')
+                             . ($movie['director'] == '' ? '' : '<div><span>' . $lang['i_director'] . ':</span> ' . $movie['director'] . '</div>')
+                             . ($movie['sets'] == '' ? '' : '<div><span>' . $lang['i_sets'] . ':</span> ' . $movie['sets'] . '</div>')
+                             . ($movie['studio'] == '' ? '' : '<div><span>' . $lang['i_studio'] . ':</span> ' . $movie['studio'] . '</div>')
+                             . ($movie['plot'] == '' ? '' : '<div><span>' . $lang['i_plot'] . ':</span> ' . $movie['plot'] . '</div>') . '
                         </div>';
                 }
                 echo json_encode($item);
@@ -160,10 +162,10 @@ if ($option  == 'remote') {
             $json = urlencode('{"jsonrpc": "2.0", "params": {"labels": ["System.BuildVersion"]}, "method": "XBMC.GetInfoLabels", "id": 1}');
             break;
         case 'xbmc_test':
-            $time_assoc['http'] = array('timeout' => 2);
+            $time_assoc['http'] = array('timeout' => 10);
             $timeout = stream_context_create($time_assoc);
             $json_test = urlencode('{"jsonrpc": "2.0", "params": {"labels": ["System.BuildVersion"]}, "method": "XBMC.GetInfoLabels", "id": 1}');
-            $get_test = @file_get_contents('http://' . $_GET['xbmc_login'] . ':' . $_GET['xbmc_pass'] . '@' . $_GET['xbmc_host'] . ':' . $_GET['xbmc_port'] . '/jsonrpc?request=' . $json_test, 0, $timeout);
+            $get_test = file_get_contents('http://' . $_GET['xbmc_login'] . ':' . $_GET['xbmc_pass'] . '@' . $_GET['xbmc_host'] . ':' . $_GET['xbmc_port'] . '/jsonrpc?request=' . $json_test);
             if (!$get_test) {
                 echo '{"error": "error"}';
             } else {

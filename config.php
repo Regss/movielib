@@ -1,6 +1,6 @@
 <?PHP
 
-$version = '2.6.0';
+$version = '2.6.1';
 
 if (file_exists('db.php')) {
     require('db.php');
@@ -95,6 +95,7 @@ $movies_table = array(
     'country'               => 'varchar(255) NOT NULL',
     'cast'                  => 'varchar(3000) NOT NULL',
     'sets'                  => 'varchar(255) NOT NULL',
+    'studio'                => 'varchar(255) NOT NULL',
     'v_codec'               => 'varchar(255) NOT NULL',
     'v_aspect'              => 'varchar(10) NOT NULL',
     'v_width'               => 'int(11) NOT NULL',
@@ -153,6 +154,7 @@ $config_table = array(
     'panel_year'            => 'int(1) DEFAULT 1',
     'panel_country'         => 'int(1) DEFAULT 1',
     'panel_sets'            => 'int(1) DEFAULT 1',
+    'panel_studio'          => 'int(1) DEFAULT 1',
     'panel_v_codec'         => 'int(1) DEFAULT 1',
     'panel_a_codec'         => 'int(1) DEFAULT 1',
     'panel_a_chan'          => 'int(1) DEFAULT 1',
@@ -212,6 +214,7 @@ $item = array(
     'panel_year',
     'panel_country',
     'panel_sets',
+    'panel_studio',
     'panel_v_codec',
     'panel_a_codec',
     'panel_a_chan',
@@ -246,6 +249,8 @@ $item_desc = array(
     'runtime',
     'director',
     'sets',
+    'studio',
+    'studio_art',
     'img_flag_vres',
     'img_flag_vtype',
     'img_flag_atype',

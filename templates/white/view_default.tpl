@@ -6,8 +6,8 @@
     {SHOW.xbmc}
         <div id="{id}" class="xbmc_hide">
             <img class="play animate" src="templates/{SET.theme}/img/play.png" title="{LANG.i_xbmc_play}">
-            <a href="{file}"><img class="download animate" src="templates/{SET.theme}/img/download.png"title="{LANG.i_xbmc_download}"></a>
-            <a id="{file}" href="cache/list.m3u"><img class="list animate" src="templates/{SET.theme}/img/list.png"title="{LANG.i_xbmc_m3u}"></a>
+            <a href="{file}"><img class="download animate" src="templates/{SET.theme}/img/download.png" title="{LANG.i_xbmc_download}"></a>
+            <a id="{file}" href="cache/list.m3u"><img class="list animate" src="templates/{SET.theme}/img/list.png" title="{LANG.i_xbmc_m3u}"></a>
         </div>
     {/SHOW.xbmc}
     {trailer_img}
@@ -15,6 +15,7 @@
         <img id="poster_movie_{id}" class="poster" src="{poster}" alt="">
         {watched_img}
     </div>
+    {studio_art}
     <div class="desc">
         <table class="table">
             {SHOW.year}
@@ -65,6 +66,12 @@
                 <td class="right">{sets}</td>
             </tr>
             {/SHOW.sets}
+            {SHOW.studio}
+            <tr>
+                <td class="left">{LANG.i_studio}:</td>
+                <td class="right">{studio}</td>
+            </tr>
+            {/SHOW.studio}
             {SHOW.seasons}
             <tr>
                 <td class="left">{LANG.i_seasons}:</td>
