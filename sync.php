@@ -64,6 +64,17 @@ if ($token == $set['token']) {
             show_id($mysql_tables[0]);
             break;
         
+        // show hash
+        case 'showhash':
+            $sql = 'SELECT id, hash FROM ' . $mysql_tables[0];
+            $sql_res = mysql_query($sql);
+            $hash_a = array();
+            while ($hash = mysql_fetch_array($sql_res)) {
+                $hash_a[] = '"' . $hash['id'] . '": "' . $hash['hash'] . '"';
+            }
+            echo '{' . implode(', ', $hash_a) . '}';
+            break;
+        
         // sync movie
         case 'addmovie':
             sync_add($tables, $mysql_tables[0]);
