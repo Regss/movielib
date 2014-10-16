@@ -107,7 +107,8 @@ $movies_table = array(
     'play_count'            => 'int(11) NOT NULL',
     'last_played'           => 'varchar(20) NOT NULL',
     'date_added'            => 'varchar(20) NOT NULL',
-    'hide'                  => 'int(1) NOT NULL DEFAULT 0'
+    'hide'                  => 'int(1) NOT NULL DEFAULT 0',
+    'hash'                  => 'varchar(32) NOT NULL'
 );
 $tvshows_table = array(
     'id'                    => 'int(6) NOT NULL',
