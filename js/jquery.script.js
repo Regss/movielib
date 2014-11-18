@@ -40,9 +40,11 @@ $(document).ready(function() {
     // show panels in loop
     $(function() {
         var timeout = panel_top_time * 1000;
-        $('.panel_top_item').cycle({
-            timeout: +timeout
-        });
+        if ($('.panel_top_item').length > 0) {
+            $('.panel_top_item').cycle({
+                timeout: +timeout
+            });
+        }
     });
 
     // view menu
@@ -72,25 +74,16 @@ $(document).ready(function() {
     
     // live search movie
     var wait;
-    $(document).on('keyup click', '#search_movies', function() {
+    $(document).on('keyup click', '.search', function() {
         clearTimeout(wait);
         wait = setTimeout(function() {
-            var search = $('#search_movies').val();
+            var video = $('.search').attr('id');
+            var search = $('.search').val();
             if (search.length > 0) {
-                $.getJSON("function.js.php?option=searchmovie&search="+search, function(data){
+                var url = "function.js.php?option=search&search="+search+"&video="+video;
+                $.get(url, function(data) {
                     $('#panel_live_search').empty();
-                    for(var m in data) {
-                        var movie = data[m];
-                        $('#panel_live_search').append('\
-                        <a href="index.php?video=movies&id='+movie['id']+'">\
-                            <div class="live_search_box" title="'+movie['title']+'">\
-                                <img class="img_live_search" src="' + movie['poster'] + '">\
-                                <div class="live_search_title">'+movie['title']+'</div>\
-                                <div class="live_search_orig_title">'+movie['originaltitle']+'</div>\
-                                '+movie['year']+' | '+movie['rating']+' | '+movie['runtime']+' min. | '+movie['genre']+' | '+movie['country']+' | '+movie['director']+'\
-                            </div>\
-                        </a>');
-                    }
+                    $('#panel_live_search').append(data);
                 });
             } else {
                 $('#panel_live_search').empty();
@@ -106,44 +99,7 @@ $(document).ready(function() {
     $(document).on('mouseleave', '.live_search_box', function(){
         $(this).removeClass('live_hover');
     });
-    
-    // live search tvshow
-    var wait;
-    $(document).on('keyup click', '#search_tvshows', function() {
-        clearTimeout(wait);
-        wait = setTimeout(function() {
-            var search = $('#search_tvshows').val();
-            if (search.length > 0) {
-                $.getJSON("function.js.php?option=searchtvshow&search="+search, function(data){
-                    $('#panel_live_search').empty();
-                    for(var m in data) {
-                        var movie = data[m];
-                        $('#panel_live_search').append('\
-                        <a href="index.php?video=tvshows&id='+movie['id']+'">\
-                            <div class="live_search_box" title="'+movie['title']+'">\
-                                <img class="img_live_search" src="' + movie['poster'] + '">\
-                                <div class="live_search_title">'+movie['title']+'</div>\
-                                <div class="live_search_orig_title">'+movie['originaltitle']+'</div>\
-                                '+movie['rating']+' | '+movie['genre']+'\
-                            </div>\
-                        </a>');
-                    }
-                });
-            } else {
-                $('#panel_live_search').empty();
-            }
-            $(document).click(function(){
-                $('#panel_live_search').empty();
-            });
-        }, 500);
-    });
-    $(document).on('mouseenter', '.live_search_box', function(){
-        $(this).addClass('live_hover');
-    });
-    $(document).on('mouseleave', '.live_search_box', function(){
-        $(this).removeClass('live_hover');
-    });
-    
+        
     // change background
     if (show_fanart == '1') {
         var bg = $('#background').attr('src');
@@ -235,6 +191,47 @@ $(document).ready(function() {
     });
     $('.actor_img').mouseleave(function(){
         $('.actor_thumb').dequeue().hide();
+    });
+    
+    // extra thumb
+    $(document).on('mouseenter', '.ex_thumbs img', function(){
+        $(this).animate({'opacity': '.7'}).dequeue();
+    });
+    $(document).on('mouseleave', '.ex_thumbs img', function(){
+        $(this).animate({'opacity': '1'}).dequeue();
+    });
+    $(document).on('click', '.ex_thumbs img', function(){
+        var link = $(this).attr('src').slice(0, -5);
+        $('body').append('<div class="ex_thumb_con"><img id="opened" class="ex_thumb" src="' + link + '.jpg"></div>');
+        $("img#opened").load(function() {
+            var b = 20;                             // border size
+            var img_h = $(this).height();           // get image height
+            var img_w = $(this).width();            // get image width
+            var win_h = $(window).height();         // get window height
+            var win_w = $(window).width();          // get window width
+            if (img_h > win_h - 100) {              // if image height is greather than windows height
+                var aspect = img_w / img_h;         // calculate aspect ratio
+                var r_h = img_h - win_h + 100;      // get resize value
+                img_h = img_h - r_h;                // set new image height
+                img_w = img_w - (r_h * aspect);     // set new image width
+            }
+            if (img_w > win_w - 100) {              // same for width is the above
+                var aspect = img_h / img_w;
+                var r_w = img_w - win_w + 100;
+                img_w = img_w - r_w;
+                img_h = img_h - (r_w * aspect);
+            }
+            var pos_x = (win_w-img_w)/2;            // set position X
+            var pos_y = (win_h-img_h)/2;            // set position Y
+            $('.ex_thumb_con').css({'left': '0px', 'top': '0px', 'right': '0px', 'bottom': '0px', 'position': 'fixed'});
+            $('.ex_thumb').css({'position': 'fixed', 'display': 'none', 'height': img_h+'px', 'width': img_w+'px', 'top':pos_y-b+'px', 'left': pos_x-b+'px', 'border': b+'px solid #fff'});
+            $('.ex_thumb').fadeIn(500);
+        });
+    });
+    $(document).on('click', '.ex_thumb, .ex_thumb_con', function(){
+        $('.ex_thumb').fadeOut(500, function(){
+            $('.ex_thumb, .ex_thumb_con').remove();
+        });
     });
     
     // episode plot toggle

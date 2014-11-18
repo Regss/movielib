@@ -88,36 +88,18 @@
                     <ul>{panel_country}</ul>
                 </div>
                 {/SHOW.panel_country}
-                {SHOW.panel_sets}
-                <div id="sets" class="panel_box_title">{LANG.i_sets}</div>
-                <div id="panel_sets" class="panel_box {SET.panel_sets}">
-                    <ul>{panel_sets}</ul>
+                {SHOW.panel_set}
+                <div id="set" class="panel_box_title">{LANG.i_set}</div>
+                <div id="panel_set" class="panel_box {SET.panel_set}">
+                    <ul>{panel_set}</ul>
                 </div>
-                {/SHOW.panel_sets}
+                {/SHOW.panel_set}
                 {SHOW.panel_studio}
                 <div id="studio" class="panel_box_title">{LANG.i_studio}</div>
                 <div id="panel_studio" class="panel_box {SET.panel_studio}">
                     <ul>{panel_studio}</ul>
                 </div>
                 {/SHOW.panel_studio}
-                {SHOW.panel_v_codec}
-                <div id="v_codec" class="panel_box_title">{LANG.i_v_codec}</div>
-                <div id="panel_v_codec" class="panel_box {SET.panel_v_codec}">
-                    <ul>{panel_v_codec}</ul>
-                </div>
-                {/SHOW.panel_v_codec}
-                {SHOW.panel_a_codec}
-                <div id="a_codec" class="panel_box_title">{LANG.i_a_codec}</div>
-                <div id="panel_a_codec" class="panel_box {SET.panel_a_codec}">
-                    <ul>{panel_a_codec}</ul>
-                </div>
-                {/SHOW.panel_a_codec}
-                {SHOW.panel_a_chan}
-                <div id="a_chan" class="panel_box_title">{LANG.i_a_chan}</div>
-                <div id="panel_a_chan" class="panel_box {SET.panel_a_chan}">
-                    <ul>{panel_a_chan}</ul>
-                </div>
-                {/SHOW.panel_a_chan}
             </div>
             <div id="panel_right">
                 <div id="panel_sort">{panel_sort}</div>

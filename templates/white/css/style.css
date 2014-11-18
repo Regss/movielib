@@ -45,11 +45,11 @@ input, select { background-color:#ddd; color:#333; border:1px solid #fff; font-s
 #view_title, #views a, #views span, #watch_title, #watch a, #watch span  { width:178px; display:block; background-color:#ddd; border:1px solid #fff; padding: 4px 0px 4px 0px; }
 #views, #watch { position:absolute; display:none; z-index:5; }
 
-input.search { width:250px; }
+input.search { width:248px; }
 #panel_search { margin-bottom:10px; overflow:hidden; text-align:right;  }
 #panel_input_search { width:252px; float:right; }
 #panel_live_search { position:absolute; z-index:1; border:0px solid #fff; background-color:#ddd; overflow:hidden; }
-.live_search_box { width:246px; text-align:left; cursor:pointer; border:1px solid #fff; margin:1px; font-size:10px; overflow: hidden; }
+.live_search_box { width:248px; text-align:left; cursor:pointer; border:1px solid #fff; margin:1px; font-size:10px; overflow: hidden; }
 .live_search_title { width:181px; margin:3px; font-weight:bold; color:#414141; font-size:12px; white-space:nowrap; text-overflow:ellipsis; display: block; overflow:hidden }
 .live_search_orig_title { width:181px; margin:3px; font-weight:bold; color:#666; font-size:10px; white-space:nowrap; text-overflow:ellipsis; display: block; overflow:hidden }
 .img_live_search { width:48px; height:68px; border:1px solid #000; margin:5px; float:left; }

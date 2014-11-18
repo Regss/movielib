@@ -2,215 +2,110 @@
 session_start();
 header('Content-type: text/html; charset=utf-8');
 
-require('config.php');
-require('function.php');
+include('config.php');
+include('function.php');
 
 // connect to database
 connect($mysql_ml);
 
 // get settings from db
-$set = get_settings($mysql_tables);
-require('lang/' . $set['language'] . '/lang.php');
+$setting = get_settings();
+include('lang/' . $setting['language'] . '/lang.php');
 
 /* #################
  * # SYNC DATABASE #
  */#################
 
- // check version
-if ($option == 'checkversion') {
-    echo  $version;
-}
-
 // check settings
 if ($option == 'checksettings') {
-    $settings = array();
-    $settings['GD'] = (extension_loaded('gd') && function_exists('gd_info') ? 'On' : 'Off');
-    $settings['CURL'] = (function_exists('curl_version') ? 'On' : 'Off');
-    $settings['ALLOW_URL_FOPEN'] = (ini_get('allow_url_fopen') == 1 ? 'On' : 'Off');
-    $settings['MAX_EXECUTION_TIME'] = ini_get('max_execution_time');
-    $settings['UPLOAD_MAX_FILESIZE'] = ini_get('upload_max_filesize');
-    $settings['POST_MAX_SIZE'] = ini_get('post_max_size');
-    echo json_encode($settings);
+    $s = $setting;
+    $s['token_md5']              = md5($setting['token']);
+    $s['version']                = $version;
+    $s['GD']                     = (extension_loaded('gd') && function_exists('gd_info') ? 'On' : 'Off');
+    $s['CURL']                   = (function_exists('curl_version') ? 'On' : 'Off');
+    $s['MAX_EXECUTION_TIME']     = ini_get('max_execution_time');
+    $s['UPLOAD_MAX_FILESIZE']    = ini_get('upload_max_filesize');
+    $s['POST_MAX_SIZE']          = ini_get('post_max_size');
+    $s['ALLOW_URL_FOPEN']        = (ini_get('allow_url_fopen') == 1 ? 'true' : 'false');
+    unset($s['token']);
+    echo json_encode($s);
 }
 
-// check token
-if ($option == 'checktoken') {
-    if ($token == $set['token']) {
-        echo 'true';
-    } else {
-        echo 'false';
-    }
-}
-
-if ($token == $set['token']) {
+if ($token == $setting['token']) {
 
     switch ($option) {
         
-        // check allow_url_fopen
-        case 'checkallowurlfopen':
-            echo (ini_get('allow_url_fopen') == 1 ? 'true' : 'false');
-            break;
-        
         // generate banner
         case 'generatebanner':
-            create_banner($lang, 'banner.jpg', $set['banner'], $mysql_tables);
+            $ret = create_banner($lang, 'banner.jpg', $setting['banner']);
+            echo ($ret);
+            break;
+        
+        // get hash
+        case 'showhash':
+            $hash_sql = 'SELECT * FROM hash';
+            $hash_res = mysql_q($hash_sql);
+            $hash = mysql_fetch_assoc($hash_res);
+            echo json_encode($hash);
+            break;
+        
+        // update hash
+        case 'updatehash':
+            foreach ($_POST as $table => $hash) {
+                $update_sql = 'UPDATE `hash` SET ' . $table . ' = "' . $hash . '"';
+            }
+            $update_res = mysql_q($update_sql);
             break;
         
         /* #########
          * # MOVIE #
          */#########
-        // show movie id from database
-        case 'showmovieid':
-            show_id($mysql_tables[0]);
+        case 'showvideo':
+            $cols = array('id', 'hash');
+            echo show($cols, $_GET['table']);
             break;
         
-        // sync movie
-        case 'addmovie':
-            sync_add($tables, $mysql_tables[0]);
-            break;
-        case 'removemovie':
-            sync_remove($mysql_tables[0]);
-            break;
-        
-        // show movie watched id from database
-        case 'showwatchedmovieid':
-            $sql = 'SELECT id FROM ' . $mysql_tables[0] . ' WHERE play_count > 0';
-            $sql_res = mysql_query($sql);
-            while ($id = mysql_fetch_array($sql_res)) {
-                echo $id[0] . ' ';
+        case 'addvideo':
+            if (isset($_POST['id'])) {
+                sync_delete(array($_POST['id']), $_GET['t']);
+                sync_add($mysql_tables);
+            } else {
+                echo 'No POST data';
             }
             break;
         
-        // sync watched
-        case 'watchedmovie':
-            sync_watched($mysql_tables[0]);
+        case 'removevideo':
+            sync_delete($_POST, $_GET['t']);
             break;
         
-        // sync unwatched
-        case 'unwatchedmovie':
-            sync_unwatched($mysql_tables[0]);
-            break;
-        
-        // show lastplayed movie id
-        case 'showlastplayedmovie':
-            $sql = 'SELECT last_played FROM ' . $mysql_tables[0] . ' ORDER BY last_played DESC LIMIT 0 , 1';
-            $sql_res = mysql_query($sql);
-            while ($date = mysql_fetch_array($sql_res)) {
-                echo $date[0] . ' ';
+        case 'updatevideo':
+            if (isset($_POST['id'])) {
+                sync_delete(array($_POST['id']), $_GET['t']);
+                sync_add($mysql_tables);
+            } else {
+                echo 'No POST data';
             }
             break;
         
-        // sync lastplayed
-        case 'lastplayedmovie':
-            sync_lastplayed($mysql_tables[0]);
-            break;
-            
         /* ##########
-         * # TVSHOW #
+         * # PANELS #
          */##########
-        // show tvshow id from database
-        case 'showtvshowid':
-            show_id($mysql_tables[1]);
+        case 'showpanel':
+            $cols = array($_GET['t'], 'id');
+            show($cols, $_GET['t']);
             break;
         
-        // sync tvshow
-        case 'addtvshow':
-            sync_add($tables, $mysql_tables[1]);
-            break;
-        case 'removetvshow':
-            sync_remove($mysql_tables[1]);
+        case 'addpanel':
+            add($_POST, $_GET['t']);
             break;
         
-        // show tvshow watched id from database
-        case 'showwatchedtvshowid':
-            $sql = 'SELECT id FROM ' . $mysql_tables[1] . ' WHERE play_count > 0';
-            $sql_res = mysql_query($sql);
-            while ($id = mysql_fetch_array($sql_res)) {
-                echo $id[0] . ' ';
-            }
-            break;
-        
-        // sync watched
-        case 'watchedtvshow':
-            sync_watched($mysql_tables[1]);
-            break;
-        
-        // sync unwatched
-        case 'unwatchedtvshow':
-            sync_unwatched($mysql_tables[1]);
-            break;
-        
-        // show lastplayed tvshow id
-        case 'showlastplayedtvshow':
-            $sql = 'SELECT last_played FROM ' . $mysql_tables[1] . ' ORDER BY last_played DESC LIMIT 0 , 1';
-            $sql_res = mysql_query($sql);
-            while ($date = mysql_fetch_array($sql_res)) {
-                echo $date[0] . ' ';
-            }
-            break;
-        
-        // sync lastplayed
-        case 'lastplayedtvshow':
-            sync_lastplayed($mysql_tables[1]);
+        case 'removepanel':
+            remove($_POST, $_GET['t']);
             break;
             
-        /* ###########
-         * # EPISODE #
-         */###########
-        // show episode id from database
-        case 'showepisodeid':
-            show_id($mysql_tables[2]);
+        case 'addthumb':
+            add_thumb($_POST);
             break;
-            
-        // sync episode
-        case 'addepisode':
-            sync_add($tables, $mysql_tables[2]);
-            break;
-        case 'removeepisode':
-            sync_remove($mysql_tables[2]);
-            break;
-        
-        // show episode watched id from database
-        case 'showwatchedepisodeid':
-            $sql = 'SELECT id FROM ' . $mysql_tables[2] . ' WHERE play_count > 0';
-            $sql_res = mysql_query($sql);
-            while ($id = mysql_fetch_array($sql_res)) {
-                echo $id[0] . ' ';
-            }
-            break;
-        
-        // sync watched
-        case 'watchedepisode':
-            sync_watched($mysql_tables[2]);
-            break;
-        
-        // sync unwatched
-        case 'unwatchedepisode':
-            sync_unwatched($mysql_tables[2]);
-            break;
-        
-        // show lastplayed episode id
-        case 'showlastplayedepisode':
-            $sql = 'SELECT last_played FROM ' . $mysql_tables[2] . ' ORDER BY last_played DESC LIMIT 0 , 1';
-            $sql_res = mysql_query($sql);
-            while ($date = mysql_fetch_array($sql_res)) {
-                echo $date[0] . ' ';
-            }
-            break;
-        
-        // sync lastplayed
-        case 'lastplayedepisode':
-            sync_lastplayed($mysql_tables[2]);
-            break;
-        
-        /* #########
-         * # ACTOR #
-         */#########
-        // add actor
-        case 'addactor':
-            add_actor($_POST['name'], $_POST['actor']);
-            break;
-        
     }
 }
 ?>

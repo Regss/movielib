@@ -1,3 +1,11 @@
+v. 2.7.0
+- added extra thumbs
+- added multi audio track
+- added audio and subtitles language
+- now movies info update when XBMC do some changes
+- added actors to live search
+- rewrite sync functions
+
 v. 2.6.1
 - added studio panel
 - added studio flags
@@ -36,7 +44,7 @@ v. 2.3.3
 - added checking files integrity
 - added checking tables integrity (auto update to new versions)
 - added checking if allow_url_fopen is enabled
-- added support for movie sets
+- added support for movies set
 
 v. 2.3.2
 - fixed graphics for HD movies

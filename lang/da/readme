@@ -1,8 +1,8 @@
-Dette script synkronisere automatisk og viser XBMC biblioteket
+Dette script synkronisere automatisk og viser XBMC/Kodi biblioteket
 
 Krav:
 - Server med Apache server, PHP 5, MySql 5
-- Addonet "Movielib" til XBMC. Som kan hentes her https://raw.github.com/Regss/xbmc-regss-repository/master/repo/repository.regss/repository.regss-1.2.1.zip 
+- Addonet "Movielib" til XBMC/Kodi. Som kan hentes her https://raw.github.com/Regss/xbmc-regss-repository/master/repo/repository.regss/repository.regss-1.2.1.zip 
 
 Standart passwords:
 Adgang til siden: user
