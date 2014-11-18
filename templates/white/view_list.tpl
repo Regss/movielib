@@ -15,10 +15,6 @@
         </span>
     </div>
     <div class="images">
-        <div>{img_flag_vres}</div>
-        <div>{img_flag_vtype}</div>
-        <div>{img_flag_atype}</div>
-        <div>{img_flag_achan}</div>
         <div>{trailer_img}</div>
         <div>{watched_img}</div>
     </div>

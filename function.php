@@ -3,9 +3,9 @@
  * # CLASS #
  */#########
 class Teamplate {
-    function __construct($file, $set, $lang) {
-        $this->file = 'templates/' . $set['theme'] . '/' . $file;
-        $this->set = $set;
+    function __construct($file, $setting, $lang) {
+        $this->file = 'templates/' . $setting['theme'] . '/' . $file;
+        $this->set = $setting;
         $this->lang = $lang;
         $this->tpl = array();
         $this->show = array();
@@ -29,7 +29,7 @@ class Teamplate {
             $cont = str_replace('{SET.' . $key . '}', $val, $cont);
         }
         foreach ($this->show as $key  => $val) {
-            if ($val <> 1) {
+            if ($val == 0) {
                 $cont = preg_replace('|{SHOW\.' . $key . '}.*?{/SHOW\.' . $key . '}|s', '', $cont);
             }
         }
@@ -42,6 +42,20 @@ class Teamplate {
  * # FUNCTIONS #
  */#############
 
+/* ###############
+ * # MYSQL query #
+ */###############
+
+function mysql_q($query) {
+    $result = mysql_query($query);
+    if (!$result) {
+        echo $query . '<br>';
+        die ('ERROR: MySQL - ' . mysql_error());
+    } else {
+        return $result;
+    }
+}
+ 
 /* ########################
  * # Connect to databaase #
  */########################
@@ -56,24 +70,22 @@ function connect($mysql_ml) {
     }
 
     // Sets utf8 connections
-    mysql_query('SET CHARACTER SET utf8');
-    mysql_query('SET NAMES utf8');
+    mysql_q('SET CHARACTER SET utf8');
+    mysql_q('SET NAMES utf8');
 }
 
 /* ##############################
  * # Get settings from database #
  */##############################
-function get_settings($mysql_tables) {
+function get_settings() {
     
     // if settings in session not exists get it from database
     if (!isset($_SESSION) or count($_SESSION) < 10) {
-        $set_sql = 'SELECT * FROM ' . $mysql_tables[3];
-        $set_result = @mysql_query($set_sql);
-        if ($set_result) {
-            $get_set = mysql_fetch_assoc($set_result);
-            foreach($get_set as $key => $val) {
-                $_SESSION[$key] = $val;
-            }
+        $set_sql = 'SELECT * FROM `config`';
+        $set_res = mysql_q($set_sql);
+        $get_set = mysql_fetch_assoc($set_res);
+        foreach($get_set as $key => $val) {
+            $_SESSION[$key] = $val;
         }
     }
     return $_SESSION;
@@ -82,314 +94,251 @@ function get_settings($mysql_tables) {
 /* ###########################
  * # Create and check tables #
  */###########################
-function create_table($mysql_tables, $tables, $lang, $version, $drop) {
+function create_table($mysql_tables, $lang, $version, $drop) {
         
     // drop tables
     if ($drop == 1) {
-        foreach ($mysql_tables as $table) {
+        foreach ($mysql_tables as $table => $table_val) {
             $drop_table_sql = 'DROP TABLE IF EXISTS `' . $table . '`';
-            if (!@mysql_query($drop_table_sql)) {
-                die(mysql_error());
-            }
+            $drop_table_res = mysql_q($drop_table_sql);
         }
     }
     
     $tables_array = array();
     $tables_sql = 'SHOW TABLES';
-    $tables_result = mysql_query($tables_sql);
+    $tables_result = mysql_q($tables_sql);
     while ($tables_db = mysql_fetch_array($tables_result)) {
         $tables_array[] = $tables_db[0];
     }
     
-    // table movies
-    if (!in_array($mysql_tables[0], $tables_array)) {
-        $create_movies_sql = 'CREATE TABLE IF NOT EXISTS `' . $mysql_tables[0] . '` (';
-        foreach($tables[$mysql_tables[0]] as $key => $val) {
-            $create_movies_sql.= '`' . $key . '` ' . $val . ', ';
-        }
-        $create_movies_sql.= 'PRIMARY KEY (`id`)) DEFAULT CHARSET=utf8';
-        if (!@mysql_query($create_movies_sql)) {
-            die($lang['inst_could_create'] . ': ' . $mysql_tables[0] . ' - ' . mysql_error() . '<br>');
-        }
-    }
-    
-    // table tvshows
-    if (!in_array($mysql_tables[1], $tables_array)) {
-        $create_tvshows_sql = 'CREATE TABLE IF NOT EXISTS `' . $mysql_tables[1] . '` (';
-        foreach($tables[$mysql_tables[1]] as $key => $val) {
-            $create_tvshows_sql.= '`' . $key . '` ' . $val . ', ';
-        }
-        $create_tvshows_sql.= 'PRIMARY KEY (`id`)) DEFAULT CHARSET=utf8';
-        if (!@mysql_query($create_tvshows_sql)) {
-            die($lang['inst_could_create'] . ': ' . $mysql_tables[1] . ' - ' . mysql_error() . '<br>');
+    // all tables
+    foreach ($mysql_tables as $table => $table_val) {
+        if (!in_array($table, $tables_array)) {
+            $create_sql_array = array();
+            foreach($table_val as $key => $val) {
+                $create_sql_array[] = '`' . $key . '` ' . $val;
+            }
+            $create_sql = 'CREATE TABLE IF NOT EXISTS `' . $table . '` (' . implode(', ', $create_sql_array) . ') DEFAULT CHARSET=utf8';
+            $create_res = mysql_q($create_sql);
         }
     }
-    
-    // table seasons
-    if (!in_array($mysql_tables[2], $tables_array)) {
-        $create_seasons_sql = 'CREATE TABLE IF NOT EXISTS `' . $mysql_tables[2] . '` (';
-        foreach($tables[$mysql_tables[2]] as $key => $val) {
-            $create_seasons_sql.= '`' . $key . '` ' . $val . ', ';
-        }
-        $create_seasons_sql.= 'PRIMARY KEY (`id`)) DEFAULT CHARSET=utf8';
-        if (!@mysql_query($create_seasons_sql)) {
-            die($lang['inst_could_create'] . ': ' . $mysql_tables[2] . ' - ' . mysql_error() . '<br>');
-        }
+    // insert config
+    $sel = 'SELECT * FROM config';
+    $res = mysql_q($sel);
+    if (mysql_num_rows($res) == 0) {
+        $insert_config_sql = 'INSERT INTO `config` () VALUES ()';
+        $insert_config_res = mysql_q($insert_config_sql);
     }
-    
-    // table episodes
-    if (!in_array($mysql_tables[2], $tables_array)) {
-        $create_episodes_sql = 'CREATE TABLE IF NOT EXISTS `' . $mysql_tables[2] . '` (';
-        foreach($tables[$mysql_tables[2]] as $key => $val) {
-            $create_episodes_sql.= '`' . $key . '` ' . $val . ', ';
+    // insert users
+    $sel = 'SELECT * FROM users';
+    $res = mysql_q($sel);
+    if (mysql_num_rows($res) == 0) {
+            $insert_users_sql = 'INSERT INTO `users` (`id`, `login`, `password`) VALUES (1, "admin", "21232f297a57a5a743894a0e4a801fc3"), (2, "user", "ee11cbb19052e40b07aac0ca060c23ee")';
+            $insert_users_res = mysql_q($insert_users_sql);
         }
-        $create_episodes_sql.= 'PRIMARY KEY (`id`)) DEFAULT CHARSET=utf8';
-        if (!@mysql_query($create_episodes_sql)) {
-            die($lang['inst_could_create'] . ': ' . $mysql_tables[2] . ' - ' . mysql_error() . '<br>');
-        }
+    // insert hash
+    $sel = 'SELECT * FROM hash';
+    $res = mysql_q($sel);
+    if (mysql_num_rows($res) == 0) {
+        $insert_hash_sql = 'INSERT INTO `hash` () VALUES ()';
+        $insert_hash_res = mysql_q ($insert_hash_sql);
     }
-    
-    // table config
-    if (!in_array($mysql_tables[3], $tables_array)) {
-        $create_config_sql = 'CREATE TABLE IF NOT EXISTS `' . $mysql_tables[3] . '` (';
-        foreach($tables[$mysql_tables[3]] as $key => $val) {
-            $create_config_sql.= '`' . $key . '` ' . $val . ', ';
-        }
-        $create_config_sql = substr($create_config_sql, 0, -2);
-        $create_config_sql.= ') DEFAULT CHARSET=utf8';
-        if (!@mysql_query($create_config_sql)) {
-            die($lang['inst_could_create'] . ': ' . $mysql_tables[3] . ' - ' . mysql_error() . '<br>');
-        }
-        if (@mysql_num_rows(mysql_query('SELECT * FROM ' . $mysql_tables[3])) == 0) {
-            $insert_config_sql = 'INSERT INTO `' . $mysql_tables[3] . '` () VALUES ()';
-            mysql_query ($insert_config_sql);
-        }
-    }
-    
-    // table users
-    if (!in_array($mysql_tables[4], $tables_array)) {
-        $create_users_sql = 'CREATE TABLE IF NOT EXISTS `' . $mysql_tables[4] . '` (';
-        foreach($tables[$mysql_tables[4]] as $key => $val) {
-            $create_users_sql.= '`' . $key . '` ' . $val . ', ';
-        }
-        $create_users_sql.= 'PRIMARY KEY (`id`)) DEFAULT CHARSET=utf8';
-        if (!@mysql_query($create_users_sql)) {
-            die($lang['inst_could_create'] . ': ' . $mysql_tables[4] . ' - ' . mysql_error() . '<br>');
-        }
-        if (@mysql_num_rows(mysql_query('SELECT * FROM ' . $mysql_tables[4])) == 0) {
-            $insert_users_sql = 'INSERT INTO `' . $mysql_tables[4] . '` (`id`, `login`, `password`) VALUES (1, "admin", "21232f297a57a5a743894a0e4a801fc3")';
-            mysql_query($insert_users_sql);
-            $insert_users_sql = 'INSERT INTO `' . $mysql_tables[4] . '` (`id`, `login`, `password`) VALUES (2, "user", "ee11cbb19052e40b07aac0ca060c23ee")';
-            mysql_query($insert_users_sql);
-        }
-    }
-    
     // check columns
-    foreach ($mysql_tables as $table) {
-        $columns_sql = 'SHOW COLUMNS FROM ' . $table;
-        $columns_result = mysql_query($columns_sql);
+    foreach ($mysql_tables as $table => $table_val) {
+        $columns_sql = 'SHOW COLUMNS FROM `' . $table . '`';
+        $columns_result = mysql_q($columns_sql);
         while($columns = mysql_fetch_assoc($columns_result)) {
             $columns_db_array[$table][] = $columns['Field'];
         }
     }
-    
-    foreach ($tables as $tables_key => $tables_val) {
+    foreach ($mysql_tables as $table => $tables_val) {
+        $alter = array();
         foreach($tables_val as $col_key => $col_type) {
-            if (!in_array($col_key, $columns_db_array[$tables_key])) {
-                mysql_query('ALTER TABLE `' . $tables_key . '` ADD `' . $col_key . '` ' . $col_type);
+            if (!in_array($col_key, $columns_db_array[$table])) {
+                $alter[] = 'ADD `' . $col_key . '` ' . $col_type;
             } else {
-                mysql_query('ALTER TABLE `' . $tables_key . '` CHANGE `' . $col_key . '` `' . $col_key . '` ' . $col_type);
+                if ($col_key !== 'id') {
+                    $alter[] = 'CHANGE `' . $col_key . '` `' . $col_key . '` ' . $col_type;
+                }
             }
         }
+        foreach ($columns_db_array[$table] as $col) {
+            if (!array_key_exists($col, $mysql_tables[$table])) {
+                $alter[] = 'DROP COLUMN `' . $col . '`';
+            }
+        }
+        $alter_sql = 'ALTER TABLE `' . $table . '` ' . implode(', ', $alter);
+        mysql_q($alter_sql);
     }
-    
     // update version
-    $update_v_sql = 'UPDATE `' . $mysql_tables[3] . '` SET 
-        version = "' . $version . '"
-        WHERE version LIKE "%"';
-    mysql_query($update_v_sql);
+    $update_v_sql = 'UPDATE `config` SET version = "' . $version . '" WHERE version LIKE "%"';
+    mysql_q($update_v_sql);
     $output_create_table = $lang['a_tables_updated'] . '<br>';
     return $output_create_table;
 }
 
-/* ##########################
- * # SYNC - show id from db #
- */##########################
-function show_id($table) {
-    $show_id_sql = 'SELECT id FROM ' . $table;
-    $show_id_result = mysql_query($show_id_sql);
-    while ($id = mysql_fetch_array($show_id_result)) {
-        echo $id[0] . ' ';
-    }
-}
- 
-/* ##########################
- * # SYNC - add Movie to DB #
- */##########################
-function sync_add($tables, $table) {
-    $insert_row = '';
-    $insert_value = '';
+/* #######################
+ * # SYNC - show from db #
+ */#######################
+function show($cols, $table) {
+    $show_sql = 'SELECT `' . implode('`, `', $cols) . '` FROM `' . $table . '`';
+    $show_result = mysql_q($show_sql);
     
-    foreach($tables[$table] as $key => $val) {
-        $insert_row.= '`' . $key . '`,';
-        $insert_value.= '"' . (isset($_POST[$key]) ? add_slash($_POST[$key]) : '') . '",';
+    $output = array();
+    while ($d = mysql_fetch_row($show_result)) {
+        $output[$d[0]] = $d[1];
     }
-    $insert_row = substr($insert_row, 0, -1);
-    $insert_value = substr(trim($insert_value), 0, -1);
-    $insert_sql = 'INSERT INTO `' . $table . '` (' . $insert_row . ') VALUES (' . $insert_value . ')';
-    
-    $insert = mysql_query($insert_sql);
-
-    if (!$insert) {
-        echo $insert_sql . '<br>';
-        echo 'ERROR: MySQL - ' . mysql_error();
+    if (count($output) > 0) {
+        echo json_encode($output);
     } else {
-    
-        // poster
-        if (isset($_POST['poster'])) {
-            $poster = base64_decode($_POST['poster']);
-            if (substr($poster, 0, 4) == 'http') {
-                $size = @getimagesize($poster);
-                if ($size[0] > $size[1]) {
-                    gd_convert('cache/' . $table . '_' . $_POST['id'] . '.jpg', $poster, 140, 35);
-                } else {
-                    gd_convert('cache/' . $table . '_' . $_POST['id'] . '.jpg', $poster, 180, 265);
-                }
-            } else {
-                $fp = fopen('cache/temp_' . $table . '_' . $_POST['id'], 'wb');
-                fwrite($fp, $poster);
-                fclose($fp);
-                $size = @getimagesize('cache/temp_' . $table . '_' . $_POST['id']);
-                if ($size[0] > $size[1]) {
-                    gd_convert('cache/' . $table . '_' . $_POST['id'] . '.jpg', 'cache/temp_' . $table . '_' . $_POST['id'], 140, 35);
-                } else {
-                    gd_convert('cache/' . $table . '_' . $_POST['id'] . '.jpg', 'cache/temp_' . $table . '_' . $_POST['id'], 180, 265);
-                }
-                unlink('cache/temp_' . $table . '_' . $_POST['id']);
-            }
-        }
-        
-        // fanart
-        if (isset($_POST['fanart'])) {
-            $fanart = base64_decode($_POST['fanart']);
-            if (substr($fanart, 0, 4) == 'http') {
-                gd_convert('cache/' . $table . '_' . $_POST['id'] . '_f.jpg', $fanart, 1280, 720);
-            } else {
-                $fp = fopen('cache/temp_f_' . $table . '_' . $_POST['id'], 'wb');
-                fwrite($fp, $fanart);
-                fclose($fp);
-                gd_convert('cache/' . $table . '_' . $_POST['id'] . '_f.jpg', 'cache/temp_f_' . $table . '_' . $_POST['id'], 1280, 720);
-                unlink('cache/temp_f_' . $table . '_' . $_POST['id']);
-            }
-        }
-    }
-}
-
-/* ###############################
- * # SYNC - remove Movie from DB #
- */###############################
-function sync_remove($table) {
-    
-    $id = $_POST['id'];
-    $delete_movie_sql = 'DELETE FROM ' . $table . ' WHERE id = "' . $id . '"';
-    if (file_exists('cache/' . $table . '_' . $id . '.jpg')) {
-        unlink('cache/' . $table . '_' . $id . '.jpg');
-    }
-    if (file_exists('cache/' . $table . '_' . $id . '_f.jpg')) {
-        unlink('cache/' . $table . '_' . $id . '_f.jpg');
-    }
-    
-    $delete = mysql_query($delete_movie_sql);
-    
-    if (!$delete) {
-        echo 'ERROR: MySQL - ' . mysql_error();
-    }
-}
-
-/* ##################
- * # SYNC - Watched #
- */##################
-function sync_watched($table) {
-    
-    $update_sql = 'UPDATE `' . $table . '` SET 
-        play_count = "' . add_slash($_POST['playcount']) . '",
-        last_played = "' . add_slash($_POST['lastplayed']) . '",
-        date_added = "' . add_slash($_POST['dateadded']) . '"
-        WHERE id = "' . $_POST['id'] . '"';
-
-    $update = mysql_query($update_sql);
-
-    if (!$update) {
-        echo 'ERROR: MySQL - ' . mysql_error();
-    }
-}
-
-/* ####################
- * # SYNC - unWatched #
- */####################
-function sync_unwatched($table) {
-    
-    $update_sql = 'UPDATE `' . $table . '` SET 
-        play_count = NULL,
-        last_played = NULL,
-        date_added = "' . add_slash($_POST['dateadded']) . '"
-        WHERE id = "' . $_POST['id'] . '"';
-        
-    $update = mysql_query($update_sql);
-
-    if (!$update) {
-        echo 'ERROR: MySQL - ' . mysql_error();
+        echo '{}';
     }
 }
 
 /* #####################
- * # SYNC - Lastplayed #
+ * # SYNC - add panels #
  */#####################
-function sync_lastplayed($table) {
-    
-    $update_sql = 'UPDATE `' . $table . '` SET 
-        play_count = "' . add_slash($_POST['playcount']) . '",
-        last_played = "' . add_slash($_POST['lastplayed']) . '"
-        WHERE id = "' . $_POST['id'] . '"';
-
-    $update = mysql_query($update_sql);
-
-    if (!$update) {
-        echo 'ERROR: MySQL - ' . mysql_error();
+function add($cols, $table) {
+    $vals = array();
+    foreach ($cols as $val) {
+        $vals[] = '("' . add_slash($val) . '")';
     }
+    $ins = 'INSERT INTO `' . $table . '` (`' . $table . '`) VALUES ' .  implode(', ', $vals);
+    $res = mysql_q($ins);
 }
 
-/* ####################
- * # SYNC - add actor #
- */####################
-function add_actor($actor_name, $actor_thumb) {
-    $actor_thumb = base64_decode($actor_thumb);
-    $actor_filename = substr(md5($actor_name), 0, 10);
-    if (substr($actor_thumb, 0, 4) == 'http') {
-        gd_convert('cache/actors/' . $actor_filename . '.jpg', $actor_thumb, 75, 100);
-    } else {
-        $fp = fopen('cache/actors/temp_a_' . $actor_filename, 'wb');
-        fwrite($fp, $actor_thumb);
-        fclose($fp);
-        gd_convert('cache/actors/' . $actor_filename . '.jpg', 'cache/actors/temp_a_' . $actor_filename, 75, 100);
-        unlink('cache/actors/temp_a_' . $actor_filename);
+/* ###########################
+ * # SYNC - add actors thumb #
+ */###########################
+function add_thumb($data) {
+    foreach ($data as $name => $thumb) {
+        // create actor thumb
+        $actor_thumb = base64_decode($thumb);
+        if (!file_exists('cache/actors/' . $name . '.jpg') && $actor_thumb !== '') {
+            $fp = fopen('cache/actors/' . $name . '.jpg', 'wb');
+            fwrite($fp, $actor_thumb);
+            fclose($fp);
+        }
     }
+}
+ 
+/* ########################
+ * # SYNC - remove panels #
+ */########################
+function remove($cols, $table) {
+    foreach ($cols as $val) {
+        $actor_filename = substr(md5($val), 0, 10);
+        if (file_exists('cache/' . $table . '/' . $actor_filename . '.jpg')) {
+            unlink('cache/' . $table . '/' . $actor_filename . '.jpg');
+        }
+    }
+    $delete_sql = 'DELETE FROM ' . $table . ' WHERE ' . $table . ' in ("' . implode('", "', $cols) . '")';
+    $delete_res = mysql_q($delete_sql);
+}
+ 
+/* ##########################
+ * # SYNC - add Video to DB #
+ */##########################
+function sync_add($mysql_tables) {
+    $insert_array = array();
+    // add actors, genres, countries
+    $panels = array('actor', 'genre', 'country', 'studio', 'director', 'stream');
+    foreach ($panels as $panel) {
+        if (isset($_POST[$panel])) {
+            $values = array();
+            foreach ($_POST[$panel] as $key => $val) {
+                if ($panel == 'actor') {
+                    $cols = array('id', $panel . 'id', 'order');
+                    $values[] = '("' . $_POST['id'] . '", "' . $val . '", "' . $key . '")';
+                } else if($panel == 'stream') {
+                    $cols = array_keys($mysql_tables['movies_stream']);
+                    $values[] = '("' . $_POST['id'] . '", "' . implode('", "', explode(';', $val)) . '")';
+                } else {
+                    $cols = array('id', $panel . 'id');
+                    $values[] = '("' . $_POST['id'] . '", "' . $val . '")';
+                }
+            }
+            $insert_sql = 'INSERT INTO `' . $_POST['table'] . '_' . $panel . '` (`' . implode('`, `', $cols) . '`) VALUES ' . implode(', ', $values);
+            $result = mysql_q($insert_sql);
+            unset($_POST[$panel]);
+        }
+    }
+    
+    // poster
+    if (isset($_POST['poster']) && $_POST['poster'] !== '') {
+        $poster = base64_decode($_POST['poster']);
+        $fp = fopen('cache/' . $_POST['table'] . '_' . $_POST['id'] . '.jpg', 'wb');
+        fwrite($fp, $poster);
+        fclose($fp);
+    }
+    // fanart
+    if (isset($_POST['fanart']) && $_POST['fanart'] !== '') {
+        $fanart = base64_decode($_POST['fanart']);
+        $fp = fopen('cache/' . $_POST['table'] . '_' . $_POST['id'] . '_f.jpg', 'wb');
+        fwrite($fp, $fanart);
+        fclose($fp);
+    }
+    // extra thumbs
+    if (isset($_POST['thumb']) && $_POST['thumb'] !== '') {
+        $c = 1;
+        foreach ($_POST['thumb'] as $thumb) {
+            $thumb = base64_decode($thumb);
+            $fp = fopen('cache/' . $_POST['table'] . '_' . $_POST['id'] . '_t' . $c . '.jpg', 'wb');
+            fwrite($fp, $thumb);
+            gd_convert('cache/' . $_POST['table'] . '_' . $_POST['id'] . '_t' . $c . 'm.jpg', 'cache/' . $_POST['table'] . '_' . $_POST['id'] . '_t' . $c . '.jpg', 100, 54);
+            $c++;
+        }
+    }
+    # insert values
+    foreach($mysql_tables[$_POST['table']] as $key => $val) {
+        $insert_array['`' . $key . '`'] = '"' . (isset($_POST[$key]) ? add_slash($_POST[$key]) : '') . '"';
+    }
+    $insert_sql = 'INSERT INTO `' . $_POST['table'] . '` (' . implode(', ', array_keys($insert_array)) . ') VALUES (' . implode(', ', $insert_array) . ')';
+    $insert = mysql_q($insert_sql);
+}
+
+/* ###############################
+ * # SYNC - delete Video from DB #
+ */###############################
+function sync_delete($id, $table) {
+    $del_array = array($table);
+    if ($table == 'movies') {
+        array_push($del_array, $table . '_actor', $table . '_genre', $table . '_country', $table . '_studio', $table . '_director', $table . '_stream');
+    }
+    if ($table == 'tvshows') {
+        array_push($del_array, $table . '_actor', $table . '_genre');
+    }
+    foreach ($del_array as $t) {
+        $delete_sql = 'DELETE FROM ' . $t . ' WHERE id in ("' . implode('", "', $id) . '")';
+        $delete = mysql_q($delete_sql);
+    }
+    # delete images
+    $files = scandir('cache/');
+    foreach ($id as $i) {
+        foreach($files as $file) {
+            $match = preg_match('/^' . $table . '_' . $i . '[^0-9]/', $file);
+            if ($match == 1) {
+                unlink('cache/' . $file);
+            }
+        }
+    }
+    # reset hash
+    $reset_sql = 'UPDATE hash SET ' . $table . ' = ""';
+    mysql_q($reset_sql);
 }
 
 /* ################
  * # Change Token #
  */################
-function change_token($mysql_tables) {
+function change_token() {
     $array = array('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',0,1,2,3,4,5,6,7,8,9);
     $new_token = '';
     for ($i = 1; $i <= 6; $i++) {
         $new_token.= $array[array_rand($array)];
     }
-    $update_sql = 'UPDATE `' . $mysql_tables[3] . '` SET token = "' . $new_token . '"';
-    $update = mysql_query($update_sql);
-    if ($update) {
-        $_SESSION['token'] = $new_token;
-    }
+    $update_sql = 'UPDATE `config` SET token = "' . $new_token . '"';
+    $update = mysql_q($update_sql);
+    $_SESSION['token'] = $new_token;
     return $new_token;
 }
 
@@ -398,7 +347,6 @@ function change_token($mysql_tables) {
  */#################
 function gd_convert($cache_path, $img_link, $new_width, $new_height) {
     if (!file_exists($cache_path) and !empty($img_link)) {
-        $convert = false;
         $img = @imagecreatefromjpeg($img_link);
         if (!$img) {
             $curl_opt = array(
@@ -419,7 +367,6 @@ function gd_convert($cache_path, $img_link, $new_width, $new_height) {
             imagecopyresampled($img_temp, $img, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
             imagejpeg($img_temp, $cache_path, 80);
         }
-        
     }
 }
 
@@ -438,35 +385,29 @@ function add_slash($string){
  * # ARRAYS FOR PANEL #
  */####################
 function panels_array($columns, $table) {
-    $panels_sql = 'SELECT ' . implode(', ', $columns) . ' FROM ' . $table . ' WHERE hide=0';
-    $panels_result = mysql_query($panels_sql);
+    
+    $sep_tab = array('actor', 'genre', 'country', 'studio', 'director');
     $panels_array = array();
-    while ($panels_mysql_array = mysql_fetch_assoc($panels_result)) {
-        foreach ($panels_mysql_array as $column => $value) {
-            if (!array_key_exists($column, $panels_array)) {
-                $panels_array[$column] = array();
+    foreach ($columns as $val) {
+        if (in_array($val, $sep_tab)) {
+            $sel = 'SELECT DISTINCT ' . $val . '.id, ' . $val . '.' . $val . ' FROM `' . $val . '`, `' . $table . '_' . $val . '` WHERE ' . $val . '.id=' . $table . '_' . $val . '.' . $val . 'id ORDER BY ' . $val . '.' . $val;
+            $res = mysql_q($sel);
+            while ($r = mysql_fetch_assoc($res)) {
+                $panels_array[$val][$r['id']] = $r[$val];
             }
-            if (strpos($value, ' / ') !== false) {
-                foreach (explode(' / ', $value) as $val) {
-                    if (!in_array($val, $panels_array[$column]) && strlen($val) > 0) {
-                        $panels_array[$column][] = $val;
+        } else {
+            $sel = 'SELECT DISTINCT `' . $val . '` FROM `' . $table . '` WHERE hide=0 ORDER BY `' . $val . '`';
+            $res = mysql_q($sel);
+            if (mysql_num_rows($res) > 0) {
+                while ($r = mysql_fetch_assoc($res)) {
+                    if ($r[$val] != '') {
+                        $panels_array[$val][] = $r[$val];
                     }
-                }
-            } else {
-                if (!in_array($value, $panels_array[$column]) && strlen($value) > 0) {
-                    $panels_array[$column][] = $value;
                 }
             }
         }
     }
-    if (isset($panels_array['genre'])) { sort($panels_array['genre']); }
     if (isset($panels_array['year'])) { rsort($panels_array['year']); }
-    if (isset($panels_array['country'])) { sort($panels_array['country']); }
-    if (isset($panels_array['sets'])) { sort($panels_array['sets']); }
-    if (isset($panels_array['studio'])) { sort($panels_array['studio']); }
-    if (isset($panels_array['v_codec'])) { sort($panels_array['v_codec']); }
-    if (isset($panels_array['a_codec'])) { sort($panels_array['a_codec']); }
-    if (isset($panels_array['a_chan'])) { sort($panels_array['a_chan']); }
     
     return $panels_array;
 }
@@ -474,29 +415,42 @@ function panels_array($columns, $table) {
 /* #################
  * # CREATE BANNER #
  */#################
-function create_banner($lang, $file, $data, $mysql_tables) {
+function create_banner($lang, $file, $data) {
     
-    $movie_sql = 'SELECT id, title, originaltitle, year, rating, runtime, genre, country, last_played FROM ' . $mysql_tables[0] . ' ORDER BY last_played DESC LIMIT 0, 1';
-    $movie_result = mysql_query($movie_sql);
+    $movie_sql = 'SELECT id, title, originaltitle, rating, runtime, year, last_played FROM movies ORDER BY last_played DESC LIMIT 0, 1';
+    $movie_result = mysql_q($movie_sql);
     $movie = mysql_fetch_assoc($movie_result);
     
-    $episode_sql = 'SELECT episode, season, tvshow, title, last_played FROM ' . $mysql_tables[2] . ' ORDER BY last_played DESC LIMIT 0, 1';
-    $episode_result = mysql_query($episode_sql);
+    $episode_sql = 'SELECT episode, season, tvshow, title, last_played FROM episodes ORDER BY last_played DESC LIMIT 0, 1';
+    $episode_result = mysql_q($episode_sql);
     $episode = mysql_fetch_assoc($episode_result);
     $episode['e_title'] = $episode['title'];
     unset($episode['title']);
     
     if (isset($episode['last_played']) && $episode['last_played'] > $movie['last_played']) {
-        $tvshow_sql = 'SELECT id, title, originaltitle, rating, genre, last_played FROM ' . $mysql_tables[1] . ' WHERE id = ' . $episode['tvshow'];
-        $tvshow_result = mysql_query($tvshow_sql);
+        $tvshow_sql = 'SELECT id, title, originaltitle, rating, last_played FROM tvshows WHERE id = ' . $episode['tvshow'];
+        $tvshow_result = mysql_q($tvshow_sql);
         $tvshow = mysql_fetch_assoc($tvshow_result);
         $ban = array_merge($tvshow, $episode);
-        $table = $mysql_tables[1];
+        $table = 'tvshows';
+        $panels_array = array('genre');
     } else {
         $ban = $movie;
-        $table = $mysql_tables[0];
+        $table = 'movies';
+        $panels_array = array('genre', 'country');
     }
-
+    
+    
+    foreach ($panels_array as $val) {
+        $sel_sql = 'SELECT ' . $val . '.' . $val . ' FROM ' . $val . ', ' . $table . '_' . $val . ' WHERE ' . $val . '.id = ' . $table . '_' . $val . '.' . $val . 'id AND ' . $table . '_' . $val . '.id = "' . $ban['id'] . '"';
+        $sel_res = mysql_q($sel_sql);
+        $out = array();
+        while ($s = mysql_fetch_row($sel_res)) {
+            $out[] = $s[0];
+        }
+        $ban[$val] = implode(' / ', $out);
+    }
+    
     $b = array();
     $b['w']     = 400; // banner width
     $b['h']     = 70; // banner height
@@ -605,8 +559,12 @@ function create_banner($lang, $file, $data, $mysql_tables) {
     imageline($banner, 0, 0, 0, $b['h']-1, $border_color);
 
     // save as file
-    imagejpeg($banner, 'cache/' . $file, 100);
-    return $b;
+    $res = imagejpeg($banner, 'cache/' . $file, 100);
+    if ($res) {
+        return 'BANNER CREATED SUCCESSFUL';
+    } else {
+        return 'BANNER NOT CREATED';
+    }
 }
 
 /* ################

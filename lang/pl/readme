@@ -1,8 +1,8 @@
-Skrypt automatycznie synchronizuje i wyświetla zawartość biblioteki z XBMC.
+Skrypt automatycznie synchronizuje i wyświetla zawartość biblioteki z XBMC/Kodi.
 
 Wymagania:
 - Serwer Apache, PHP 5, MySql 5
-- Add-on "Movielib" dla XBMC https://raw.github.com/Regss/xbmc-regss-repository/master/repo/repository.regss/repository.regss-1.2.1.zip 
+- Add-on "Movielib" dla XBMC/Kodi https://raw.github.com/Regss/xbmc-regss-repository/master/repo/repository.regss/repository.regss-1.2.1.zip 
 
 Domyślne hasła:
 Dostęp do strony: user

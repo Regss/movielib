@@ -60,12 +60,12 @@
                 <td class="right">{director}</td>
             </tr>
             {/SHOW.director}
-            {SHOW.sets}
+            {SHOW.set}
             <tr>
-                <td class="left">{LANG.i_sets}:</td>
-                <td class="right">{sets}</td>
+                <td class="left">{LANG.i_set}:</td>
+                <td class="right">{set}</td>
             </tr>
-            {/SHOW.sets}
+            {/SHOW.set}
             {SHOW.studio}
             <tr>
                 <td class="left">{LANG.i_studio}:</td>
@@ -78,12 +78,12 @@
                 <td class="right">{seasons}</td>
             </tr>
             {/SHOW.seasons}
-            {SHOW.cast}
+            {SHOW.actor}
             <tr>
                 <td class="left">{LANG.i_cast}:</td>
-                <td class="right">{cast}</td>
+                <td class="right">{actor}</td>
             </tr>
-            {/SHOW.cast}
+            {/SHOW.actor}
             {SHOW.plot}
             <tr>
                 <td class="left">{LANG.i_plot}:</td>
@@ -93,8 +93,15 @@
         </table>
         {episodes}
         <img class="img_space" src="templates/{SET.theme}/img/space.png" alt="">
-        {img_flag_vres}{img_flag_vtype}{img_flag_atype}{img_flag_achan}
+        <table class="table_flags">
+            <tr>
+                <td>{img_flag_v}</td>
+                <td>{img_flag_a}</td>
+                <td>{img_flag_s}</td>
+            </tr>
+        </table>
     </div>
+    {extra_thumbs}
     {SHOW.trailer}
     <div id="trailer" class="trailer">{trailer}</div>
     {/SHOW.trailer}

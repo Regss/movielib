@@ -1,8 +1,8 @@
-The script automatically synchronizes and displays XBMC library.
+The script automatically synchronizes and displays XBMC/Kodi library.
 
 Requirements:
 - Server with Apache server, PHP 5, MySql 5
-- Addon "Movielib" for XBMC https://raw.github.com/Regss/xbmc-regss-repository/master/repo/repository.regss/repository.regss-1.2.1.zip 
+- Addon "Movielib" for XBMC/Kodi https://raw.github.com/Regss/xbmc-regss-repository/master/repo/repository.regss/repository.regss-1.2.1.zip 
 
 Default passwords:
 Access to site: user

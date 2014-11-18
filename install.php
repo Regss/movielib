@@ -2,8 +2,8 @@
 session_start();
 header('Content-type: text/html; charset=utf-8');
 
-require('config.php');
-require('function.php');
+include('config.php');
+include('function.php');
 
 /* ############
  * # LANGUAGE #
@@ -29,15 +29,16 @@ $option_install_language = scandir('lang/');
 foreach ($option_install_language as $val) {
     if (file_exists('lang/' . $val . '/lang.php')) {
         
-        if (array_key_exists($val, $language)) {
-            $lang_title = $language[$val];
+        if (array_key_exists($val, $langs)) {
+            $lang_title = $langs[$val];
         } else {
             $lang_title = $val;
         }
         $output_install_lang.= '<option' . ($val == $install_lang ? ' selected="selected"' : '') . ' value="' . $val . '">' . $lang_title . '</option>';
     }
 }
-require('lang/' . $install_lang . '/lang.php');
+include('lang/' . $install_lang . '/lang.php');
+$output_panel = '';
 
 switch ($option) {
     
@@ -65,7 +66,7 @@ switch ($option) {
         /* ################
          * # SET DATABASE #
          */################
-         if (file_exists('db.php')) {
+        if (file_exists('db.php')) {
             $output_panel_info.= $lang['ins_db_exist'] . '<br />';
         }
         $title = $lang['inst_conn_db'];
@@ -78,7 +79,7 @@ switch ($option) {
                     <tr><td>' . $lang['inst_pass'] . ':</td><td><input type="password" name="pass" value=""></td></tr>
                     <tr><td>' . $lang['inst_database'] . ':</td><td><input type="text" name="database" value="movielib"></td></tr>
                 </table>
-            <input id="ok" type="submit" value="OK" />
+                <input id="ok" type="submit" value="OK" />
             </form>';
         break;
         
@@ -86,22 +87,40 @@ switch ($option) {
         /* ##################
          * # CHECK DATABASE #
          */##################
-        $conn_install = @mysql_connect($_POST['host'] . ':' . $_POST['port'], $_POST['login'], $_POST['pass']);
+        $conn_install = mysql_connect($_POST['host'] . ':' . $_POST['port'], $_POST['login'], $_POST['pass']);
         if (!$conn_install) {
             die($lang['ins_could_connect'] . ' - ' . mysql_error());
         }
-        $create_db = @mysql_query('CREATE DATABASE ' . $_POST['database']);
-        $sel_install = @mysql_select_db($_POST['database']);
+        $create_sql = 'CREATE DATABASE IF NOT EXISTS ' . $_POST['database'];
+        mysql_q($create_sql);
+        
+        $sel_install = mysql_select_db($_POST['database']);
         if (!$sel_install) {
             die($lang['ins_could_connect'] . ' - ' . mysql_error());
         }
-        create_table($mysql_tables, $tables, $lang, $version, 1);
-        $fp = fopen('db.php', 'w');
+        create_table($mysql_tables, $lang, $version, 1);
+        
+        // create db.php
         $to_write = '<?PHP $mysql_ml = array(\'' . $_POST['host'] . '\', \'' . $_POST['port'] . '\', \'' . $_POST['login'] . '\', \'' . $_POST['pass'] . '\', \'' . $_POST['database'] . '\'); ?>';
-        fwrite($fp, $to_write);
-        fclose($fp);
-        $title = $lang['ins_finished'];
-        $output_panel = '<a class="box" href="admin.php?option=delete_install">' . $lang['ins_admin'] . '</a>';
+        $fp = @fopen('db.php', 'w');
+        if (!$fp) {
+            $title = $lang['ins_error'];
+            if (file_exists('db.php')) {
+                $output_panel_error.= $lang['ins_file_db_ex'] . ' ' . substr(decoct(fileperms('db.php')), -3) . '<br>';
+            } else {
+                $output_panel_error.= $lang['ins_file_db_not'] . ' ' . substr(decoct(fileperms('.')), -3) . '<br>';
+            }
+            $output_panel = '
+                <div class="center">' . $lang['ins_file_db_cre'] . ':</div>
+                <form action="install.php?option=success" method="post">
+                    <textarea readonly="readonly">' . $to_write . '</textarea>
+                </form>';
+        } else {
+            fwrite($fp, $to_write);
+            fclose($fp);
+            $title = $lang['ins_finished'];
+            $output_panel = '<a class="box" href="admin.php?option=delete_install">' . $lang['ins_admin'] . '</a>';
+        }
         
         // delete session var
         $_SESSION = array();
@@ -139,6 +158,9 @@ switch ($option) {
 if ($output_panel_info !== '') {
     $output_panel_info = '<div class="panel_info">' . $output_panel_info . '</div>';
 }
+if ($output_panel_error !== '') {
+    $output_panel_error = '<div class="panel_error">' . $output_panel_error . '</div>';
+}
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -155,6 +177,7 @@ if ($output_panel_info !== '') {
     </head>
     <body>
         <?PHP echo $output_panel_info ?>
+        <?PHP echo $output_panel_error ?>
         <div class="container_install">
             <div class="title"><?PHP echo $title ?></div>
             <?PHP echo $output_panel ?>
