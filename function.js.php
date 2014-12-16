@@ -133,30 +133,87 @@ if ($option  == 'remote') {
             }
             $json = urlencode('{"jsonrpc": "2.0", "params": {"item": {"' . $video . '": ' . $_GET['id'] . '}}, "method": "Player.Open", "id": 1}');
             break;
-        case 'stop':
-            $json = urlencode('{"jsonrpc": "2.0", "params": {"playerid": 1}, "method": "Player.Stop", "id": 1}');
-            break;
-        case 'pause':
-            $json = urlencode('{"jsonrpc": "2.0", "params": {"playerid": 1}, "method": "Player.PlayPause", "id": 1}');
-            break;
-        case 'v_up':
-            $json = urlencode('{"jsonrpc": "2.0", "params": {"action": "volumeup"}, "method": "Input.ExecuteAction", "id": 1}');
-            break;
-        case 'v_down':
-            $json = urlencode('{"jsonrpc": "2.0", "params": {"action": "volumedown"}, "method": "Input.ExecuteAction", "id": 1}');
-            break;
-        case 'stepforward':
+        case 'stepforward': // stepforward
+        case '190':
             $json = urlencode('{"jsonrpc": "2.0", "params": {"action": "stepforward"}, "method": "Input.ExecuteAction", "id": 1}');
             break;
-        case 'stepback':
+        case 'stepback': // stepback
+        case '188':
             $json = urlencode('{"jsonrpc": "2.0", "params": {"action": "stepback"}, "method": "Input.ExecuteAction", "id": 1}');
             break;
-        case 'bigstepforward':
+        case 'bigstepforward': // bigstepforward
+        case '221':
             $json = urlencode('{"jsonrpc": "2.0", "params": {"action": "bigstepforward"}, "method": "Input.ExecuteAction", "id": 1}');
             break;
-        case 'bigstepback':
+        case 'bigstepback': // bigstepback
+        case '219':
             $json = urlencode('{"jsonrpc": "2.0", "params": {"action": "bigstepback"}, "method": "Input.ExecuteAction", "id": 1}');
             break;
+        case 'v_up': // volume up
+        case '61':
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"action": "volumeup"}, "method": "Input.ExecuteAction", "id": 1}');
+            break;
+        case 'v_down': // volume down
+        case '173':
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"action": "volumedown"}, "method": "Input.ExecuteAction", "id": 1}');
+            break;
+        case 'mute': // volume mute
+        case '48':
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"action": "mute"}, "method": "Input.ExecuteAction", "id": 1}');
+            break;
+        case 'stop': // stop
+        case '88':
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"playerid": 1}, "method": "Player.Stop", "id": 1}');
+            break;
+        case 'pause': // pause
+        case '32':
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"playerid": 1}, "method": "Player.PlayPause", "id": 1}');
+            break;
+        case 'right': // right
+        case '39':
+            $json = urlencode('{"jsonrpc": "2.0", "method": "Input.Right", "id": 1}');
+            break;
+        case 'left': // left
+        case '37':
+            $json = urlencode('{"jsonrpc": "2.0", "method": "Input.Left", "id": 1}');
+            break;
+        case 'up': // up
+        case '38':
+            $json = urlencode('{"jsonrpc": "2.0", "method": "Input.Up", "id": 1}');
+            break;
+        case 'down': // down
+        case '40':
+            $json = urlencode('{"jsonrpc": "2.0", "method": "Input.Down", "id": 1}');
+            break;
+        case 'watch': // watched
+        case '87':
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"action": "togglewatched"}, "method": "Input.ExecuteAction", "id": 1}');
+            break;
+        case 'info': // info
+        case '73':
+            $json = urlencode('{"jsonrpc": "2.0", "method": "Input.Info", "id": 1}');
+            break;
+        case 'select': // select
+        case '13':
+            $json = urlencode('{"jsonrpc": "2.0", "method": "Input.Select", "id": 1}');
+            break;
+        case 'back': // back
+        case '8':
+            $json = urlencode('{"jsonrpc": "2.0", "method": "Input.Back", "id": 1}');
+            break;
+        case 'context': // context menu
+        case '67':
+            $json = urlencode('{"jsonrpc": "2.0", "method": "Input.ContextMenu", "id": 1}');
+            break;
+        case 'power': // shutdown menu
+        case '83':
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"window":"shutdownmenu"}, "method": "GUI.ActivateWindow", "id": 1}');
+            break;
+        case 'sync': // sync
+        case '82':
+            $json = urlencode('{"jsonrpc": "2.0", "params": {"addonid":"script.movielib"}, "method": "Addons.ExecuteAddon", "id": 1}');
+            break;
+            
         case 'playing':
             // get player status
             $json_player = urlencode('{"jsonrpc": "2.0", "params": {"playerid": 1}, "method": "Player.GetItem", "id": 1}');
@@ -286,6 +343,8 @@ if ($option  == 'deletemovie' or $option  == 'deletetvshow') {
         $table = 'movies';
     } else {
         $table = 'tvshows';
+        $delete_sql = 'DELETE FROM episodes WHERE tvshow in (' . $_GET['id'] . ')';
+        $delete = mysql_q($delete_sql);
     }
     sync_delete(array($_GET['id']), $table);
 }

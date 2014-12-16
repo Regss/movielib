@@ -115,7 +115,7 @@ if ($option == '') {
     }
     $overall_tvshows_unwatched = $overall_tvshows_all - $overall_tvshows_watched;
     
-    // Cached
+    // Cached poster and fanarts
     $cached_dir = scandir('cache/');
     $poster_cached = 0;
     $fanart_cached = 0;
@@ -125,6 +125,15 @@ if ($option == '') {
         }
         if (preg_match_all('/[0-9]+_f\.jpg/', $val, $res) == 1) {
             $fanart_cached++;
+        }
+    }
+    
+    // Cached actors
+    $cached_dir = scandir('cache/actors/');
+    $actors_cached = 0;
+    foreach ($cached_dir as $val) {
+        if (preg_match_all('/[0-9a-z]{10}\.jpg/', $val, $res) == 1) {
+            $actors_cached++;
         }
     }
     
@@ -162,6 +171,7 @@ if ($option == '') {
             <tr><td class="bold orange">' . $lang['a_cache'] . '</td><td></td></tr>
             <tr><td>' . $lang['a_cached_posters'] . '</td><td>' . $poster_cached . '</td></tr>
             <tr><td>' . $lang['a_cached_fanarts'] . '</td><td>' . $fanart_cached . '</td></tr>
+            <tr><td>' . $lang['a_cached_actors'] . '</td><td>' . $actors_cached . '</td></tr>
             <tr><td class="bold orange">' . $lang['a_server_settings'] . '</td><td></td></tr>
             <tr><td>GD</td><td>' . (extension_loaded('gd') && function_exists('gd_info') ? $lang['a_setting_on'] : $lang['a_setting_off']) . '</td></tr>
             <tr><td>CURL</td><td>' . (function_exists('curl_version') ? $lang['a_setting_on'] : $lang['a_setting_off']) . '</td></tr>
@@ -331,7 +341,7 @@ if ($option == 'delete_all_tvshows') {
         }
     }
     # reset hash
-    $reset_sql = 'UPDATE hash SET tvshows = ""';
+    $reset_sql = 'UPDATE hash SET tvshows = "", episodes = ""';
     $reset_res = mysql_query($reset_sql);
     if (!$reset_res) {
         echo $reset_sql . '<br>';
@@ -361,6 +371,7 @@ if ($option == 'settings') {
     $output_show_fanart = '';
     $output_fadeout_fanart = '';
     $output_show_trailer = '';
+    $output_show_facebook = '';
     $output_protect_site = '';
     $output_per_page = '';
     $output_panel_top_limit = '';
@@ -412,6 +423,7 @@ if ($option == 'settings') {
         $output_show_fanart.= '<option' . ($setting['show_fanart'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         $output_fadeout_fanart.= '<option' . ($setting['fadeout_fanart'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         $output_show_trailer.= '<option' . ($setting['show_trailer'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
+        $output_show_facebook.= '<option' . ($setting['show_facebook'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         $output_protect_site.= '<option' . ($setting['protect_site'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         $output_xbmc_actors.= '<option' . ($setting['xbmc_actors'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         $output_xbmc_posters.= '<option' . ($setting['xbmc_posters'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
@@ -465,6 +477,7 @@ if ($option == 'settings') {
                 <tr><td>' . $lang['a_show_fanart'] . ':</td><td><select name="show_fanart">' . $output_show_fanart . '</select></td></tr>
                 <tr><td>' . $lang['a_fadeout_fanart'] . ':</td><td><select name="fadeout_fanart">' . $output_fadeout_fanart . '</select></td></tr>
                 <tr><td>' . $lang['a_show_trailer'] . ':</td><td><select name="show_trailer">' . $output_show_trailer . '</select></td></tr>
+                <tr><td>' . $lang['a_show_facebook'] . ':</td><td><select name="show_facebook">' . $output_show_facebook . '</select></td></tr>
                 <tr><td>' . $lang['a_protect_site']  . ':</td><td><select name="protect_site">' . $output_protect_site . '</select></td></tr>
                 <tr><td class="bold orange">' . $lang['a_set_panel_left'] . '</td><td></td></tr>
                 <tr><td>' . $lang['a_panel_overall'] . ':</td><td><select name="panel_overall">' . $output_panel_overall . '</select></td></tr>

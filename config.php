@@ -1,6 +1,6 @@
 <?PHP
 
-$version = '2.7.0';
+$version = '2.7.1';
 
 if (file_exists('db.php')) {
     include('db.php');
@@ -71,7 +71,8 @@ $langs = array(
     'no' => 'Norwegian',
     'pl' => 'Polish',
     'pt' => 'Portuguese',
-    'ru' => 'Russian'
+    'ru' => 'Russian',
+    'hr' => 'Croatian'
 );
 
 // MimeType
@@ -210,6 +211,7 @@ $mysql_tables['config'] = array(
     'show_fanart'           => 'int(1) DEFAULT 1',
     'fadeout_fanart'        => 'int(1) DEFAULT 0',
     'show_trailer'          => 'int(1) DEFAULT 1',
+    'show_facebook'         => 'int(1) DEFAULT 1',
     'banner'                => 'varchar(200) DEFAULT 0',
     'protect_site'          => 'int(1) DEFAULT 0',
     'token'                 => 'varchar(6) DEFAULT ""',
@@ -231,14 +233,14 @@ $mysql_tables['users'] = array(
     'password'              => 'varchar(32) DEFAULT NULL'
 );
 $mysql_tables['hash'] = array(
-    'movies'                => 'varchar(32) NOT NULL',
-    'tvshows'               => 'varchar(32) NOT NULL',
-    'episodes'              => 'varchar(32) NOT NULL',
-    'actor'                 => 'varchar(32) NOT NULL',
-    'genre'                 => 'varchar(32) NOT NULL',
-    'country'               => 'varchar(32) NOT NULL',
-    'studio'                => 'varchar(32) NOT NULL',
-    'director'              => 'varchar(32) NOT NULL'
+    'movies'                => 'varchar(32) DEFAULT ""',
+    'tvshows'               => 'varchar(32) DEFAULT ""',
+    'episodes'              => 'varchar(32) DEFAULT ""',
+    'actor'                 => 'varchar(32) DEFAULT ""',
+    'genre'                 => 'varchar(32) DEFAULT ""',
+    'country'               => 'varchar(32) DEFAULT ""',
+    'studio'                => 'varchar(32) DEFAULT ""',
+    'director'              => 'varchar(32) DEFAULT ""'
 );
 
 // views
@@ -254,10 +256,11 @@ $item = array(
     'filter',
     'filterid',
     'meta_title',
-    'meta_originaltitle',
     'meta_img',
     'meta_url',
-    'meta_plot',
+    'meta_desc',
+    'meta_type',
+    'facebook',
     'version',
     'panel_top',
     'panel_top_last_added',
@@ -297,6 +300,7 @@ $item_desc = array(
     'watched_img',
     'genre',
     'rating',
+    'rating_star',
     'actor',
     'plot',
     'year',
@@ -306,16 +310,87 @@ $item_desc = array(
     'set',
     'studio',
     'studio_art',
+    'ribbon_new',
     'img_flag_v',
     'img_flag_a',
     'img_flag_s',
+    'facebook_button',
     'extra_thumbs',
     'trailer_img',
     'trailer',
     'premiered',
     'seasons',
     'episodes',
-    'episodes_plot'
+    'episodes_plot',
+    'fb_url'
+);
+
+// array for language audio and subs
+$iso_lang = array(
+    'ces' => array('ces', 'cze', 'czech'),
+    'dan' => array('dan', 'danish'),
+    'deu' => array('deu', 'ger', 'german', 'deutch'),
+    'dut' => array('dut', 'nld', 'dutch'),
+    'egy' => array('egy', 'egyptian'),
+    'ell' => array('ell', 'gre', 'greek'),
+    'eng' => array('eng', 'english'),
+    'est' => array('est', 'estonian'),
+    'fin' => array('fin', 'finnish'),
+    'fra' => array('fra', 'fre', 'french'),
+    'gle' => array('gle', 'irish'),
+    'heb' => array('heb', 'hebrew'),
+    'hun' => array('hun', 'hungarian'),
+    'ind' => array('ind', 'indonesian'),
+    'ira' => array('ira', 'iranian'),
+    'isl' => array('isl', 'ice', 'icelandic'),
+    'ita' => array('ita', 'italian'),
+    'jpn' => array('jpn', 'japanese'),
+    'kat' => array('kat', 'geo', 'georgian'),
+    'khm' => array('khm', 'khmer'),
+    'kor' => array('kor', 'korean'),
+    'mlt' => array('mlt', 'maltese'),
+    'mol' => array('mol'),
+    'mon' => array('mon', 'mongolian'),
+    'nep' => array('nep', 'nepali'),
+    'nno' => array('nno', 'norwegian'),
+    'pol' => array('pol', 'polish'),
+    'por' => array('por', 'portuguese'),
+    'ron' => array('ron', 'rum', 'romanian'),
+    'rus' => array('rus', 'russian'),
+    'slk' => array('slk', 'slo', 'slovak'),
+    'slv' => array('slv', 'slovenian'),
+    'spa' => array('spa', 'spanish'),
+    'srp' => array('srp', 'serbian'),
+    'swe' => array('swe', 'swedish'),
+    'tur' => array('tur', 'turkish'),
+    'ukr' => array('ukr', 'ukrainian'),
+    'zho' => array('zho', 'chi', 'chinese')
+);
+
+// array for language facebook buttons
+$lang_fb_assoc = array(
+    'sq' => 'sq_AL',
+    'bg' => 'bg_BG',
+    'cs' => 'cs_CZ',
+    'da' => 'da_DK',
+    'nl' => 'nl_NL',
+    'en' => 'en_GB',
+    'en' => 'en_US',
+    'et' => 'et_EE',
+    'fr' => 'fr_FR',
+    'de' => 'de_DE',
+    'el' => 'el_GR',
+    'hu' => 'hu_HU',
+    'it' => 'it_IT',
+    'nb' => 'nb_NO',
+    'pl' => 'pl_PL',
+    'pt' => 'pt_PT',
+    'ro' => 'ro_RO',
+    'ru' => 'ru_RU',
+    'sk' => 'sk_SK',
+    'sl' => 'sl_SI',
+    'es' => 'es_LA',
+    'uk' => 'uk_UA'
 );
 
 // JSON function
@@ -339,6 +414,7 @@ $var = array(
     'option'    =>  '',
     'filter'    =>  '',
     'filterid'  =>  '',
+    'fb_link'   =>  ''
     );
 foreach ($var as $key => $val) {
     if (isset($_GET[$key])) {

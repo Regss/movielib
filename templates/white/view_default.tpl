@@ -15,7 +15,13 @@
         <img id="poster_movie_{id}" class="poster" src="{poster}" alt="">
         {watched_img}
     </div>
+    {SHOW.facebook_button}
+    <div class="fb">
+        <div class="fb-like" data-href="{fb_url}" data-layout="button_count" data-action="like" data-show-faces="true" data-share="true"></div>
+    </div>
+    {/SHOW.facebook_button}
     {studio_art}
+    {ribbon_new}
     <div class="desc">
         <table class="table">
             {SHOW.year}
@@ -39,7 +45,7 @@
             {SHOW.rating}
             <tr>
                 <td class="left">{LANG.i_rating}:</td>
-                <td class="right">{rating}</td>
+                <td class="right">{rating_star} ({rating})</td>
             </tr>
             {/SHOW.rating}
             {SHOW.country}

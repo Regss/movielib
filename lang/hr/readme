@@ -1,0 +1,11 @@
+Ova skripta automatski sinkronizira i pokazuje XBMC/Kodi biblioteku.
+
+Zahtjevi:
+- Poslužitelj sa Apache servisom, PHP 5 i MySql 5
+- Dodatak "Movielib" za XBMC/Kodi https://raw.github.com/Regss/xbmc-regss-repository/master/repo/repository.regss/repository.regss-1.2.1.zip 
+
+Zadana lozinka:
+Pristup stranici: user
+Pristup stranici: admin
+
+U Administracijskoj ploči morate generirati token i upisati ga u postavke dodatka zajedno sa putanjom do skripte.

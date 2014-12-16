@@ -58,7 +58,7 @@ if ($token == $setting['token']) {
             break;
         
         /* #########
-         * # MOVIE #
+         * # VIDEO #
          */#########
         case 'showvideo':
             $cols = array('id', 'hash');

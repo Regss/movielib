@@ -1,3 +1,16 @@
+v. 2.7.1
+- added navigate buttons to remote
+- added star rating
+- added video new flag
+- fixed audio and subs flag
+- fixed deleting episodes when delete tvshow
+- fixed banner
+- fixed sync episodes
+- added next, prev buttons for extrathumb view
+- added cached actors in admin panel
+- fixed facebook tags
+- added facebook buttons
+
 v. 2.7.0
 - added extra thumbs
 - added multi audio track

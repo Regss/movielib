@@ -6,12 +6,12 @@
         <!--[if IE]>
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
         <![endif]-->
-        <meta property="og:title" content="{meta_title} / {meta_originaltitle}" />
-        <meta property="og:type" content="video.movie" />
+        <meta property="og:title" content="{meta_title}" />
+        <meta property="og:type" content="{meta_type}" />
         <meta property="og:url" content="{meta_url}" />
         <meta property="og:site_name" content="{SET.site_name}" />
         <meta property="og:image" content="{meta_img}" />
-        <meta property="og:description" content="{meta_plot}" />
+        <meta property="og:description" content="{meta_desc}" />
         <link type="image/x-icon" href="templates/{SET.theme}/img/icon.ico" rel="icon" media="all" />
         <link type="text/css" href="templates/{SET.theme}/css/style.css" rel="stylesheet" media="all" />
         <link type="text/css" href="templates/{SET.theme}/css/{include_view}.css" rel="stylesheet" media="all" />
@@ -23,17 +23,33 @@
     </head>
     <body>
         <img src="templates/{SET.theme}/img/bg.jpg" id="background" alt="">
+        {SHOW.facebook}
+        {facebook}
+        {/SHOW.facebook}
         {SHOW.panel_remote}
         <div id="panel_remote">
             <div id="r_left">
-                <img id="stop" class="animate" src="templates/{SET.theme}/img/stop.png" title="{LANG.i_xbmc_stop}">
-                <img id="pause" class="animate" src="templates/{SET.theme}/img/pause.png" title="{LANG.i_xbmc_pause}">
-                <img id="v_up" class="animate" src="templates/{SET.theme}/img/v_up.png" title="{LANG.i_xbmc_v_up}">
-                <img id="v_down" class="animate" src="templates/{SET.theme}/img/v_down.png" title="{LANG.i_xbmc_v_down}">
-                <img id="stepback" class="animate" src="templates/{SET.theme}/img/stepback.png" title="{LANG.i_xbmc_stepback}">
-                <img id="stepforward" class="animate" src="templates/{SET.theme}/img/stepforward.png" title="{LANG.i_xbmc_stepforward}">
-                <img id="bigstepback" class="animate" src="templates/{SET.theme}/img/bigstepback.png" title="{LANG.i_xbmc_bigstepback}">
-                <img id="bigstepforward" class="animate" src="templates/{SET.theme}/img/bigstepforward.png" title="{LANG.i_xbmc_bigstepforward}">
+                <div><img id="stepback" class="animate" src="templates/{SET.theme}/img/stepback.png" title="{LANG.i_xbmc_stepback} ( , )"></div>
+                <div><img id="pause" class="animate" src="templates/{SET.theme}/img/pause.png" title="{LANG.i_xbmc_pause} ( SPACE )"></div>
+                <div><img id="stepforward" class="animate" src="templates/{SET.theme}/img/stepforward.png" title="{LANG.i_xbmc_stepforward} ( . )"></div>
+                <div><img id="bigstepback" class="animate" src="templates/{SET.theme}/img/bigstepback.png" title="{LANG.i_xbmc_bigstepback} ( [ )"></div>
+                <div><img id="stop" class="animate" src="templates/{SET.theme}/img/stop.png" title="{LANG.i_xbmc_stop} ( X )"></div>
+                <div><img id="bigstepforward" class="animate" src="templates/{SET.theme}/img/bigstepforward.png" title="{LANG.i_xbmc_bigstepforward} ( ] )"></div>
+                <div><img id="v_up" class="animate" src="templates/{SET.theme}/img/v_up.png" title="{LANG.i_xbmc_v_up} ( = )"></div>
+                <div><img id="v_mute" class="animate" src="templates/{SET.theme}/img/v_mute.png" title="{LANG.i_xbmc_v_mute} ( 0 )"></div>
+                <div><img id="v_down" class="animate" src="templates/{SET.theme}/img/v_down.png" title="{LANG.i_xbmc_v_down} ( - )"></div>
+                <div><img id="info" class="animate" src="templates/{SET.theme}/img/info.png" title="{LANG.i_xbmc_info} ( I )"></div>
+                <div><img id="up" class="animate" src="templates/{SET.theme}/img/up.png" title="{LANG.i_xbmc_up} ( UP )"></div>
+                <div><img id="watch" class="animate" src="templates/{SET.theme}/img/watch.png" title="{LANG.i_xbmc_watched} ( W )"></div>
+                <div><img id="left" class="animate" src="templates/{SET.theme}/img/left.png" title="{LANG.i_xbmc_left} ( LEFT )"></div>
+                <div><img id="select" class="animate" src="templates/{SET.theme}/img/select.png" title="{LANG.i_xbmc_select} ( ENTER )"></div>
+                <div><img id="right" class="animate" src="templates/{SET.theme}/img/right.png" title="{LANG.i_xbmc_right} ( RIGHT )"></div>
+                <div><img id="context" class="animate" src="templates/{SET.theme}/img/context.png" title="{LANG.i_xbmc_context} ( C )"></div>
+                <div><img id="down" class="animate" src="templates/{SET.theme}/img/down.png" title="{LANG.i_xbmc_down} ( DOWN )"></div>
+                <div><img id="back" class="animate" src="templates/{SET.theme}/img/back.png" title="{LANG.i_xbmc_back} ( BACKSPACE )"></div>
+                <div><img id="power" class="animate" src="templates/{SET.theme}/img/power.png" title="{LANG.i_xbmc_power} ( S )"></div>
+                <div></div>
+                <div><img id="sync" class="animate" src="templates/{SET.theme}/img/sync.png" title="{LANG.i_xbmc_sync} ( R )"></div>
             </div>
             <div id="r_right">
                 <img src="templates/{SET.theme}/img/xbmc_vd.png">

@@ -13,7 +13,7 @@ $.ajax({
         theme = set['theme'];
     }
 });
-
+     
 $(document).ready(function() {
     // show panel header when site load
     $('.panel_top_item, .panel_top_item_title').hide().fadeIn(3000);
@@ -200,38 +200,75 @@ $(document).ready(function() {
     $(document).on('mouseleave', '.ex_thumbs img', function(){
         $(this).animate({'opacity': '1'}).dequeue();
     });
+    
     $(document).on('click', '.ex_thumbs img', function(){
+        // opened thumb
         var link = $(this).attr('src').slice(0, -5);
-        $('body').append('<div class="ex_thumb_con"><img id="opened" class="ex_thumb" src="' + link + '.jpg"></div>');
-        $("img#opened").load(function() {
-            var b = 20;                             // border size
-            var img_h = $(this).height();           // get image height
-            var img_w = $(this).width();            // get image width
-            var win_h = $(window).height();         // get window height
-            var win_w = $(window).width();          // get window width
-            if (img_h > win_h - 100) {              // if image height is greather than windows height
-                var aspect = img_w / img_h;         // calculate aspect ratio
-                var r_h = img_h - win_h + 100;      // get resize value
-                img_h = img_h - r_h;                // set new image height
-                img_w = img_w - (r_h * aspect);     // set new image width
-            }
-            if (img_w > win_w - 100) {              // same for width is the above
-                var aspect = img_h / img_w;
-                var r_w = img_w - win_w + 100;
-                img_w = img_w - r_w;
-                img_h = img_h - (r_w * aspect);
-            }
-            var pos_x = (win_w-img_w)/2;            // set position X
-            var pos_y = (win_h-img_h)/2;            // set position Y
-            $('.ex_thumb_con').css({'left': '0px', 'top': '0px', 'right': '0px', 'bottom': '0px', 'position': 'fixed'});
-            $('.ex_thumb').css({'position': 'fixed', 'display': 'none', 'height': img_h+'px', 'width': img_w+'px', 'top':pos_y-b+'px', 'left': pos_x-b+'px', 'border': b+'px solid #fff'});
-            $('.ex_thumb').fadeIn(500);
+        // create array for all thumbs
+        var thumb_array = [];
+        $(this).parent().find('img').each(function(thumb){
+            thumb_array.push($(this).attr('src').slice(0, -5));
         });
-    });
-    $(document).on('click', '.ex_thumb, .ex_thumb_con', function(){
-        $('.ex_thumb').fadeOut(500, function(){
-            $('.ex_thumb, .ex_thumb_con').remove();
+        // actual thumb index
+        var act = thumb_array.indexOf(link);
+        show_thumb(thumb_array[act]);
+        
+        $(document).on('click', '.ex_prev', function(){
+            act = act - 1;
+            $('.ex_thumb_con').fadeOut(300, function(){
+                show_thumb(thumb_array[act]);
+            });
         });
+        $(document).on('click', '.ex_next', function(){
+            act = act + 1;
+            $('.ex_thumb_con').fadeOut(300, function(){
+                show_thumb(thumb_array[act]);
+            });
+        });
+        $(document).on('click', '.ex_thumb_con', function(){
+            $('.ex_thumb_con').fadeOut(300, function(){
+                $('.ex_thumb_con').remove();
+            });
+        });
+        function show_thumb(link) {
+            $('.ex_thumb_con').remove();
+            var prev = (act == 0 ? '' : '<div class="ex_prev"><</div>');
+            var next = (thumb_array.length == act+1 ? '' : '<div class="ex_next">></div>');
+            $('body').append('<div class="ex_thumb_con">'+prev+'<img id="opened" class="ex_thumb" src="' + link + '.jpg">'+next+'</div>');
+            $("img#opened").load(function() {
+                var b = 20;                             // border size
+                var img_h = $(this).height();           // get image height
+                var img_w = $(this).width();            // get image width
+                var win_h = $(window).height();         // get window height
+                var win_w = $(window).width();          // get window width
+                if (img_h > win_h - 100) {              // if image height is greather than windows height
+                    var aspect = img_w / img_h;         // calculate aspect ratio
+                    var r_h = img_h - win_h + 100;      // get resize value
+                    img_h = img_h - r_h;                // set new image height
+                    img_w = img_w - (r_h * aspect);     // set new image width
+                }
+                if (img_w > win_w - 100) {              // same for width is the above
+                    var aspect = img_h / img_w;
+                    var r_w = img_w - win_w + 100;
+                    img_w = img_w - r_w;
+                    img_h = img_h - (r_w * aspect);
+                }
+                var pos_x = (win_w-img_w)/2;            // set position X
+                var pos_y = (win_h-img_h)/2;            // set position Y
+                $('.ex_thumb_con').css({'left': '0px', 'top': '0px', 'right': '0px', 'bottom': '0px', 'position': 'fixed', 'display': 'none'});
+                $('.ex_thumb').css({'position': 'relative', 'height': img_h+'px', 'width': img_w+'px', 'top':pos_y-b+'px', 'left': pos_x-b+'px', 'border': b+'px solid #fff'});
+                $('.ex_prev, .ex_next').css({'top': (win_h-60)/2+'px', 'opacity': '.3', 'user-select': 'none'});
+                $('.ex_prev').css({'left': pos_x});
+                $('.ex_next').css({'left': pos_x+img_w-60});
+                $('.ex_thumb_con').fadeIn(300);
+            });
+            $('.ex_prev, .ex_next').mouseenter(function(){
+                $(this).dequeue().animate({opacity: '1'}, 300);
+            });
+            $('.ex_prev, .ex_next').mouseleave(function(){
+                $(this).dequeue().animate({opacity: '.3'}, 300);
+            });
+        }
     });
     
     // episode plot toggle
@@ -259,6 +296,7 @@ $(document).ready(function() {
     
     // show remote and now playing
     $('#panel_remote').on('mouseenter click', function(){
+        keypress = true;
         $.ajax({url: 'function.js.php?option=remote&f=check', dataType: 'json', success: function(data){
             if ('result' in data) {
                 $('#r_right img').attr('src', 'templates/'+theme+'/img/xbmc_v.png');
@@ -277,15 +315,27 @@ $(document).ready(function() {
                 }
             }});
         }});
+        
+        
     });
     
     // hide remote and now playing
     $('#panel_remote, #now_playing').mouseleave(function(){
-        $('#panel_remote').animate({marginLeft: '-70px'}, {queue: false, duration: 500, complete: function(){
+        keypress = false;
+        $('#panel_remote').animate({marginLeft: '-100px'}, {queue: false, duration: 500, complete: function(){
             $('#now_playing').animate({marginLeft: '-500px'}, {queue: false, duration: 500});
         }});
     });
     
+    // remote keypresing
+    $(document).on('keydown', function(e) {
+        if (keypress == true) {
+            e.preventDefault();
+            $.ajax({url: 'function.js.php?option=remote&f='+e.keyCode});
+        }
+    });
+
+        
     // hide now playing on stop button
     $('#stop').click(function(){
         $('#now_playing').animate({marginLeft: '-500px'}, {queue: false, duration: 500});
@@ -302,7 +352,7 @@ $(document).ready(function() {
         $(this).children('.xbmc_hide').animate({opacity: 1}, {queue: false, duration: 300});
     });
     $('.movie').mouseleave(function(){
-        $(this).children('.xbmc_hide').animate({opacity: .3}, {queue: false, duration: 300});
+        $(this).children('.xbmc_hide').animate({opacity: .0}, {queue: false, duration: 300});
     });
     
     // create list.m3u

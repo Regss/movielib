@@ -440,15 +440,16 @@ function create_banner($lang, $file, $data) {
         $panels_array = array('genre', 'country');
     }
     
-    
-    foreach ($panels_array as $val) {
-        $sel_sql = 'SELECT ' . $val . '.' . $val . ' FROM ' . $val . ', ' . $table . '_' . $val . ' WHERE ' . $val . '.id = ' . $table . '_' . $val . '.' . $val . 'id AND ' . $table . '_' . $val . '.id = "' . $ban['id'] . '"';
-        $sel_res = mysql_q($sel_sql);
-        $out = array();
-        while ($s = mysql_fetch_row($sel_res)) {
-            $out[] = $s[0];
+    if(isset($ban['id'])) {
+        foreach ($panels_array as $val) {
+            $sel_sql = 'SELECT ' . $val . '.' . $val . ' FROM ' . $val . ', ' . $table . '_' . $val . ' WHERE ' . $val . '.id = ' . $table . '_' . $val . '.' . $val . 'id AND ' . $table . '_' . $val . '.id = "' . $ban['id'] . '"';
+            $sel_res = mysql_q($sel_sql);
+            $out = array();
+            while ($s = mysql_fetch_row($sel_res)) {
+                $out[] = $s[0];
+            }
+            $ban[$val] = implode(' / ', $out);
         }
-        $ban[$val] = implode(' / ', $out);
     }
     
     $b = array();
@@ -559,12 +560,8 @@ function create_banner($lang, $file, $data) {
     imageline($banner, 0, 0, 0, $b['h']-1, $border_color);
 
     // save as file
-    $res = imagejpeg($banner, 'cache/' . $file, 100);
-    if ($res) {
-        return 'BANNER CREATED SUCCESSFUL';
-    } else {
-        return 'BANNER NOT CREATED';
-    }
+    imagejpeg($banner, 'cache/' . $file, 100);
+    return $b;
 }
 
 /* ################
@@ -607,6 +604,17 @@ function imagettfstroketext(&$image, $size, $angle, $x, $y, &$textcolor, &$strok
  */#################
 function zero($dig) {
     return str_pad($dig, 2, 0, STR_PAD_LEFT);
+}
+
+/* #################
+ * # LANGUAGE FLAG #
+ */#################
+function check_flag($f, $iso_lang) {
+    foreach ($iso_lang as $k => $v) {
+        if (in_array($f, $v)) {
+            return $k;
+        }
+    }
 }
 
 ?>

@@ -39,6 +39,20 @@ if ($setting['protect_site'] == 1) {
     $video = $_GET['video'];
 }
 
+/* ############
+ * # FACEBOOK #
+ */############
+if ($fb_link !== '') {
+    if ($video == 'tvshows') {
+        $face_sql = 'SELECT id FROM tvshows WHERE title="' .  urldecode($fb_link) . '" LIMIT 0, 1';
+    } else {
+        $face_sql = 'SELECT id FROM movies WHERE title="' . urldecode(substr($fb_link, 0, -4)) . '" AND year="' . substr($fb_link, -4, 4) . '" LIMIT 0, 1';
+    }
+    $face_res = mysql_q($face_sql);
+    $face_id = mysql_fetch_assoc($face_res);
+    $id = $face_id['id'];
+}
+
 // views
 $view = $setting['view'];
 if (isset($_COOKIE['view'])) {
@@ -295,7 +309,13 @@ $list_sql = 'SELECT ' . $mysql_table . '.* FROM ' . $mysql_table . $mysql_table2
     ORDER BY ' . $sort_mysql[$sort] . $limit_sql;
 
 $list_result = mysql_q($list_sql);
-        
+
+// get date for last added
+$new_sql = 'SELECT ' . $mysql_table . '.date_added FROM ' . $mysql_table . $mysql_table2 . ' ORDER BY ' . $mysql_table . '.date_added DESC LIMIT 0, 1';
+$new_result = mysql_q($new_sql);
+$new_date = mysql_fetch_assoc($new_result);
+$new_date = substr($new_date['date_added'], 0, 10);
+
 $output_panel_list = '';
 while ($list = mysql_fetch_assoc($list_result)) {
 
@@ -369,6 +389,20 @@ while ($list = mysql_fetch_assoc($list_result)) {
     if ($list['rating'] !== '') {
         $show_desc['rating'] = 1;
         $output_desc['rating'] = round($list['rating'], 1);
+        
+        $show_desc['rating_star'] = 1;
+        $output_desc['rating_star'] = '';
+        $r = $output_desc['rating'];
+        for ($s = 1; $s <= 10; $s++) {
+            if ($r >= 1) {
+                $output_desc['rating_star'].= '<img src="templates/' . $setting['theme'] . '/img/star.png"> ';
+            } else if ($r >= 0.5) {
+                $output_desc['rating_star'].= '<img src="templates/' . $setting['theme'] . '/img/star_h.png"> '; 
+            } else {
+                $output_desc['rating_star'].= '<img src="templates/' . $setting['theme'] . '/img/star_g.png"> ';
+            }
+            $r--;
+        }
     }
     
     // actors
@@ -453,6 +487,12 @@ while ($list = mysql_fetch_assoc($list_result)) {
             }
         }
         
+        // ribbon new
+        if (substr($list['date_added'], 0, 10) == $new_date) {
+            $show_desc['ribbon_new'] = 1;
+            $output_desc['ribbon_new'] = '<div class="ribbon_new_text">' . mb_strtoupper($lang['i_ribbon_new']) . '</div><img class="ribbon_new" src="templates/' . $setting['theme'] . '/img/ribbon_new.png">';
+        }
+        
         // streams
         $stream_sql = 'SELECT * FROM `movies_stream` WHERE id = "' . $list['id'] . '"';
         $stream_res = mysql_q($stream_sql);
@@ -510,8 +550,8 @@ while ($list = mysql_fetch_assoc($list_result)) {
                 }
                 
                 // audio language
-                if (file_exists('templates/' . $setting['theme'] . '/img/flags/l_' . $s['a_lang'] . '.png')) {
-                    $img_flag_alang = '<img class="flag" src="templates/' . $setting['theme'] . '/img/flags/l_' . $s['a_lang'] . '.png" alt="">';
+                if (file_exists('templates/' . $setting['theme'] . '/img/flags/l_' . check_flag($s['a_lang'], $iso_lang) . '.png')) {
+                    $img_flag_alang = '<img class="flag" src="templates/' . $setting['theme'] . '/img/flags/l_' . check_flag($s['a_lang'], $iso_lang) . '.png" alt="">';
                 } else {
                     $img_flag_alang = $s['a_lang'];
                 }
@@ -522,8 +562,8 @@ while ($list = mysql_fetch_assoc($list_result)) {
         // subtitles
         if (isset($str['s'])) {
             foreach ($str['s'] as $s) {
-                if (file_exists('templates/' . $setting['theme'] . '/img/flags/l_' . $s['s_lang'] . '.png')) {
-                    $img_flag_slang = '<img src="templates/' . $setting['theme'] . '/img/flags/sub.png" alt=""><img class="flag" src="templates/' . $setting['theme'] . '/img/flags/l_' . $s['s_lang'] . '.png" alt="">';
+                if (file_exists('templates/' . $setting['theme'] . '/img/flags/l_' . check_flag($s['a_lang'], $iso_lang) . '.png')) {
+                    $img_flag_slang = '<img src="templates/' . $setting['theme'] . '/img/flags/sub.png" alt=""><img class="flag" src="templates/' . $setting['theme'] . '/img/flags/l_' . check_flag($s['a_lang'], $iso_lang) . '.png" alt="">';
                 } else {
                     $img_flag_slang = $s['s_lang'];
                 }
@@ -655,6 +695,20 @@ while ($list = mysql_fetch_assoc($list_result)) {
         }
     }
     
+    // facebook meta data
+    if ($setting['show_facebook'] == 1) {
+        $show_desc['facebook_button'] = 1;
+    }
+    $url = 'http://' . $_SERVER['SERVER_NAME'] . implode('/', array_slice(explode('/', $_SERVER['REQUEST_URI']), 0, -1)) . '/';
+    $output_desc['fb_url'] = $url . 'index.php?video=' . $video . '&fb_link=' . urlencode($list['title']) . ($video == 'movies' ? $list['year'] : '');
+    if ($id <> 0) {
+        $output['meta_img'] = (file_exists('cache/' . $mysql_table . '_' . $id . '.jpg') ? $url . 'cache/' . $mysql_table . '_' . $id . '.jpg' : 'templates/' . $setting['theme'] . '/img/d_poster.jpg');
+        $output['meta_title'] = htmlspecialchars($list['title']);
+        $output['meta_desc'] = htmlspecialchars($list['plot']);
+        $output['meta_url'] = $output_desc['fb_url'];
+        $output['meta_type'] = ($video == 'tvshows' ? 'video.tv_show' : 'video.movie');
+    }
+    
     // panel movie
     $panel_list = new Teamplate($views[$include_view] . '.tpl', $setting, $lang);
     foreach ($output_desc as $key => $val) {
@@ -668,21 +722,35 @@ while ($list = mysql_fetch_assoc($list_result)) {
 $output['panel_list'] = $output_panel_list;
 $output['sort'] = $sort;
 
-// meta data
-$url = 'http://' . $_SERVER['SERVER_NAME'] . implode('/', array_slice(explode('/', $_SERVER['REQUEST_URI']), 0, -1)) . '/';
-if ($id <> 0) {
-    $meta_sql = 'SELECT title, originaltitle, plot FROM ' . $mysql_table . ' WHERE id = ' . $id;
-    $meta_result = mysql_q($meta_sql);
-    $meta = mysql_fetch_array($meta_result);
-    $output['meta_img'] = (file_exists('cache/' . $mysql_table . '_' . $id . '.jpg') ? $url . 'cache/' . $mysql_table . '_' . $id . '.jpg' : 'templates/' . $setting['theme'] . '/img/d_poster.jpg');
-    $output['meta_title'] = htmlspecialchars($meta['title']);
-    $output['meta_originaltitle'] = htmlspecialchars($meta['originaltitle']);
-    $output['meta_plot'] = htmlspecialchars($meta['plot']);
-    $output['meta_url'] = $url . 'index.php?video=' . $video . '&id=' . $id;
-} else {
-    $output['meta_title'] = 'Movielib';
-    $output['meta_originaltitle'] = $setting['site_name'];
+// faccebok meta data
+if ($id == 0) {
+    $url = 'http://' . $_SERVER['SERVER_NAME'] . implode('/', array_slice(explode('/', $_SERVER['REQUEST_URI']), 0, -1)) . '/';
+    $output['meta_title'] = $setting['site_name'];
     $output['meta_url'] = $url . 'index.php';
+    $output['meta_img'] = $url . ('templates/' . $setting['theme'] . '/img/logo.jpg');
+    $output['meta_type'] = 'website';
+    $output['meta_desc'] = 'Page whereby using XBMC can present your library of movies and TV series.';
+}
+if ($setting['show_facebook'] == 1) {
+    $show['facebook'] = 1;
+    if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+        $get_lang = strtolower(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2));
+    } else {
+        $get_lang = 'en';
+    }
+    if (array_key_exists ($get_lang , $lang_fb_assoc)) {
+        $lang_fb = $lang_fb_assoc[$get_lang];
+    } else {
+        $lang_fb = $lang_fb_assoc['en'];
+    }
+    $output['facebook'] = '<div id="fb-root"></div>
+                            <script>(function(d, s, id) {
+                              var js, fjs = d.getElementsByTagName(s)[0];
+                              if (d.getElementById(id)) return;
+                              js = d.createElement(s); js.id = id;
+                              js.src = "//connect.facebook.net/' . $lang_fb . '/sdk.js#xfbml=1&version=v2.0";
+                              fjs.parentNode.insertBefore(js, fjs);
+                            }(document, \'script\', \'facebook-jssdk\'));</script>';
 }
 
 // create page

@@ -1,13 +1,16 @@
-.movie { text-align:left; border:1px solid #000; background-color:#222; min-height:250px; margin-top:10px; margin-bottom:10px; padding:5px 10px 5px 10px; }
+.movie { text-align:left; border:1px solid #000; background-color:#222; min-height:280px; margin-top:10px; margin-bottom:10px; padding:5px 10px 5px 10px; }
 .poster_container { float:left; margin-top:5px; margin-right:5px; }
 .studio { float:right; margin-top:-30px; width:140px; }
+.ribbon_new { position: absolute; margin-left:338px; margin-top:-51px; }
+.ribbon_new_text { width:140px; z-index:10; position: absolute; margin-left:500px; margin-top:-8px; text-align:center; font-size:16px; 	text-shadow: 1px 1px #000000; font-family:Verdana, Tahoma; font-weight:bold; -webkit-transform: rotate(45deg); -moz-transform: rotate(45deg); -o-transform: rotate(45deg); writing-mode: lr-tb; }
 .poster { width:142px; border:1px solid #fff; }
+.fb { position: absolute; display:block; width:142px; text-align:center; margin-top:230px; }
 .title { font-size:20px; font-weight:bold; color:#ff7300; }
 .title a:link { font-size:20px; font-weight:bold; color:#ff7300; }
 .title a:visited { font-size:20px; font-weight:bold; color:#ff7300; }
 .title a:active { font-size:20px; font-weight:bold; color:#ff7300; }
 .title a:hover { font-size:20px; font-weight:bold; color:#ff7300; text-decoration:underline; }
-.xbmc_hide { width:22px; position:absolute; opacity:.3; margin-top:10px; margin-left:5px; }
+.xbmc_hide { width:22px; position:absolute; opacity:.0; margin-top:10px; margin-left:5px; }
 .xbmc_hide img { cursor:pointer; }
 .xbmc_e { width:48px; }
 .xbmc_e  img { width:14px; height:14px; cursor:pointer; }
@@ -21,6 +24,9 @@
 .table_flags img { margin:2px; }
 .ex_thumbs { margin:10px; text-align:center; }
 .ex_thumbs img { border:3px solid #fff; margin:2px; cursor:pointer; }
+.ex_prev { width: 60px; height: 60px; line-height:60px; background-color:#fff; font-size:48px; font-weight:bold; cursor:pointer; text-align: center; color:#000; left:0px; position:absolute; z-index:10; display:block; }
+.ex_next { width: 60px; height: 60px; line-height:60px; background-color:#fff; font-size:48px; font-weight:bold; cursor:pointer; text-align: center; color:#000; right:0px; position:absolute; z-index:10; display:block; }
+.ex_thumb { width:100%; height:100%; }
 .desc { text-align:center; margin-left:150px; margin-top:5px; min-height: 220px; }
 .desc a:link { color:#ddd; text-decoration:none; }
 .desc a:visited { color:#ddd; text-decoration:none; }
@@ -29,6 +35,7 @@
 .table { margin:0px; padding:0px; border:0px; width:100%; }
 .left { font-weight:bold; color:#ff7300; text-align:right; width:60px; vertical-align:top; }
 .right { text-align:left; }
+.right img { vertical-align:middle; }
 .aired { width:60px; }
 .actor_thumb { position: absolute; display:none; border:1px solid #ddd;}
 .trailer { border: 1px solid #fff; margin:auto; margin-top:10px; margin-bottom:10px; width:560px; }
