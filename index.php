@@ -562,8 +562,8 @@ while ($list = mysql_fetch_assoc($list_result)) {
         // subtitles
         if (isset($str['s'])) {
             foreach ($str['s'] as $s) {
-                if (file_exists('templates/' . $setting['theme'] . '/img/flags/l_' . check_flag($s['a_lang'], $iso_lang) . '.png')) {
-                    $img_flag_slang = '<img src="templates/' . $setting['theme'] . '/img/flags/sub.png" alt=""><img class="flag" src="templates/' . $setting['theme'] . '/img/flags/l_' . check_flag($s['a_lang'], $iso_lang) . '.png" alt="">';
+                if (file_exists('templates/' . $setting['theme'] . '/img/flags/l_' . check_flag($s['s_lang'], $iso_lang) . '.png')) {
+                    $img_flag_slang = '<img src="templates/' . $setting['theme'] . '/img/flags/sub.png" alt=""><img class="flag" src="templates/' . $setting['theme'] . '/img/flags/l_' . check_flag($s['s_lang'], $iso_lang) . '.png" alt="">';
                 } else {
                     $img_flag_slang = $s['s_lang'];
                 }
