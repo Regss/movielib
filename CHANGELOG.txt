@@ -1,3 +1,7 @@
+v. 2.7.2
+- added sync episode thumbnail
+- added new episodes view
+
 v. 2.7.1
 - added navigate buttons to remote
 - added star rating

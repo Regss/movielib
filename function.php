@@ -278,6 +278,13 @@ function sync_add($mysql_tables) {
         fwrite($fp, $fanart);
         fclose($fp);
     }
+    // thumbnail
+    if (isset($_POST['thumbnail']) && $_POST['thumbnail'] !== '') {
+        $thumbnail = base64_decode($_POST['thumbnail']);
+        $fp = fopen('cache/' . $_POST['table'] . '_' . $_POST['id'] . '.jpg', 'wb');
+        fwrite($fp, $thumbnail);
+        fclose($fp);
+    }
     // extra thumbs
     if (isset($_POST['thumb']) && $_POST['thumb'] !== '') {
         $c = 1;
@@ -307,6 +314,9 @@ function sync_delete($id, $table) {
     }
     if ($table == 'tvshows') {
         array_push($del_array, $table . '_actor', $table . '_genre');
+    }
+    if ($table == 'episodes') {
+        array_push($del_array, $table . '_stream');
     }
     foreach ($del_array as $t) {
         $delete_sql = 'DELETE FROM ' . $t . ' WHERE id in ("' . implode('", "', $id) . '")';

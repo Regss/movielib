@@ -12,31 +12,35 @@
 .title a:hover { font-size:20px; font-weight:bold; color:#ff7300; text-decoration:underline; }
 .xbmc_hide { width:22px; position:absolute; opacity:.0; margin-top:10px; margin-left:5px; }
 .xbmc_hide img { cursor:pointer; }
-.xbmc_e { width:48px; }
-.xbmc_e  img { width:14px; height:14px; cursor:pointer; }
+.xbmc_e { margin-left:10px; }
 .title_org { font-size:11px; font-weight:bold; color:#aaa; }
 .watched_img { display:block; position:absolute; margin-left:102px; margin-top:-44px; }
-.watched_episode { width:10px; height:10px; }
-.episode_plot { display: none; position: absolute; width:300px; border:1px solid #000; background-color:#222; padding:5px; text-align:left; }
 .trailer_img { position:absolute; margin-left:94px; margin-top:8px; display:block; }
 .table_flags { margin:auto; }
-.table_flags td { padding-left:20px; padding-right:20px; vertical-align:top; }
-.table_flags img { margin:2px; }
+.table_flags td { padding-left:10px; padding-right:10px; vertical-align:top; }
+.table_flags img { margin:2px; height:14px; }
 .ex_thumbs { margin:10px; text-align:center; }
 .ex_thumbs img { border:3px solid #fff; margin:2px; cursor:pointer; }
 .ex_prev { width: 60px; height: 60px; line-height:60px; background-color:#fff; font-size:48px; font-weight:bold; cursor:pointer; text-align: center; color:#000; left:0px; position:absolute; z-index:10; display:block; }
 .ex_next { width: 60px; height: 60px; line-height:60px; background-color:#fff; font-size:48px; font-weight:bold; cursor:pointer; text-align: center; color:#000; right:0px; position:absolute; z-index:10; display:block; }
 .ex_thumb { width:100%; height:100%; }
-.desc { text-align:center; margin-left:150px; margin-top:5px; min-height: 220px; }
+.desc { text-align:center; margin-left:150px; margin-top:5px; min-height: 260px; }
 .desc a:link { color:#ddd; text-decoration:none; }
 .desc a:visited { color:#ddd; text-decoration:none; }
 .desc a:hover { color:#ddd; text-decoration:underline; }
 .desc a:active { color:#ddd; text-decoration:none; }
-.table { margin:0px; padding:0px; border:0px; width:100%; }
+.table { margin:0px; padding:0px; width:100%; }
 .left { font-weight:bold; color:#ff7300; text-align:right; width:60px; vertical-align:top; }
 .right { text-align:left; }
 .right img { vertical-align:middle; }
-.aired { width:60px; }
 .actor_thumb { position: absolute; display:none; border:1px solid #ddd;}
 .trailer { border: 1px solid #fff; margin:auto; margin-top:10px; margin-bottom:10px; width:560px; }
 .img_space { width:300px; height:1px; display:block; margin:auto; margin-top:5px; margin-bottom:5px; }
+.episode { min-height:130px; background-color: #111; border: 1px solid #000; margin-bottom:5px; }
+.episode_desc { text-align:center; margin:5px 5px 5px 213px; }
+.thumbnail { width:200px; height:113px; border:1px solid #fff; margin-left:5px; display:block; }
+.season { font-size:16px; font-weight:bold; color:#ff7300; margin-left:10px; margin-bottom:5px; }
+.episode_title { font-size:14px; font-weight:bold; color:#ff7300; margin:2px 0px 2px 2px; text-align:left; }
+.episode_watched { display:block; position:absolute; margin-left:166px; margin-top:78px; }
+.episode_ribbon_new { position: absolute; margin-left:263px; margin-top:-7px; }
+.episode_ribbon_new_text { width:140px; z-index:10; position: absolute; margin-left:490px; margin-top:38px; text-align:center; font-size:16px; text-shadow: 1px 1px #000000; font-family:Verdana, Tahoma; font-weight:bold; -webkit-transform: rotate(45deg); -moz-transform: rotate(45deg); -o-transform: rotate(45deg); writing-mode: lr-tb; }

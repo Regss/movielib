@@ -97,7 +97,6 @@
             </tr>
             {/SHOW.plot}
         </table>
-        {episodes}
         <img class="img_space" src="templates/{SET.theme}/img/space.png" alt="">
         <table class="table_flags">
             <tr>
@@ -108,6 +107,7 @@
         </table>
     </div>
     {extra_thumbs}
+    {episodes}
     {SHOW.trailer}
     <div id="trailer" class="trailer">{trailer}</div>
     {/SHOW.trailer}

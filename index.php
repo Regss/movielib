@@ -344,9 +344,6 @@ while ($list = mysql_fetch_assoc($list_result)) {
     if (isset($_SESSION['logged_admin']) && $_SESSION['logged_admin'] == true && $video == 'movies') {
         $show_desc['xbmc'] = 1;
     }
-    if (isset($_SESSION['logged_admin']) && $_SESSION['logged_admin'] == true && $video == 'tvshows') {
-        $show_desc['xbmc_episode'] = 1;
-    }
     
     // originaltitle
     if ($list['originaltitle'] !== '') {
@@ -645,53 +642,147 @@ while ($list = mysql_fetch_assoc($list_result)) {
         }
         
         // episodes
-        $episodes_array = array();
         if ($id <> 0) {
+            // get date for last added episode
+            $new_episode_sql = 'SELECT date_added FROM episodes ORDER BY date_added DESC LIMIT 0, 1';
+            $new_episode_result = mysql_q($new_episode_sql);
+            $new_episode_date = mysql_fetch_assoc($new_episode_result);
+            $new_episode_date = substr($new_episode_date['date_added'], 0, 10);
+        
             $show_desc['episodes'] = 1;
-            $episodes_sql = 'SELECT id, title, episode, season, plot, firstaired, file, play_count, last_played FROM episodes WHERE tvshow = "' . $list['id'] . '" ORDER BY season, episode ASC';
+            $episodes_sql = 'SELECT id, title, episode, season, plot, firstaired, file, play_count, date_added, last_played FROM episodes WHERE tvshow = "' . $list['id'] . '" ORDER BY season, episode ASC';
             $episodes_result = mysql_q($episodes_sql);
             $i = -1;
-            $output_desc['episodes'].= '<table class="table">';
+            
+            $output_epiosde_list = '';
             while ($episodes = mysql_fetch_assoc($episodes_result)) {
-                if ($show_desc['xbmc_episode'] == 1) {
-                    $e_xbmc = '
-                    <div id="' . $episodes['id'] . '" class="xbmc_e">
-                        <img class="play animate" src="templates/{SET.theme}/img/play.png" title="' . $lang['i_xbmc_play'] . '">
-                        <a href="http://' . $setting['xbmc_login'] . ':' . $setting['xbmc_pass'] . '@' . $setting['xbmc_host'] . ':' . $setting['xbmc_port'] . '/vfs/' . urlencode($episodes['file']) . '"><img class="download animate" src="templates/{SET.theme}/img/download.png" title="' . $lang['i_xbmc_download'] . '"></a>
-                        <a id="http://' . $setting['xbmc_login'] . ':' . $setting['xbmc_pass'] . '@' . $setting['xbmc_host'] . ':' . $setting['xbmc_port'] . '/vfs/' . urlencode($episodes['file']) . '" href="cache/list.m3u"><img class="list animate" src="templates/{SET.theme}/img/list.png" title="' . $lang['i_xbmc_m3u'] . '"></a>
-                    </div>';
-                } else {
-                    $e_xbmc = '';
+            
+                // output and show episodes arrays
+                $output_episode = array();
+                $show_episode = array();    
+                foreach ($item_episode as $val) {
+                    $output_episode[$val] = '';
+                    $show_episode[$val] = 0;
                 }
-                if ($episodes['plot'] !== '') {
-                    $output_episodes_plot = '
-                        <div class="episode_plot" id="plot_season_' . $episodes['season'] . '_episode_' . $episodes['episode'] . '">
-                            <span class="orange bold">' . $lang['i_plot'] . ':</span> ' . $episodes['plot'] . '
-                        </div>';
+                
+                if (isset($_SESSION['logged_admin']) && $_SESSION['logged_admin'] == true && $video == 'tvshows') {
+                    $show_episode['xbmc'] = 1;
+                }
+                
+                $output_episode['episode'] = $episodes['id'];
+                $output_episode['season'] = $episodes['season'];
+                $output_episode['plot'] = $episodes['plot'];
+                $output_episode['aired'] = $episodes['firstaired'];
+                                
+                // title
+                $output_episode['title'] = $episodes['episode'] . '. ' . ($episodes['title'] == '' ? $lang['i_episode'] . ' ' . $episodes['episode'] : $episodes['title']);
+                
+                // file
+                $output_episode['file'] = 'http://' . $setting['xbmc_login'] . ':' . $setting['xbmc_pass'] . '@' . $setting['xbmc_host'] . ':' . $setting['xbmc_port'] . '/vfs/' . urlencode($episodes['file']);
+                
+                // thumbnail
+                if (file_exists('cache/episodes_' . $episodes['id'] . '.jpg')) {
+                    $output_episode['thumbnail'] = '<img class="thumbnail" src="cache/episodes_' . $episodes['id'] . '.jpg">';
                 } else {
-                    $output_episodes_plot = '';
+                    $output_episode['thumbnail'] = '<img class="thumbnail" src="templates/' . $setting['theme'] . '/img/d_thumbnail.jpg">';
+                }
+                
+                // wached status
+                if ($setting['watched_status'] == 1 && $episodes['play_count'] > 0) {
+                    $output_episode['watched_img'] = '<img class="episode_watched" src="templates/' . $setting['theme'] . '/img/watched.png" title="' . $lang['i_last_played'] . ': ' . $episodes['last_played'] . '" alt="">';
+                }
+                
+                // episode ribbon new
+                if (substr($episodes['date_added'], 0, 10) == $new_episode_date) {
+                    $output_episode['ribbon_new'] = '<div class="episode_ribbon_new_text">' . mb_strtoupper($lang['i_ribbon_new']) . '</div><img class="episode_ribbon_new" src="templates/' . $setting['theme'] . '/img/ribbon_new.png">';
+                }
+        
+                // episode streams
+                $stream_sql = 'SELECT * FROM `episodes_stream` WHERE id = "' . $episodes['id'] . '"';
+                $stream_res = mysql_q($stream_sql);
+                
+                if (mysql_num_rows($stream_res) > 0) {
+                    $str = array('v' => array(), 'a' => array(), 's' => array());
+                    while ($stream = mysql_fetch_assoc($stream_res)) {
+                        $str[$stream['type']][] = $stream;
+                    }
+                }
+                
+                $img_flag_vres = '';
+                $img_flag_vtype = '';
+                $img_flag_vq = '';
+                if (isset($str['v'])) {
+                    foreach ($str['v'] as $s) {
+                        // episode video resolution
+                        foreach ($vres_assoc as $key => $val) {
+                            if (is_numeric($s['v_width']) && $s['v_width'] >= $key) {
+                                $img_flag_vres = '<img class="flag" src="templates/' . $setting['theme'] . '/img/flags/vres_' . $val . '.png" alt="">';
+                            }
+                        }
+                        // episode video codec
+                        foreach ($vtype_assoc as $key => $val) {
+                            if (in_array($s['v_codec'], $vtype_assoc[$key])) {
+                                $img_flag_vtype = '<img class="flag" src="templates/' . $setting['theme'] . '/img/flags/vc_' . $key . '.png" alt="">';
+                            }
+                        }
+                        // episode video hd or sd
+                        if (is_numeric($s['v_width']) && $s['v_width'] >= 1280) {
+                            $img_flag_vq = '<img class="flag" src="templates/' . $setting['theme'] . '/img/flags/v_hd.png" alt="">';
+                        } else {
+                            $img_flag_vq = '<img class="flag" src="templates/' . $setting['theme'] . '/img/flags/v_sd.png" alt="">';
+                        }
+                        $output_episode['img_flag_v'].= $img_flag_vres . $img_flag_vtype . $img_flag_vq;
+                    }
+                }
+                if (isset($str['a'])) {
+                    foreach ($str['a'] as $s) {
+                        // episode audio codec
+                        foreach ($atype_assoc as $key => $val) {
+                            if(in_array($s['a_codec'], $atype_assoc[$key])) {
+                                $img_flag_atype = '<img class="flag" src="templates/' . $setting['theme'] . '/img/flags/ac_' . $key . '.png" alt="">';
+                            }
+                        }
+                        // episode audio channel
+                        foreach ($achan_assoc as $val) {
+                            if (is_numeric($s['a_chan']) && $s['a_chan'] >= $val) {
+                                $img_flag_achan = '<img class="flag" src="templates/' . $setting['theme'] . '/img/flags/ach_' . $val . '.png" alt="">';
+                            }
+                        }
+                        // episode audio language
+                        if (file_exists('templates/' . $setting['theme'] . '/img/flags/l_' . check_flag($s['a_lang'], $iso_lang) . '.png')) {
+                            $img_flag_alang = '<img class="flag" src="templates/' . $setting['theme'] . '/img/flags/l_' . check_flag($s['a_lang'], $iso_lang) . '.png" alt="">';
+                        } else {
+                            $img_flag_alang = $s['a_lang'];
+                        }
+                        $output_episode['img_flag_a'].= $img_flag_atype . $img_flag_achan . $img_flag_alang;
+                    }
+                }
+                if (isset($str['s'])) {
+                    foreach ($str['s'] as $s) {
+                        // episode subtitles
+                        if (file_exists('templates/' . $setting['theme'] . '/img/flags/l_' . check_flag($s['s_lang'], $iso_lang) . '.png')) {
+                            $img_flag_slang = '<img src="templates/' . $setting['theme'] . '/img/flags/sub.png" alt=""><img class="flag" src="templates/' . $setting['theme'] . '/img/flags/l_' . check_flag($s['s_lang'], $iso_lang) . '.png" alt="">';
+                        } else {
+                            $img_flag_slang = $s['s_lang'];
+                        }
+                        $output_episode['img_flag_s'].= $img_flag_slang ;
+                    }
                 }
                 if ($episodes['season'] <> $i) {
-                    $output_desc['episodes'].= '
-                        <tr>
-                            <td></td>
-                            <td class="orange bold text_left" id="season_' . $episodes['season'] . '">' . $lang['i_season'] . ' ' . $episodes['season'] . '</td>
-                            <td class="orange bold text_left aired">' . $lang['i_aired'] . '</td>
-                            <td></td>
-                            <td></td>
-                        </tr>';
+                    $show_episode['season_title'] = 1;
                 }
-                $output_desc['episodes'].= '
-                    <tr class="episode" id="season_' . $episodes['season'] . '_episode_' . $episodes['episode'] . '">
-                        <td class="left"></td>
-                        <td class="right plot">' . $episodes['episode'] . '. ' . $episodes['title'] . $output_episodes_plot . '</td>
-                        <td>' . $episodes['firstaired'] . '</td>
-                        <td>' . ($episodes['play_count'] > 0 ? '<img class="watched_episode" src="templates/' . $setting['theme'] . '/img/watched.png" title="' . $lang['i_last_played'] . ': ' . $episodes['last_played'] . '" alt="">' : '') . '</td>
-                        <td>' . $e_xbmc . '</td>
-                    </tr>';
                 $i = $episodes['season'];
+            
+                $episode_list = new Teamplate('episodes.tpl', $setting, $lang);
+                foreach ($output_episode as $key => $val) {
+                    $episode_list->tpl($key, $val);
+                }
+                foreach ($show_episode as $key => $val) {
+                    $episode_list->show($key, $val);
+                }
+                $output_epiosde_list.= $episode_list->init();
+                $output_desc['episodes'] = $output_epiosde_list;
             }
-            $output_desc['episodes'].= '</table>';
         }
     }
     

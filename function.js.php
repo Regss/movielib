@@ -340,13 +340,17 @@ if ($option  == 'deletemovie' or $option  == 'deletetvshow') {
     include('function.php');
     connect($mysql_ml);
     if ($option  == 'deletemovie') {
-        $table = 'movies';
+        sync_delete(array($_GET['id']), 'movies');
     } else {
-        $table = 'tvshows';
-        $delete_sql = 'DELETE FROM episodes WHERE tvshow in (' . $_GET['id'] . ')';
-        $delete = mysql_q($delete_sql);
+        $episodes_sql = 'SELECT id FROM episodes WHERE tvshow = "' . $_GET['id'] . '"';
+        $episodes_res = mysql_query($episodes_sql);
+        $episodes_id = array();
+        while ($epi = mysql_fetch_assoc($episodes_res)) {
+            $episodes_id[] = $epi['id'];
+        }
+        sync_delete(array($_GET['id']), 'tvshows');
+        sync_delete($episodes_id, 'episodes');
     }
-    sync_delete(array($_GET['id']), $table);
 }
 
 // hide movie or tvshow

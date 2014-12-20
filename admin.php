@@ -324,7 +324,7 @@ if ($option == 'tvshowslist') {
 
 // DELETE ALL
 if ($option == 'delete_all_tvshows') {
-    $truncate = array('tvshows', 'tvshows_actor', 'tvshows_genre', 'episodes');
+    $truncate = array('tvshows', 'tvshows_actor', 'tvshows_genre', 'episodes', 'episodes_stream');
     foreach ($truncate as $t) {
         $sql = 'TRUNCATE `' . $t . '`';
         $res = mysql_query($sql);
@@ -336,6 +336,10 @@ if ($option == 'delete_all_tvshows') {
     $files = scandir('cache/');
     foreach($files as $file) {
         $match = preg_match('|^tvshows|', $file);
+        if ($match == 1) {
+            unlink('cache/' . $file);
+        }
+        $match = preg_match('|^episodes|', $file);
         if ($match == 1) {
             unlink('cache/' . $file);
         }

@@ -269,20 +269,6 @@ $(document).ready(function() {
             $(this).dequeue().animate({opacity: '.3'}, 300);
         });
     }
-        
-    // episode plot toggle
-    $('.plot').mouseenter(function(){
-        var e_id = $(this).parent().attr('id');
-        $(this).parent().mousemove(function(event) {
-            var posX = event.pageX;
-            var posY = event.pageY;
-            $('#plot_'+e_id).css({'top': posY+10, 'left': posX-100});
-        });
-        $('#plot_'+e_id).delay(500).show(0);
-    });
-    $('.plot').mouseleave(function(){
-        $('.episode_plot').dequeue().hide();
-    });
     
     // control remote - check connection and change logo
     $.ajax({url: 'function.js.php?option=remote&f=check', dataType: 'json', success: function(data){
@@ -347,10 +333,10 @@ $(document).ready(function() {
     });
     
     // panel desc
-    $('.movie').mouseenter(function(){
+    $('.movie, .episode').mouseenter(function(){
         $(this).children('.xbmc_hide').animate({opacity: 1}, {queue: false, duration: 300});
     });
-    $('.movie').mouseleave(function(){
+    $('.movie, .episode').mouseleave(function(){
         $(this).children('.xbmc_hide').animate({opacity: .0}, {queue: false, duration: 300});
     });
     

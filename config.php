@@ -1,6 +1,6 @@
 <?PHP
 
-$version = '2.7.1';
+$version = '2.7.2';
 
 if (file_exists('db.php')) {
     include('db.php');
@@ -189,6 +189,19 @@ $mysql_tables['movies_stream'] = array(
     'a_lang'                => 'varchar(10)',
     's_lang'                => 'varchar(10)'
 );
+$mysql_tables['episodes_stream'] = array(
+    'id'                    => 'int(6) NOT NULL',
+    'type'                  => 'varchar(1) NOT NULL',
+    'v_codec'               => 'varchar(255)',
+    'v_aspect'              => 'varchar(10)',
+    'v_width'               => 'int(11)',
+    'v_height'              => 'int(11)',
+    'v_duration'            => 'int(11)',
+    'a_codec'               => 'varchar(255)',
+    'a_chan'                => 'int(11)',
+    'a_lang'                => 'varchar(10)',
+    's_lang'                => 'varchar(10)'
+);
 $mysql_tables['config'] = array(
     'site_name'             => 'varchar(30) DEFAULT "MovieLib"',
     'language'              => 'varchar(2) DEFAULT "en"',
@@ -323,6 +336,21 @@ $item_desc = array(
     'episodes',
     'episodes_plot',
     'fb_url'
+);
+$item_episode = array(
+    'episode',
+    'season',
+    'season_title',
+    'thumbnail',
+    'file',
+    'xbmc',
+    'plot',
+    'aired',
+    'img_flag_v',
+    'img_flag_a',
+    'img_flag_s',
+    'watched_img',
+    'ribbon_new'
 );
 
 // array for language audio and subs
