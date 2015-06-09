@@ -422,6 +422,30 @@ function panels_array($columns, $table) {
     return $panels_array;
 }
 
+/* ##############
+ * # CREATE URL #
+ */##############
+function create_url($setting, $urls) {
+    if ($setting['mod_rewrite'] == 1 && array_key_exists('HTTP_MOD_REWRITE', $_SERVER)) {
+        $index = 'index,';
+        $p = '-';
+        $c = ',';
+        $end = '.html';
+    } else {
+        $index = 'index.php?';
+        $p = '=';
+        $c = '&';
+        $end = '';
+    }
+    $pair = array();
+    foreach ($urls as $k => $v) {
+        if (strlen($v) > 0) {
+            $pair[] = $k . $p . $v;
+        }
+    }
+    return $index . implode($c, $pair) . $end;
+}
+
 /* #################
  * # CREATE BANNER #
  */#################

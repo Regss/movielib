@@ -21,7 +21,11 @@ input, select { background-color:#ddd; color:#333; border:1px solid #fff; font-s
 .container_login { width:300px; margin:auto; background-color:#ccc; border:1px solid #333; margin-top:20px; padding:10px; text-align:center; }
 
 #select_media { width:800px; margin:auto; overflow:hidden; color:#414141; padding-bottom:10px; font-family:Verdana, Tahoma, sans-serif; font-size:20px; font-weight:bold; text-align:center; }
-#select_media a, #select_media span { display:block; width:399px; float:left; border-bottom:1px solid #ddd; border-left:1px solid #ddd; background-color:#fff; padding: 10px 0px 10px 0px; }
+#select_media a { display:block; width:399px; float:left; border-bottom:1px solid #ddd; border-left:1px solid #ddd; background-color:#fff; padding: 10px 0px 10px 0px; }
+#select_media a.selected:link  { color:#414141; }
+#select_media a.selected:visited  { color:#414141; }
+#select_media a.selected:hover { color:#000; }
+#select_media a.selected:active { color:#000; }
 
 #panel_top, #panel_title { width:728px; overflow:hidden; margin:auto; }
 .panel_top_item_title { float:left; color:#414141; font-weight:bold; padding-top:3px; padding-left:4px; background-color:#fff; width:138px; height:17px; margin-left:20px; margin-right:20px; }
@@ -42,13 +46,13 @@ input, select { background-color:#ddd; color:#333; border:1px solid #fff; font-s
 
 #panel_view { margin-bottom:10px; font-weight:bold; overflow:hidden; }
 #view_menu , #watch_menu { width:180px; float:right; margin-left:10px; }
-#view_title, #views a, #views span, #watch_title, #watch a, #watch span  { width:178px; display:block; background-color:#ddd; border:1px solid #fff; padding: 4px 0px 4px 0px; }
-#views, #watch { position:absolute; display:none; z-index:5; }
+#view_title, #views a, #views span, #watch_title, #watches a, #watches span  { width:178px; display:block; background-color:#ddd; border:1px solid #fff; padding: 4px 0px 4px 0px; }
+#views, #watches { position:absolute; display:none; z-index:5; }
 
 input.search { width:248px; }
 #panel_search { margin-bottom:10px; overflow:hidden; text-align:right;  }
 #panel_input_search { width:252px; float:right; }
-#panel_live_search { position:absolute; z-index:1; border:0px solid #fff; background-color:#ddd; overflow:hidden; }
+#panel_live_search { position:absolute; z-index:20; border:0px solid #fff; background-color:#ddd; overflow:hidden; }
 .live_search_box { width:248px; text-align:left; cursor:pointer; border:1px solid #fff; margin:1px; font-size:10px; overflow: hidden; }
 .live_search_title { width:181px; margin:3px; font-weight:bold; color:#414141; font-size:12px; white-space:nowrap; text-overflow:ellipsis; display: block; overflow:hidden }
 .live_search_orig_title { width:181px; margin:3px; font-weight:bold; color:#666; font-size:10px; white-space:nowrap; text-overflow:ellipsis; display: block; overflow:hidden }

@@ -6,6 +6,6 @@
         <a id="{file}" href="cache/list.m3u"><img class="list animate" src="templates/{SET.theme}/img/list.png" title="{LANG.i_xbmc_m3u}"></a>
     </div>
     {/SHOW.xbmc}
-    <a href="index.php?id={id}&video={video}&view={view}&sort={sort}&filter={filter}&filterid={filterid}"><img id="poster_movie_{id}" class="poster" src="{poster}" alt="" title="{title}">{ribbon_new}</a>
+    <a href="{url_title}"><img id="poster_movie_{id}" class="poster" src="{poster}" alt="" title="{title}">{ribbon_new}</a>
     {watched_img}
 </div>

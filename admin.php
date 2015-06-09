@@ -173,9 +173,10 @@ if ($option == '') {
             <tr><td>' . $lang['a_cached_fanarts'] . '</td><td>' . $fanart_cached . '</td></tr>
             <tr><td>' . $lang['a_cached_actors'] . '</td><td>' . $actors_cached . '</td></tr>
             <tr><td class="bold orange">' . $lang['a_server_settings'] . '</td><td></td></tr>
-            <tr><td>GD</td><td>' . (extension_loaded('gd') && function_exists('gd_info') ? $lang['a_setting_on'] : $lang['a_setting_off']) . '</td></tr>
-            <tr><td>CURL</td><td>' . (function_exists('curl_version') ? $lang['a_setting_on'] : $lang['a_setting_off']) . '</td></tr>
-            <tr><td>ALLOW URL FOPEN</td><td>' . (ini_get('allow_url_fopen') == 1 ? $lang['a_setting_on'] : $lang['a_setting_off']) . '</td></tr>
+            <tr><td>GD</td><td>' . (extension_loaded('gd') && function_exists('gd_info') ? '<span class="green">' . $lang['a_setting_on'] . '</span>' : '<span class="red">' . $lang['a_setting_off'] . '</span>') . '</td></tr>
+            <tr><td>CURL</td><td>' . (function_exists('curl_version') ? '<span class="green">' . $lang['a_setting_on'] . '</span>' : '<span class="red">' . $lang['a_setting_off'] . '</span>') . '</td></tr>
+            <tr><td>MOD REWRITE</td><td>' . (array_key_exists('HTTP_MOD_REWRITE', $_SERVER) ? '<span class="green">' . $lang['a_setting_on'] . '</span>' : '<span class="red">' . $lang['a_setting_off'] . '</span>') . '</td></tr>
+            <tr><td>ALLOW URL FOPEN</td><td>' . (ini_get('allow_url_fopen') == 1 ? '<span class="green">' . $lang['a_setting_on'] . '</span>' : '<span class="red">' . $lang['a_setting_off'] . '</span>') . '</td></tr>
             <tr><td>MAX EXECUTION TIME</td><td>' . ini_get('max_execution_time') . '</td></tr>
             <tr><td>UPLOAD MAX FILESIZE</td><td>' . ini_get('upload_max_filesize') . '</td></tr>
             <tr><td>POST MAX SIZE</td><td>' . ini_get('post_max_size') . '</td></tr>
@@ -360,6 +361,7 @@ if ($option == 'settings') {
     
     $output_lang = '';
     $output_theme = '';
+    $output_select_media_header = '';
     $output_view = '';
     $output_panel_top = '';
     $output_panel_view = '';
@@ -377,7 +379,10 @@ if ($option == 'settings') {
     $output_show_trailer = '';
     $output_show_facebook = '';
     $output_protect_site = '';
+    $output_mod_rewrite = '';
     $output_per_page = '';
+    $output_default_sort = '';
+    $output_default_watch = '';
     $output_panel_top_limit = '';
     $output_xbmc_actors = '';
     $output_xbmc_posters = '';
@@ -397,6 +402,28 @@ if ($option == 'settings') {
             }
             $output_lang.= '<option' . ($val == $setting['language'] ? ' selected="selected"' : '') . ' value="' . $val . '">' . $lang_title . '</option>';
         }
+    }
+    
+    // set default sort
+    $sort_array = array(
+        1 => $lang['i_title'],
+        4 => $lang['i_rating'],
+        5 => $lang['i_added'],
+        7 => $lang['i_last_played'],
+        8 => $lang['i_most_watched']
+    );
+    foreach ($sort_array as $key => $val) {
+        $output_default_sort.= '<option' . ($key == $setting['default_sort'] ? ' selected="selected"' : '') . ' value="' . $key . '">' . $val . '</option>';
+    }
+    
+     // set default watch
+    $watch_array = array(
+        0 => $lang['i_all'],
+        1 => $lang['i_watched'],
+        2 => $lang['i_unwatched']
+    );
+    foreach ($watch_array as $key => $val) {
+        $output_default_watch.= '<option' . ($key == $setting['default_watch'] ? ' selected="selected"' : '') . ' value="' . $key . '">' . $val . '</option>';
     }
     
     // set theme input
@@ -421,6 +448,7 @@ if ($option == 'settings') {
     $mode = array(0, 1);
     foreach ($mode as $val) {
         $output_panel_top.= '<option' . ($setting['panel_top'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
+        $output_select_media_header.= '<option' . ($setting['select_media_header'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         $output_panel_view.= '<option' . ($setting['panel_view'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         $output_watched_status.= '<option' . ($setting['watched_status'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         $output_live_search.= '<option' . ($setting['live_search'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
@@ -429,6 +457,7 @@ if ($option == 'settings') {
         $output_show_trailer.= '<option' . ($setting['show_trailer'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         $output_show_facebook.= '<option' . ($setting['show_facebook'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         $output_protect_site.= '<option' . ($setting['protect_site'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
+        $output_mod_rewrite.= '<option' . ($setting['mod_rewrite'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         $output_xbmc_actors.= '<option' . ($setting['xbmc_actors'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         $output_xbmc_posters.= '<option' . ($setting['xbmc_posters'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         $output_xbmc_fanarts.= '<option' . ($setting['xbmc_fanarts'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
@@ -471,8 +500,11 @@ if ($option == 'settings') {
                 <tr><td>' . $lang['a_site_name'] . ':</td><td><input type="text" name="site_name" value="' . $setting['site_name'] . '" /></td></tr>
                 <tr><td>' . $lang['a_language'] . ':</td><td><select name="language">' . $output_lang . '</select></td></tr>
                 <tr><td>' . $lang['a_theme'] . ':</td><td><select name="theme">' . $output_theme . '</select></td></tr>
+                <tr><td>' . $lang['a_select_media_header'] . ':</td><td><select name="select_media_header">' . $output_select_media_header . '</select></td></tr>
                 <tr><td>' . $lang['a_view'] . ':</td><td><select name="view">' . $output_view . '</select></td></tr>
                 <tr><td>' . $lang['a_per_page'] . ':</td><td><select name="per_page">' . $output_per_page . '</select></td></tr>
+                <tr><td>' . $lang['a_default_sort'] . ':</td><td><select name="default_sort">' . $output_default_sort . '</select></td></tr>
+                <tr><td>' . $lang['a_default_watch'] . ':</td><td><select name="default_watch">' . $output_default_watch . '</select></td></tr>
                 <tr><td>' . $lang['a_panel_top'] . ':</td><td><select name="panel_top">' . $output_panel_top . '</select></td></tr>
                 <tr><td>' . $lang['a_panel_view'] . ':</td><td><select name="panel_view">' . $output_panel_view . '</select></td></tr>
                 <tr><td>' . $lang['a_watched_status'] . ':</td><td><select name="watched_status">' . $output_watched_status . '</select></td></tr>
@@ -483,6 +515,7 @@ if ($option == 'settings') {
                 <tr><td>' . $lang['a_show_trailer'] . ':</td><td><select name="show_trailer">' . $output_show_trailer . '</select></td></tr>
                 <tr><td>' . $lang['a_show_facebook'] . ':</td><td><select name="show_facebook">' . $output_show_facebook . '</select></td></tr>
                 <tr><td>' . $lang['a_protect_site']  . ':</td><td><select name="protect_site">' . $output_protect_site . '</select></td></tr>
+                <tr><td>' . $lang['a_mod_rewrite']  . ':</td><td><select name="mod_rewrite">' . $output_mod_rewrite . '</select></td></tr>
                 <tr><td class="bold orange">' . $lang['a_set_panel_left'] . '</td><td></td></tr>
                 <tr><td>' . $lang['a_panel_overall'] . ':</td><td><select name="panel_overall">' . $output_panel_overall . '</select></td></tr>
                 <tr><td>' . $lang['a_panel_genre'] . ':</td><td><select name="panel_genre">' . $output_panel_genre . '</select></td></tr>
