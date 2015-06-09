@@ -55,10 +55,10 @@ $(document).ready(function() {
         $('#views').hide();
     });
     $('#watch_menu').mouseenter(function () {
-        $('#watch').show();
+        $('#watches').show();
     });
     $('#watch_menu').mouseleave(function () {
-        $('#watch').hide();
+        $('#watches').hide();
     });
     
     // Default value for search input

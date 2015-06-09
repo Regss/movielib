@@ -1,6 +1,6 @@
 <?PHP
 
-$version = '2.7.2';
+$version = '2.7.3';
 
 if (file_exists('db.php')) {
     include('db.php');
@@ -19,7 +19,8 @@ $vres_assoc = array(
     640 => 480,
     768 => 576,
     1280 => 720,
-    1920 => 1080
+    1920 => 1080,
+    3000 => 4096
 );
 
 // Video codec
@@ -27,7 +28,7 @@ $vtype_assoc['3ivx']    =   array('3ivx', '3iv2', '3ivd');
 $vtype_assoc['avc']     =   array('avc', 'avc1');
 $vtype_assoc['divx']    =   array('divx', 'div1', 'div2', 'div3', 'div4', 'div5', 'div6');
 $vtype_assoc['flv']     =   array('flv');
-$vtype_assoc['h264']    =   array('h264');
+$vtype_assoc['h264']    =   array('h264', 'x264');
 $vtype_assoc['mp4']     =   array('mp4');
 $vtype_assoc['mpeg']    =   array('mpeg', 'pim1');
 $vtype_assoc['mpeg2']   =   array('mpeg2', 'em2v', 'lmp2', 'mmes', 'mpeg-2');
@@ -35,6 +36,7 @@ $vtype_assoc['mpeg4']   =   array('mpeg4', 'dm4v', 'dx50', 'geox', 'm4s2', 'mpeg
 $vtype_assoc['qt']      =   array('qt', '8bps', 'advj', 'avrn', 'rle', 'rpza', 'smc', 'sv10', 'svq', 'zygo');
 $vtype_assoc['wmv']     =   array('wmv', 'wma');
 $vtype_assoc['xvid']    =   array('xvid', 'xvix');
+$vtype_assoc['hevc']    =   array('h265', 'x265');
 
 // Audio codec
 $atype_assoc['aac']     =   array('aac');
@@ -72,7 +74,9 @@ $langs = array(
     'pl' => 'Polish',
     'pt' => 'Portuguese',
     'ru' => 'Russian',
-    'hr' => 'Croatian'
+    'hr' => 'Croatian',
+    'sk' => 'Slovak',
+    'sr' => 'Serbian'
 );
 
 // MimeType
@@ -93,6 +97,7 @@ $mysql_tables['movies'] = array(
     'year'                  => 'varchar(4) NOT NULL',
     'set'                   => 'varchar(255) NOT NULL',
     'file'                  => 'varchar(255) NOT NULL',
+    'imdbid'                => 'varchar(12) NOT NULL',
     'play_count'            => 'int(11) NOT NULL',
     'last_played'           => 'varchar(20) NOT NULL',
     'date_added'            => 'varchar(20) NOT NULL',
@@ -180,7 +185,7 @@ $mysql_tables['movies_stream'] = array(
     'id'                    => 'int(6) NOT NULL',
     'type'                  => 'varchar(1) NOT NULL',
     'v_codec'               => 'varchar(255)',
-    'v_aspect'              => 'varchar(10)',
+    'v_aspect'              => 'varchar(15)',
     'v_width'               => 'int(11)',
     'v_height'              => 'int(11)',
     'v_duration'            => 'int(11)',
@@ -193,7 +198,7 @@ $mysql_tables['episodes_stream'] = array(
     'id'                    => 'int(6) NOT NULL',
     'type'                  => 'varchar(1) NOT NULL',
     'v_codec'               => 'varchar(255)',
-    'v_aspect'              => 'varchar(10)',
+    'v_aspect'              => 'varchar(15)',
     'v_width'               => 'int(11)',
     'v_height'              => 'int(11)',
     'v_duration'            => 'int(11)',
@@ -206,8 +211,11 @@ $mysql_tables['config'] = array(
     'site_name'             => 'varchar(30) DEFAULT "MovieLib"',
     'language'              => 'varchar(2) DEFAULT "en"',
     'theme'                 => 'varchar(15) DEFAULT "default"',
+    'select_media_header'   => 'int(1) DEFAULT 0',
     'view'                  => 'int(1) DEFAULT 0',
     'per_page'              => 'int(5) DEFAULT 50',
+    'default_sort'          => 'int(1) DEFAULT 1',
+    'default_watch'         => 'int(1) DEFAULT 0',
     'panel_top_limit'       => 'int(5) DEFAULT 10',
     'panel_top_time'        => 'int(5) DEFAULT 5',
     'panel_top'             => 'int(1) DEFAULT 1',
@@ -227,6 +235,7 @@ $mysql_tables['config'] = array(
     'show_facebook'         => 'int(1) DEFAULT 1',
     'banner'                => 'varchar(200) DEFAULT 0',
     'protect_site'          => 'int(1) DEFAULT 0',
+    'mod_rewrite'           => 'int(1) DEFAULT 0',
     'token'                 => 'varchar(6) DEFAULT ""',
     'xbmc_actors'           => 'int(1) DEFAULT 1',
     'xbmc_posters'          => 'int(1) DEFAULT 1',
@@ -266,8 +275,7 @@ $item = array(
     'include_view',
     'sort',
     'watch',
-    'filter',
-    'filterid',
+    'url_delete_filter',
     'meta_title',
     'meta_img',
     'meta_url',
@@ -303,10 +311,9 @@ $item_desc = array(
     'view',
     'include_view',
     'sort',
-    'filter',
-    'filterid',
     'title',
     'originaltitle',
+    'url_title',
     'file',
     'xbmc',
     'xbmc_episode',
@@ -314,6 +321,7 @@ $item_desc = array(
     'genre',
     'rating',
     'rating_star',
+    'imdb_url',
     'actor',
     'plot',
     'year',
@@ -434,8 +442,6 @@ $json_f = array(
 // Set var
 $var = array(
     'id'        =>  0,
-    'sort'      =>  1,
-    'watch'     =>  0,
     'search'    =>  '',
     'page'      =>  1,
     'token'     =>  '',

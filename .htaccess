@@ -1,0 +1,16 @@
+<IfModule mod_rewrite.c>
+
+    # Tell PHP that the mod_rewrite module is ENABLED.
+    SetEnv HTTP_MOD_REWRITE On
+    
+    RewriteEngine On
+
+    RewriteRule ^index.html$ index.php
+
+    RewriteRule ^(index,[^/]+)-([^/]+)$ $1=$2 [N]
+    RewriteRule ^(index,[^/]+),([^/]+)$ $1&$2 [N]
+
+    RewriteRule ^index,([^/]+).html$ index.php?$1
+    RewriteRule ^index,(.*)/([^/]+).html$ $1/index.php?$2
+
+</IfModule>

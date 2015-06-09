@@ -1,6 +1,6 @@
 <div id="{mysql_table}_{id}" class="movie">
     <div class="title">
-        <a href="index.php?id={id}&video={video}&view={view}&sort={sort}&filter={filter}&filterid={filterid}">{title}</a>
+        <a href="{url_title}">{title}</a>
     </div>
     <div class="title_org">{originaltitle}</div>
     {SHOW.xbmc}
@@ -45,7 +45,7 @@
             {SHOW.rating}
             <tr>
                 <td class="left">{LANG.i_rating}:</td>
-                <td class="right">{rating_star} ({rating})</td>
+                <td class="right">{rating_star} ({rating}) {imdb_url}</td>
             </tr>
             {/SHOW.rating}
             {SHOW.country}

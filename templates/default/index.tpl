@@ -142,7 +142,7 @@
                 {SHOW.panel_filter}
                 <div id="panel_filter">
                     <div id="filter_text">{panel_filter}</div>
-                    <a href="index.php?video={video}&view={view}&watch={watch}&sort={sort}&filter={filter}&filterid={filterid}"><img id="filter_delete_img" class="animate" src="templates/{SET.theme}/img/delete.png" title="{LANG.i_del_result}" alt=""></a>
+                    <a href="{url_delete_filter}"><img id="filter_delete_img" class="animate" src="templates/{SET.theme}/img/delete.png" title="{LANG.i_del_result}" alt=""></a>
                 </div>
                 {/SHOW.panel_filter}
                 <div id="panel_list" class="{video}">
