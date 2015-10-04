@@ -95,7 +95,11 @@ $output['view'] = $view;
 $output['include_view'] = $views[$include_view];
 $output['video'] = $video;
 $output['watch'] = $watch;
-$output['url_delete_filter'] = create_url($setting, array('video' => $video, 'view' => $view, 'sort' => $sort, 'filter' => $filter, 'filterid' => $filterid));
+if ($id == 0) {
+    $output['url_delete_filter'] = create_url($setting, array('video' => $video, 'view' => $view, 'sort' => $sort));
+} else {
+    $output['url_delete_filter'] = create_url($setting, array('video' => $video, 'view' => $view, 'sort' => $sort, 'filter' => $filter, 'filterid' => $filterid));
+}
 
 /* ################
  * # SELECT MEDIA #
@@ -107,8 +111,8 @@ if ($video == 'tvshows') {
 }
 $output['select_media'] = '<a class="' . ($video == 'movies' ? "selected" : "") . '" href="' . create_url($setting, array('video' => 'movies', 'view' => $view)) . '">' . mb_strtoupper($lang['i_movies']) . '</a><a class="' . ($video == 'tvshows' ? "selected" : "") . '" href="' . create_url($setting, array('video' => 'tvshows', 'view' => $view)) . '">' . mb_strtoupper($lang['i_tvshows']) . '</a>';
 if ($setting['select_media_header'] == 1) {
-    $count_movies = mysql_result(mysql_query('SELECT COUNT( * ) FROM movies'), 0);
-    $count_tvshows = mysql_result(mysql_query('SELECT COUNT( * ) FROM tvshows'), 0);
+    $count_movies = mysql_result(mysql_q('SELECT COUNT( * ) FROM movies'), 0);
+    $count_tvshows = mysql_result(mysql_q('SELECT COUNT( * ) FROM tvshows'), 0);
     if ($count_movies == 0 or $count_tvshows == 0) {
         $output['select_media'] = '';
     }
@@ -342,7 +346,7 @@ $list_sql = 'SELECT ' . $mysql_table . '.* FROM ' . $mysql_table . $mysql_table2
 $list_result = mysql_q($list_sql);
 
 // get date for last added
-$new_sql = 'SELECT ' . $mysql_table . '.date_added FROM ' . $mysql_table . $mysql_table2 . ' ORDER BY ' . $mysql_table . '.date_added DESC LIMIT 0, 1';
+$new_sql = 'SELECT ' . $mysql_table . '.date_added FROM ' . $mysql_table . ' ORDER BY ' . $mysql_table . '.date_added DESC LIMIT 0, 1';
 $new_result = mysql_q($new_sql);
 $new_date = mysql_fetch_assoc($new_result);
 $new_date = substr($new_date['date_added'], 0, 10);
@@ -401,13 +405,23 @@ while ($list = mysql_fetch_assoc($list_result)) {
         $output_desc['watched_img'] = '<img class="watched_img" src="templates/' . $setting['theme'] . '/img/watched.png" title="' . $lang['i_last_played'] . ': ' . $list['last_played'] . '" alt="">';
     }
     
+    // play count
+    if ($setting['show_playcount'] == 1 && $list['play_count'] > 0) {
+        $playcount_array = str_split($list['play_count']);
+        $output_desc['playcount_img'] = '<div class="playcount_block">';
+        foreach ($playcount_array as $int) {
+            $output_desc['playcount_img'].= '<img class="playcount_img" src="templates/' . $setting['theme'] . '/img/' . $int . '.png" title="' . $lang['i_last_played'] . ': ' . $list['last_played'] . '" alt="">';
+        }
+        $output_desc['playcount_img'].= '</div>';
+    }
+    
     // genre
     $output_genre_array = array();
     $genre_sql = 'SELECT genre.id, genre.genre FROM genre, ' . $video . '_genre WHERE ' . $video . '_genre.id = "' . $list['id'] . '" AND genre.id = ' . $video . '_genre.genreid';
     $genre_res = mysql_q($genre_sql);
         
     while ($val =  mysql_fetch_assoc($genre_res)) {
-        $output_genre_array[] = '<a href="'. create_url($setting, array('video' => $video, 'view' => $view, 'watch' => $watch, 'sort' => $sort, 'filtergenrefilterid' => $val['id'])) . '">' . $val['genre'] . '</a>';
+        $output_genre_array[] = '<a href="'. create_url($setting, array('video' => $video, 'view' => $view, 'watch' => $watch, 'sort' => $sort, 'filter' => 'genre', 'filterid' => $val['id'])) . '">' . $val['genre'] . '</a>';
     }
     if (count($output_genre_array) > 0) {
         $show_desc['genre'] = 1;
@@ -417,7 +431,7 @@ while ($list = mysql_fetch_assoc($list_result)) {
     // rating
     if ($list['rating'] !== '') {
         $show_desc['rating'] = 1;
-        $output_desc['rating'] = round($list['rating'], 1);
+        $output_desc['rating'] = $list['rating'];
         
         $show_desc['rating_star'] = 1;
         $output_desc['rating_star'] = '';
@@ -446,7 +460,7 @@ while ($list = mysql_fetch_assoc($list_result)) {
             } else {
                 $actor_thumb = '';
             }
-            $output_actor_array[] = '<a class="actor_img" href="' . create_url($setting, array('video' => $video, 'view' => $view, 'watch' => $watch, 'sort' => $sort, 'filteractorfilterid' => $val['id'])) . '" alt="' . substr(md5($val['actor']), 0, 10) . '">' . $actor_thumb . $val['actor'] . '</a>';
+            $output_actor_array[] = '<a class="actor_img" href="' . create_url($setting, array('video' => $video, 'view' => $view, 'watch' => $watch, 'sort' => $sort, 'filter' => 'actor', 'filterid' => $val['id'])) . '" alt="' . substr(md5($val['actor']), 0, 10) . '">' . $actor_thumb . $val['actor'] . '</a>';
         }
     }
     if (count($output_actor_array) > 0) {
@@ -466,7 +480,7 @@ while ($list = mysql_fetch_assoc($list_result)) {
         // year
         if ($list['year'] !== '') {
             $show_desc['year'] = 1;
-            $output_desc['year'] = '<a href="' . create_url($setting, array('video' => $video, 'view' => $view, 'watch' => $watch, 'sort' => $sort, 'filteryearfilterid' => array_search($list['year'], $panels_array['year']))) . '">' . $list['year'] . '</a>';
+            $output_desc['year'] = '<a href="' . create_url($setting, array('video' => $video, 'view' => $view, 'watch' => $watch, 'sort' => $sort, 'filter' => 'year', 'filterid' => array_search($list['year'], $panels_array['year']))) . '">' . $list['year'] . '</a>';
         }
         
         // country
@@ -475,7 +489,7 @@ while ($list = mysql_fetch_assoc($list_result)) {
         $country_res = mysql_q($country_sql);
         
         while ($val =  mysql_fetch_assoc($country_res)) {
-            $output_country_array[] = '<a href="' . create_url($setting, array('video' => $video, 'view' => $view, 'watch' => $watch, 'sort' => $sort, 'filtercountryfilterid' => $val['id'])) . '">' . $val['country'] . '</a>';
+            $output_country_array[] = '<a href="' . create_url($setting, array('video' => $video, 'view' => $view, 'watch' => $watch, 'sort' => $sort, 'filter' => 'country', 'filterid' => $val['id'])) . '">' . $val['country'] . '</a>';
         }
         if (count($output_country_array) > 0) {
             $show_desc['country'] = 1;
@@ -483,7 +497,7 @@ while ($list = mysql_fetch_assoc($list_result)) {
         }
         
         // runtime
-        if ($list['runtime'] !== '0') {
+        if ($list['runtime'] !== NULL) {
             $show_desc['runtime'] = 1;
             $output_desc['runtime'] = $list['runtime'];
         }
@@ -494,7 +508,7 @@ while ($list = mysql_fetch_assoc($list_result)) {
         $val =  mysql_fetch_assoc($director_res);
         if (isset($val['director'])) {
             $show_desc['director'] = 1;
-            $output_desc['director'] = '<a href="' . create_url($setting, array('video' => $video, 'view' => $view, 'watch' => $watch, 'sort' => $sort, 'filterdirectorfilterid' => $val['id'])) . '">' . $val['director'] . '</a>';
+            $output_desc['director'] = '<a href="' . create_url($setting, array('video' => $video, 'view' => $view, 'watch' => $watch, 'sort' => $sort, 'filter' => 'director', 'filterid' => $val['id'])) . '">' . $val['director'] . '</a>';
         }
         
         // set
@@ -608,16 +622,12 @@ while ($list = mysql_fetch_assoc($list_result)) {
         }
         
         // extra thumbs
-        $c = 1;
         $ex_thumb_array = array();
-        for (;;) {
+        for ($c=1;$c<10;$c++) {
             $ex_t = 'cache/movies_' . $list['id'] . '_t' . $c . 'm.jpg';
             if (file_exists($ex_t)) {
                 $ex_thumb_array[] = '<img src="' . $ex_t . '">';
-            } else {
-                break;
             }
-            $c++;
         }
         if (count($ex_thumb_array) > 0) {
             $show_desc['extra_thumbs'] = 1;
@@ -894,6 +904,7 @@ foreach ($show as $key => $val) {
     $index->show($key, $val);
 }
 
-print $index->init();
+$site = $index->init();
+print $site;
 
 ?>

@@ -372,6 +372,21 @@ $(document).ready(function() {
         $.ajax({url: 'function.js.php?option=visible'+video+'&id='+id});
     });
     
+    // admin image delete
+    $(document).on('mouseover', '.p_exist, .f_exist', function(){
+        $(this).attr('src', 'admin/img/delete.png');
+        $(this).on('mouseleave', '', function(){
+            $(this).attr('src', 'admin/img/exist.png');
+        });
+    });
+    $(document).on('click', '.p_exist, .f_exist', function(){
+        var id = $(this).parent().parent().attr('id');
+        var video = $(this).parent().parent().parent().parent().attr('id');
+        var type = $(this).parent().attr('class');
+        $(this).remove();
+        $.ajax({url: 'function.js.php?option=delete'+type+'&id='+id+'&video='+video+'s'});
+    });
+    
     // admin banner
     $(document).on('keyup', '.ban', function() {
         var b = [];

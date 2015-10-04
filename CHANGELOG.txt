@@ -1,3 +1,22 @@
+v. 2.8.0
+- fixed filter delete button
+- fixed database tables
+- added indexes to database
+- added cleaning function
+- separate image sync
+- fixed filter links
+- added delete button for each image in admin panel
+- added playcount digit in default view
+- added function to autosync webserver settings for control remote
+
+v. 2.7.3
+- add uhd flag
+- add htaccess and mod rewrite
+- option to set default sorting
+- optin to set default watched status
+- option to set hidden the select media header bar
+- add imdb link
+
 v. 2.7.2
 - added sync episode thumbnail
 - added new episodes view

@@ -14,6 +14,7 @@
     <div class="poster_container">
         <img id="poster_movie_{id}" class="poster" src="{poster}" alt="">
         {watched_img}
+        {playcount_img}
     </div>
     {SHOW.facebook_button}
     <div class="fb">

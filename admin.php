@@ -56,18 +56,13 @@ if ($option == '') {
     
     // get version from db
     $db_vers_sql = 'SELECT version FROM config';
-    $db_vers_result = mysql_query($db_vers_sql);
-    if (!$db_vers_result) {
-        echo $db_vers_sql . '<br>';
-        die('ERROR: MySQL - ' . mysql_error());
-    } else {
-        $db_version_assoc = mysql_fetch_assoc($db_vers_result);
-        $db_version = $db_version_assoc['version'];
-    }
+    $db_vers_result = mysql_q($db_vers_sql);
+    $db_version_assoc = mysql_fetch_assoc($db_vers_result);
+    $db_version = $db_version_assoc['version'];
     
     // check tables if versions not match
-    if ($db_version !== $version) {
-        $output_panel_info.= create_table($mysql_tables, $lang, $version, 0);
+    if ($db_version !== $version or isset($_GET['tables'])) {
+        $output_panel_info.= create_table($mysql_tables, $mysql_indexes, $lang, $version, 0);
 
         // delete session var
         $_SESSION = array();
@@ -76,11 +71,7 @@ if ($option == '') {
 
     // Watched
     $overall_movies_sql = 'SELECT play_count, hide FROM movies';
-    $overall_movies_result = mysql_query($overall_movies_sql);
-    if (!$overall_movies_result) {
-        echo $overall_movies_sql . '<br>';
-        die('ERROR: MySQL - ' . mysql_error());
-    }
+    $overall_movies_result = mysql_q($overall_movies_sql);
     $overall_movies_all = mysql_num_rows($overall_movies_result);
     $overall_movies_watched = 0;
     $overall_movies_hidden = 0;
@@ -96,11 +87,7 @@ if ($option == '') {
     $overall_movies_unwatched = $overall_movies_all - $overall_movies_watched;
     
     $overall_tvshows_sql = 'SELECT play_count, hide FROM tvshows';
-    $overall_tvshows_result = mysql_query($overall_tvshows_sql);
-    if (!$overall_tvshows_result) {
-        echo $overall_tvshows_sql . '<br>';
-        die('ERROR: MySQL - ' . mysql_error());
-    }
+    $overall_tvshows_result = mysql_q($overall_tvshows_sql);
     $overall_tvshows_all = mysql_num_rows($overall_tvshows_result);
     $overall_tvshows_watched = 0;
     $overall_tvshows_hidden = 0;
@@ -119,12 +106,16 @@ if ($option == '') {
     $cached_dir = scandir('cache/');
     $poster_cached = 0;
     $fanart_cached = 0;
+    $exthumb_cached = 0;
     foreach ($cached_dir as $val) {
-        if (preg_match_all('/[0-9]+\.jpg/', $val, $res) == 1) {
+        if (preg_match_all('/_[0-9]+\.jpg/', $val, $res) == 1) {
             $poster_cached++;
         }
-        if (preg_match_all('/[0-9]+_f\.jpg/', $val, $res) == 1) {
+        if (preg_match_all('/_[0-9]+_f\.jpg/', $val, $res) == 1) {
             $fanart_cached++;
+        }
+        if (preg_match_all('/_[0-9]+_t[0-9]\.jpg/', $val, $res) == 1) {
+            $exthumb_cached++;
         }
     }
     
@@ -172,6 +163,7 @@ if ($option == '') {
             <tr><td>' . $lang['a_cached_posters'] . '</td><td>' . $poster_cached . '</td></tr>
             <tr><td>' . $lang['a_cached_fanarts'] . '</td><td>' . $fanart_cached . '</td></tr>
             <tr><td>' . $lang['a_cached_actors'] . '</td><td>' . $actors_cached . '</td></tr>
+            <tr><td>' . $lang['a_cached_exthumb'] . '</td><td>' . $exthumb_cached . '</td></tr>
             <tr><td class="bold orange">' . $lang['a_server_settings'] . '</td><td></td></tr>
             <tr><td>GD</td><td>' . (extension_loaded('gd') && function_exists('gd_info') ? '<span class="green">' . $lang['a_setting_on'] . '</span>' : '<span class="red">' . $lang['a_setting_off'] . '</span>') . '</td></tr>
             <tr><td>CURL</td><td>' . (function_exists('curl_version') ? '<span class="green">' . $lang['a_setting_on'] . '</span>' : '<span class="red">' . $lang['a_setting_off'] . '</span>') . '</td></tr>
@@ -187,20 +179,24 @@ if ($option == '') {
         </table>';
 }
 
-/* ##############
- * # MOVIE LIST #
- */##############
-if ($option == 'movieslist') {
-    $list_sql = 'SELECT id, title, trailer, play_count, hide FROM movies ORDER BY title';
-    $list_result = mysql_query($list_sql);
-    if (!$list_result) {
-        echo $list_sql . '<br>';
-        die('ERROR: MySQL - ' . mysql_error());
+/* #########################
+ * # MOVIE AND TVSHOW LIST #
+ */#########################
+if ($option == 'movieslist' or $option == 'tvshowslist') {
+    if ($option == 'movieslist') {
+        $t = 'movies';
+        $list_sql = 'SELECT id, title, trailer, play_count, hide FROM movies ORDER BY title';
+    } else {
+        $t = 'tvshows';
+        $list_sql = 'SELECT id, title, play_count, hide FROM tvshows ORDER BY title';
     }
+    
+    $list_result = mysql_q($list_sql);
     $output_panel = '
-        <table id="movie" class="table">
-            <tr class="bold"><td>
-                </td><td>ID</td>
+        <table id="' . substr($t, 0, -1) . '" class="table">
+            <tr class="bold">
+                <td></td>
+                <td>ID</td>
                 <td>' . $lang['a_title'] . '</td>
                 <td><img src="admin/img/i_poster.png" title="' . $lang['a_poster'] . '" alt=""></td>
                 <td><img src="admin/img/i_fanart.png" title="' . $lang['a_fanart'] . '" alt=""></td>
@@ -210,17 +206,17 @@ if ($option == 'movieslist') {
             </tr>';
     $i = 0;
     while ($list = mysql_fetch_array($list_result)) {
-        if (file_exists('cache/movies_' . $list['id'] . '.jpg')) {
-            $poster_exist = '<img src="admin/img/exist.png" alt="">';
+        if (file_exists('cache/' . $t . '_' . $list['id'] . '.jpg')) {
+            $poster_exist = '<img class="p_exist animate" src="admin/img/exist.png" alt="" title="' . $lang['a_delete_poster'] . '">';
         } else {
             $poster_exist = '';
         }
-        if (file_exists('cache/movies_' . $list['id'] . '_f.jpg')) {
-            $fanart_exist = '<img src="admin/img/exist.png" alt="">';
+        if (file_exists('cache/' . $t . '_' . $list['id'] . '_f.jpg')) {
+            $fanart_exist = '<img class="f_exist animate" src="admin/img/exist.png" alt="" title="' . $lang['a_delete_fanart'] . '">';
         } else {
             $fanart_exist = '';
         }
-        if (stristr($list['trailer'], 'http://')) {
+        if ($t == 'movies' && stristr($list['trailer'], 'http://')) {
             $trailer_link = '<a href="' . $list['trailer'] . '" target="_blank"><img class="animate" src="admin/img/link.png" title="Link" alt=""></a>';
         } else {
             $trailer_link = '';
@@ -235,123 +231,38 @@ if ($option == 'movieslist') {
             <tr id="' . $list['id'] . '">
                 <td>' . $i . '</td><td>' . $list['id'] . '</td>
                 <td>' . $list['title'] . '</td>
-                <td>'  . $poster_exist . '</td>
-                <td>'  . $fanart_exist . '</td>
+                <td class="poster">'  . $poster_exist . '</td>
+                <td class="fanart">'  . $fanart_exist . '</td>
                 <td>'  . $trailer_link . '</td>
                 <td>' . $hide . '</td>
                 <td><img class="delete_row animate" src="admin/img/delete.png" title="' . $lang['a_delete'] . '" alt=""></td>
             </tr>';
     }
-    $output_panel.= '</table><a id="delete_all" class="box" href="admin.php?option=delete_all_movies">' . $lang['a_delete_all'] . '</a>';
+    $output_panel.= '</table><a id="delete_all" class="box" href="admin.php?option=delete_all_' . $t . '">' . $lang['a_delete_all'] . '</a>';
 }
 
 // DELETE ALL
-if ($option == 'delete_all_movies') {
-    $truncate = array('movies', 'movies_country', 'movies_actor', 'movies_director', 'movies_genre', 'movies_stream', 'movies_studio');
+if ($option == 'delete_all_movies' or $option == 'delete_all_tvshows') {
+    if ($option == 'delete_all_movies') {
+        $truncate = array('movies', 'movies_country', 'movies_actor', 'movies_director', 'movies_genre', 'movies_stream', 'movies_studio');
+        $reg_exp = '#^(movies)#';
+    } else {
+        $truncate = array('tvshows', 'tvshows_actor', 'tvshows_genre', 'episodes', 'episodes_stream');
+        $reg_exp = '#^(tvshows|episodes)#';
+    }
     foreach ($truncate as $t) {
         $sql = 'TRUNCATE `' . $t . '`';
-        $res = mysql_query($sql);
-        if (!$res) {
-            echo $sql . '<br>';
-            die ('ERROR: MySQL - ' . mysql_error());
-        }
+        mysql_q($sql);
     }
     $files = scandir('cache/');
+    $files_to_remove = array();
     foreach($files as $file) {
-        $match = preg_match('|^movies|', $file);
-        if ($match == 1) {
-            unlink('cache/' . $file);
+        $match = preg_match_all($reg_exp, $file);
+        if ($match > 0) {
+            $files_to_remove[] = $file;
         }
     }
-    # reset hash
-    $reset_sql = 'UPDATE hash SET movies = ""';
-    $reset_res = mysql_query($reset_sql);
-    if (!$reset_res) {
-        echo $reset_sql . '<br>';
-        die ('ERROR: MySQL - ' . mysql_error());
-    }
-}
-
-/* ###############
- * # TVSHOW LIST #
- */###############
-if ($option == 'tvshowslist') {
-    $list_sql = 'SELECT id, title, play_count, hide FROM tvshows ORDER BY title';
-    $list_result = mysql_query($list_sql);
-    if (!$list_result) {
-        echo $list_sql . '<br>';
-        die ('ERROR: MySQL - ' . mysql_error());
-    }
-    $output_panel = '
-        <table id="tvshow" class="table">
-            <tr class="bold"><td>
-                </td><td>ID</td>
-                <td>' . $lang['a_title'] . '</td>
-                <td><img src="admin/img/i_poster.png" title="' . $lang['a_poster'] . '" alt=""></td>
-                <td><img src="admin/img/i_fanart.png" title="' . $lang['a_fanart'] . '" alt=""></td>
-                <td><img src="admin/img/i_hidden.png" title="' . $lang['a_visible'] . ' / ' . $lang['a_hidden'] . '" alt=""></td>
-                <td><img src="admin/img/i_delete.png" title="' . $lang['a_delete'] . '" alt=""></td>
-            </tr>';
-    $i = 0;
-    while ($list = mysql_fetch_array($list_result)) {
-        if (file_exists('cache/tvshows_' . $list['id'] . '.jpg')) {
-            $poster_exist = '<img src="admin/img/exist.png" alt="">';
-        } else {
-            $poster_exist = '';
-        }
-        if (file_exists('cache/tvshows_' . $list['id'] . '_f.jpg')) {
-            $fanart_exist = '<img src="admin/img/exist.png" alt="">';
-        } else {
-            $fanart_exist = '';
-        }
-        if ($list['hide'] == 1) {
-            $hide = '<img class="hidden animate" src="admin/img/hidden.png" title="visible / hide" alt="">';
-        } else {
-            $hide = '<img class="visible animate" src="admin/img/visible.png" title="visible / hide" alt="">';
-        }
-        $i++;
-        $output_panel.= '
-            <tr id="' . $list['id'] . '">
-                <td>' . $i . '</td><td>' . $list['id'] . '</td>
-                <td>' . $list['title'] . '</td>
-                <td>'  . $poster_exist . '</td>
-                <td>'  . $fanart_exist . '</td>
-                <td>' . $hide . '</td>
-                <td><img class="delete_row animate" src="admin/img/delete.png" title="' . $lang['a_delete'] . '" alt=""></td>
-            </tr>';
-    }
-    $output_panel.= '</table><a id="delete_all" class="box" href="admin.php?option=delete_all_tvshows">' . $lang['a_delete_all'] . '</a>';
-}
-
-// DELETE ALL
-if ($option == 'delete_all_tvshows') {
-    $truncate = array('tvshows', 'tvshows_actor', 'tvshows_genre', 'episodes', 'episodes_stream');
-    foreach ($truncate as $t) {
-        $sql = 'TRUNCATE `' . $t . '`';
-        $res = mysql_query($sql);
-        if (!$res) {
-            echo $sql . '<br>';
-            die ('ERROR: MySQL - ' . mysql_error());
-        }
-    }
-    $files = scandir('cache/');
-    foreach($files as $file) {
-        $match = preg_match('|^tvshows|', $file);
-        if ($match == 1) {
-            unlink('cache/' . $file);
-        }
-        $match = preg_match('|^episodes|', $file);
-        if ($match == 1) {
-            unlink('cache/' . $file);
-        }
-    }
-    # reset hash
-    $reset_sql = 'UPDATE hash SET tvshows = "", episodes = ""';
-    $reset_res = mysql_query($reset_sql);
-    if (!$reset_res) {
-        echo $reset_sql . '<br>';
-        die ('ERROR: MySQL - ' . mysql_error());
-    }
+    remove_images($files_to_remove);
 }
 
 /* ############
@@ -366,6 +277,7 @@ if ($option == 'settings') {
     $output_panel_top = '';
     $output_panel_view = '';
     $output_watched_status = '';
+    $output_show_playcount = '';
     $output_live_search = '';
     $output_live_search_max_res = '';
     $output_panel_overall = '';
@@ -384,11 +296,12 @@ if ($option == 'settings') {
     $output_default_sort = '';
     $output_default_watch = '';
     $output_panel_top_limit = '';
-    $output_xbmc_actors = '';
+    $output_xbmc_thumbs = '';
     $output_xbmc_posters = '';
     $output_xbmc_fanarts = '';
-    $output_xbmc_thumbs = '';
-    $output_xbmc_thumbs_q = '';
+    $output_xbmc_exthumbs = '';
+    $output_xbmc_exthumbs_q = '';
+    $output_xbmc_auto_conf_remote = '';
     $output_xbmc_master = '';
     
     // set language input
@@ -442,7 +355,7 @@ if ($option == 'settings') {
     // extra thumbs size
     $dimens = array('1920x1080', '1280x720', '853x480');
     foreach ($dimens as $val) {
-        $output_xbmc_thumbs_q.= '<option' . ($val == $setting['xbmc_thumbs_q'] ? ' selected="selected"' : '') . ' value="' . $val . '">' . $val . '</option>';
+        $output_xbmc_exthumbs_q.= '<option' . ($val == $setting['xbmc_exthumbs_q'] ? ' selected="selected"' : '') . ' value="' . $val . '">' . $val . '</option>';
     }
     
     $mode = array(0, 1);
@@ -451,6 +364,7 @@ if ($option == 'settings') {
         $output_select_media_header.= '<option' . ($setting['select_media_header'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         $output_panel_view.= '<option' . ($setting['panel_view'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         $output_watched_status.= '<option' . ($setting['watched_status'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
+        $output_show_playcount.= '<option' . ($setting['show_playcount'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         $output_live_search.= '<option' . ($setting['live_search'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         $output_show_fanart.= '<option' . ($setting['show_fanart'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         $output_fadeout_fanart.= '<option' . ($setting['fadeout_fanart'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
@@ -458,10 +372,11 @@ if ($option == 'settings') {
         $output_show_facebook.= '<option' . ($setting['show_facebook'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         $output_protect_site.= '<option' . ($setting['protect_site'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         $output_mod_rewrite.= '<option' . ($setting['mod_rewrite'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
-        $output_xbmc_actors.= '<option' . ($setting['xbmc_actors'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
+        $output_xbmc_thumbs.= '<option' . ($setting['xbmc_thumbs'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         $output_xbmc_posters.= '<option' . ($setting['xbmc_posters'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         $output_xbmc_fanarts.= '<option' . ($setting['xbmc_fanarts'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
-        $output_xbmc_thumbs.= '<option' . ($setting['xbmc_thumbs'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
+        $output_xbmc_exthumbs.= '<option' . ($setting['xbmc_exthumbs'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
+        $output_xbmc_auto_conf_remote.= '<option' . ($setting['xbmc_auto_conf_remote'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         $output_xbmc_master.= '<option' . ($setting['xbmc_master'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
     }
     
@@ -490,11 +405,12 @@ if ($option == 'settings') {
         <form action="admin.php?option=settings_save" method="post">
             <table class="table">
                 <tr><td class="bold orange">' . $lang['a_set_sync'] . '</td><td></td></tr>
-                <tr><td>' . $lang['a_xbmc_actors'] . ':</td><td><select name="xbmc_actors">' . $output_xbmc_actors . '</select></td></tr>
+                <tr><td>' . $lang['a_xbmc_thumbs'] . ':</td><td><select name="xbmc_thumbs">' . $output_xbmc_thumbs . '</select></td></tr>
                 <tr><td>' . $lang['a_xbmc_posters'] . ':</td><td><select name="xbmc_posters">' . $output_xbmc_posters . '</select></td></tr>
                 <tr><td>' . $lang['a_xbmc_fanarts'] . ':</td><td><select name="xbmc_fanarts">' . $output_xbmc_fanarts . '</select></td></tr>
-                <tr><td>' . $lang['a_xbmc_thumbs'] . ':</td><td><select name="xbmc_thumbs">' . $output_xbmc_thumbs . '</select></td></tr>
-                <tr><td>' . $lang['a_xbmc_thumbs_q'] . ':</td><td><select name="xbmc_thumbs_q">' . $output_xbmc_thumbs_q . '</select></td></tr>
+                <tr><td>' . $lang['a_xbmc_exthumbs'] . ':</td><td><select name="xbmc_exthumbs">' . $output_xbmc_exthumbs . '</select></td></tr>
+                <tr><td>' . $lang['a_xbmc_exthumbs_q'] . ':</td><td><select name="xbmc_exthumbs_q">' . $output_xbmc_exthumbs_q . '</select></td></tr>
+                <tr><td>' . $lang['a_xbmc_auto_conf_remote'] . ':</td><td><select name="xbmc_auto_conf_remote">' . $output_xbmc_auto_conf_remote . '</select></td></tr>
                 <tr><td>' . $lang['a_xbmc_master'] . ':</td><td><select name="xbmc_master">' . $output_xbmc_master . '</select></td></tr>
                 <tr><td class="bold orange">' . $lang['a_set_main'] . '</td><td></td></tr>
                 <tr><td>' . $lang['a_site_name'] . ':</td><td><input type="text" name="site_name" value="' . $setting['site_name'] . '" /></td></tr>
@@ -508,6 +424,7 @@ if ($option == 'settings') {
                 <tr><td>' . $lang['a_panel_top'] . ':</td><td><select name="panel_top">' . $output_panel_top . '</select></td></tr>
                 <tr><td>' . $lang['a_panel_view'] . ':</td><td><select name="panel_view">' . $output_panel_view . '</select></td></tr>
                 <tr><td>' . $lang['a_watched_status'] . ':</td><td><select name="watched_status">' . $output_watched_status . '</select></td></tr>
+                <tr><td>' . $lang['a_show_playcount'] . ':</td><td><select name="show_playcount">' . $output_show_playcount . '</select></td></tr>
                 <tr><td>' . $lang['a_live_search'] . ':</td><td><select name="live_search">' . $output_live_search . '</select></td></tr>
                 <tr><td>' . $lang['a_live_search_max_res'] . ':</td><td><select name="live_search_max_res">' . $output_live_search_max_res . '</select></td></tr>
                 <tr><td>' . $lang['a_show_fanart'] . ':</td><td><select name="show_fanart">' . $output_show_fanart . '</select></td></tr>
@@ -548,15 +465,12 @@ if ($option == 'settings_save' && isset($_POST) && count($_POST) > 10) {
     $_SESSION = array();
     $_SESSION['logged_admin'] = true;
     if ($test) {
-        $settings_update_res = mysql_query($settings_update_sql);
-        if (!$settings_update_res) {
-            echo $settings_update_sql . '<br>';
-            die ('ERROR: MySQL - ' . mysql_error());
-        }
+        $settings_update_res = mysql_q($settings_update_sql);
         $output_panel_info.= $lang['a_saved'] . '<br />';
     } else {
         $output_panel_info.= $lang['a_not_saved'] . '<br />';
     }
+    reset_hash();
 }
 
 /* ###################
@@ -584,11 +498,7 @@ if ($option == 'password_save') {
         if ($_POST['password'] == $_POST['password_re']) {
             if (strlen($_POST['password']) > 3) {
                 $password_update_sql = 'UPDATE users SET password = "' . md5($_POST['password']) . '" WHERE login ="user"';
-                $password_update_res = mysql_query($password_update_sql);
-                if (!$password_update_res) {
-                    echo $password_update_sql . '<br>';
-                    die ('ERROR: MySQL - ' . mysql_error());
-                }
+                mysql_q($password_update_sql);
                 $output_panel_info.= $lang['a_user_pass_changed'] . '<br />';
             } else {
                 $output_panel_info.= $lang['a_user_pass_min'] . '<br />';
@@ -602,11 +512,7 @@ if ($option == 'password_save') {
         if ($_POST['password_admin'] == $_POST['password_admin_re']) {
             if (strlen($_POST['password_admin']) > 3) {
                 $password_update_sql = 'UPDATE users SET password = "' . md5($_POST['password_admin']) . '" WHERE login ="admin"';
-                $password_update_res = mysql_query($password_update_sql);
-                if (!$password_update_res) {
-                    echo $password_update_sql . '<br>';
-                    die ('ERROR: MySQL - ' . mysql_error());
-                }
+                mysql_q($password_update_sql);
                 $output_panel_info.= $lang['a_admin_pass_changed'] . '<br />';
             } else {
                 $output_panel_info.= $lang['a_admin_pass_min'] . '<br />';
@@ -618,11 +524,7 @@ if ($option == 'password_save') {
 }
 // check admin pass is not default
 $pass_check_sql = 'SELECT * FROM users WHERE login = "admin"';
-$pass_check_result = mysql_query($pass_check_sql);
-if (!$pass_check_result) {
-    echo $pass_check_sql . '<br>';
-    die ('ERROR: MySQL - ' . mysql_error());
-}
+$pass_check_result = mysql_q($pass_check_sql);
 $pass_check = mysql_fetch_array($pass_check_result);
 if ($pass_check['password'] == '21232f297a57a5a743894a0e4a801fc3') {
     $output_panel_info.= $lang['a_pass_default'] . '<br />';
@@ -664,11 +566,7 @@ if ($option == 'banner') {
         }
         if (!isset($false)) {
             $update_sql = 'UPDATE config SET `banner` = "' . banner2str($_POST['banner']) . '"';
-            $update_res = mysql_query($update_sql);
-            if (!$update_res) {
-                echo $update_sql . '<br>';
-                die ('ERROR: MySQL - ' . mysql_error());
-            }
+            mysql_q($update_sql);
             $_SESSION['banner'] = $setting['banner'] = banner2str($_POST['banner']);
             $b = create_banner($lang, 'banner.jpg', banner2str($_POST['banner']));
         } else {
@@ -704,17 +602,25 @@ if ($option == 'banner') {
  * # XBMC #
  */########
 if ($option == 'xbmc') {
+    $_SESSION = array();
+    $_SESSION['logged_admin'] = true;
+    if ($setting['xbmc_auto_conf_remote'] == 1) {
+        $output_panel.= '<p class="green">' . $lang['a_xbmc_auto_conf_enabled'] . '</p>';
+        $d = 'disabled';
+    } else {
+        $d = '';
+    }
     $output_panel.= '
         <form action="admin.php?option=xbmc_save" method="post">
             <table class="table">
                 <tr><td class="bold orange">' . $lang['a_xbmc_settings'] . '</td><td></td></tr>
-                <tr><td>' . $lang['a_xbmc_host'] . '</td><td><input id="xbmc_host" type="input" name="xbmc_host" value="' . $setting['xbmc_host'] . '" /></td></tr>
-                <tr><td>' . $lang['a_xbmc_port'] . '</td><td><input id="xbmc_port" type="input" name="xbmc_port" value="' . $setting['xbmc_port'] . '" /></td></tr>
-                <tr><td>' . $lang['a_xbmc_login'] . '</td><td><input id="xbmc_login" type="input" name="xbmc_login" value="' . $setting['xbmc_login'] . '" /></td></tr>
-                <tr><td>' . $lang['a_xbmc_pass'] . '</td><td><input id="xbmc_pass" type="input" name="xbmc_pass" value="' . $setting['xbmc_pass'] . '" /></td></tr>
+                <tr><td>' . $lang['a_xbmc_host'] . '</td><td><input id="xbmc_host" type="input" name="xbmc_host" value="' . $setting['xbmc_host'] . '" ' . $d . '/></td></tr>
+                <tr><td>' . $lang['a_xbmc_port'] . '</td><td><input id="xbmc_port" type="input" name="xbmc_port" value="' . $setting['xbmc_port'] . '" ' . $d . '/></td></tr>
+                <tr><td>' . $lang['a_xbmc_login'] . '</td><td><input id="xbmc_login" type="input" name="xbmc_login" value="' . $setting['xbmc_login'] . '" ' . $d . '/></td></tr>
+                <tr><td>' . $lang['a_xbmc_pass'] . '</td><td><input id="xbmc_pass" type="input" name="xbmc_pass" value="' . $setting['xbmc_pass'] . '" ' . $d . '/></td></tr>
             </table>
                 <div id="xbmc_test" class="box"><div></div>' . $lang['a_xmbc_test'] . '</div>
-                <input type="submit" value="' . $lang['a_save'] . '" />
+                <input type="submit" value="' . $lang['a_save'] . '" ' . $d . '/>
         </form>
     ';
 }
@@ -726,11 +632,7 @@ if ($option == 'xbmc_save') {
         xbmc_port = "' . $_POST['xbmc_port'] . '",
         xbmc_login = "' . $_POST['xbmc_login'] . '", 
         xbmc_pass = "' . $_POST['xbmc_pass'] . '"';
-    $xbmc_update_res = mysql_query($xbmc_update_sql);
-    if (!$xbmc_update_res) {
-        echo $xbmc_update_sql . '<br>';
-        die ('ERROR: MySQL - ' . mysql_error());
-    }
+    mysql_q($xbmc_update_sql);
     $output_panel_info.= $lang['a_xbmc_saved'] . '<br />';
     $_SESSION = array();
     $_SESSION['logged_admin'] = true;
