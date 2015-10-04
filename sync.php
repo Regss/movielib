@@ -34,11 +34,14 @@ if ($option == 'checksettings') {
 if ($token == $setting['token']) {
 
     switch ($option) {
+        // auto config remote
+        case 'autoconfremote':
+            auto_conf_remote($_POST);
+            break;
         
         // generate banner
         case 'generatebanner':
-            $ret = create_banner($lang, 'banner.jpg', $setting['banner']);
-            echo ($ret);
+            create_banner($lang, 'banner.jpg', $setting['banner']);
             break;
         
         // get hash
@@ -55,6 +58,11 @@ if ($token == $setting['token']) {
                 $update_sql = 'UPDATE `hash` SET ' . $table . ' = "' . $hash . '"';
             }
             $update_res = mysql_q($update_sql);
+            break;
+        
+        // clean dataabse
+        case 'cleandb':
+            clean_db();
             break;
         
         /* #########
@@ -88,23 +96,18 @@ if ($token == $setting['token']) {
             break;
         
         /* ##########
-         * # PANELS #
+         * # IMAGES #
          */##########
-        case 'showpanel':
-            $cols = array($_GET['t'], 'id');
-            show($cols, $_GET['t']);
+        case 'showimages':
+            show_images();
             break;
         
-        case 'addpanel':
-            add($_POST, $_GET['t']);
+        case 'addimages':
+            add_images($_POST);
             break;
         
-        case 'removepanel':
-            remove($_POST, $_GET['t']);
-            break;
-            
-        case 'addthumb':
-            add_thumb($_POST);
+        case 'removeimages':
+            remove_images($_POST);
             break;
     }
 }

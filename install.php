@@ -98,7 +98,7 @@ switch ($option) {
         if (!$sel_install) {
             die($lang['ins_could_connect'] . ' - ' . mysql_error());
         }
-        create_table($mysql_tables, $lang, $version, 1);
+        create_table($mysql_tables, $mysql_indexes, $lang, $version, 1);
         
         // create db.php
         $to_write = '<?PHP $mysql_ml = array(\'' . $_POST['host'] . '\', \'' . $_POST['port'] . '\', \'' . $_POST['login'] . '\', \'' . $_POST['pass'] . '\', \'' . $_POST['database'] . '\'); ?>';

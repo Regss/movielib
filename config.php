@@ -1,6 +1,6 @@
 <?PHP
 
-$version = '2.7.3';
+$version = '2.8.0';
 
 if (file_exists('db.php')) {
     include('db.php');
@@ -88,48 +88,48 @@ $mimetype_assoc['video/flv']            =   array('flv');
 // tables
 $mysql_tables['movies'] = array(
     'id'                    => 'int(6) NOT NULL PRIMARY KEY',
-    'title'                 => 'varchar(100) NOT NULL',
-    'plot'                  => 'varchar(5000) NOT NULL',
-    'rating'                => 'float NOT NULL',
-    'trailer'               => 'varchar(255) NOT NULL',
-    'runtime'               => 'int(4) NOT NULL',
-    'originaltitle'         => 'varchar(255) NOT NULL',
-    'year'                  => 'varchar(4) NOT NULL',
-    'set'                   => 'varchar(255) NOT NULL',
-    'file'                  => 'varchar(255) NOT NULL',
-    'imdbid'                => 'varchar(12) NOT NULL',
-    'play_count'            => 'int(11) NOT NULL',
-    'last_played'           => 'varchar(20) NOT NULL',
-    'date_added'            => 'varchar(20) NOT NULL',
-    'hide'                  => 'int(1) NOT NULL DEFAULT 0',
-    'hash'                  => 'varchar(32) NOT NULL'
+    'title'                 => 'varchar(100) DEFAULT ""',
+    'plot'                  => 'varchar(5000) DEFAULT ""',
+    'rating'                => 'float DEFAULT NULL',
+    'trailer'               => 'varchar(255) DEFAULT ""',
+    'runtime'               => 'int(4) DEFAULT NULL',
+    'originaltitle'         => 'varchar(255) DEFAULT ""',
+    'year'                  => 'int(4) DEFAULT NULL',
+    'set'                   => 'varchar(255) DEFAULT ""',
+    'file'                  => 'varchar(255) DEFAULT ""',
+    'imdbid'                => 'varchar(12) DEFAULT ""',
+    'play_count'            => 'int(10) DEFAULT 0',
+    'last_played'           => 'varchar(20) DEFAULT ""',
+    'date_added'            => 'varchar(20) DEFAULT ""',
+    'hide'                  => 'int(1) DEFAULT 0',
+    'hash'                  => 'varchar(32) DEFAULT ""'
 );
 $mysql_tables['tvshows'] = array(
     'id'                    => 'int(6) NOT NULL PRIMARY KEY',
-    'title'                 => 'varchar(100) NOT NULL',
-    'plot'                  => 'varchar(5000) NOT NULL',
-    'rating'                => 'float NOT NULL',
-    'originaltitle'         => 'varchar(255) NOT NULL',
-    'premiered'             => 'varchar(20) NOT NULL',
-    'play_count'            => 'int(11) NOT NULL',
-    'last_played'           => 'varchar(20) NOT NULL',
-    'date_added'            => 'varchar(20) NOT NULL',
-    'hide'                  => 'int(1) NOT NULL DEFAULT 0',
-    'hash'                  => 'varchar(32) NOT NULL'
+    'title'                 => 'varchar(100) DEFAULT ""',
+    'plot'                  => 'varchar(5000) DEFAULT ""',
+    'rating'                => 'float DEFAULT NULL',
+    'originaltitle'         => 'varchar(255) DEFAULT ""',
+    'premiered'             => 'varchar(20) DEFAULT ""',
+    'play_count'            => 'int(10) DEFAULT 0',
+    'last_played'           => 'varchar(20) DEFAULT ""',
+    'date_added'            => 'varchar(20) DEFAULT ""',
+    'hide'                  => 'int(1) DEFAULT 0',
+    'hash'                  => 'varchar(32) DEFAULT ""'
 );
 $mysql_tables['episodes'] = array(
     'id'                    => 'int(6) NOT NULL PRIMARY KEY',
-    'title'                 => 'varchar(100) NOT NULL',
-    'plot'                  => 'varchar(5000) NOT NULL',
+    'title'                 => 'varchar(100) DEFAULT ""',
+    'plot'                  => 'varchar(5000) DEFAULT ""',
     'episode'               => 'int(6) NOT NULL',
     'season'                => 'int(6) NOT NULL',
     'tvshow'                => 'int(6) NOT NULL',
-    'firstaired'            => 'varchar(20) NOT NULL',
-    'file'                  => 'varchar(255) NOT NULL',
-    'play_count'            => 'int(11) NOT NULL',
-    'last_played'           => 'varchar(20) NOT NULL',
-    'date_added'            => 'varchar(20) NOT NULL',
-    'hash'                  => 'varchar(32) NOT NULL'
+    'firstaired'            => 'varchar(20) DEFAULT ""',
+    'file'                  => 'varchar(255) DEFAULT ""',
+    'play_count'            => 'int(10) DEFAULT 0',
+    'last_played'           => 'varchar(20) DEFAULT ""',
+    'date_added'            => 'varchar(20) DEFAULT ""',
+    'hash'                  => 'varchar(32) DEFAULT ""'
 );
 $mysql_tables['actor'] = array(
     'id'                    => 'int(6) NOT NULL AUTO_INCREMENT PRIMARY KEY',
@@ -221,6 +221,7 @@ $mysql_tables['config'] = array(
     'panel_top'             => 'int(1) DEFAULT 1',
     'panel_view'            => 'int(1) DEFAULT 1',
     'watched_status'        => 'int(1) DEFAULT 1',
+    'show_playcount'        => 'int(1) DEFAULT 1',
     'live_search'           => 'int(1) DEFAULT 1',
     'live_search_max_res'   => 'int(4) DEFAULT 10',
     'panel_overall'         => 'int(1) DEFAULT 1',
@@ -237,11 +238,12 @@ $mysql_tables['config'] = array(
     'protect_site'          => 'int(1) DEFAULT 0',
     'mod_rewrite'           => 'int(1) DEFAULT 0',
     'token'                 => 'varchar(6) DEFAULT ""',
-    'xbmc_actors'           => 'int(1) DEFAULT 1',
+    'xbmc_thumbs'           => 'int(1) DEFAULT 1',
     'xbmc_posters'          => 'int(1) DEFAULT 1',
     'xbmc_fanarts'          => 'int(1) DEFAULT 1',
-    'xbmc_thumbs'           => 'int(1) DEFAULT 1',
-    'xbmc_thumbs_q'         => 'varchar(10) DEFAULT "853x480"',
+    'xbmc_exthumbs'         => 'int(1) DEFAULT 1',
+    'xbmc_exthumbs_q'       => 'varchar(10) DEFAULT "853x480"',
+    'xbmc_auto_conf_remote' => 'int(1) DEFAULT 0',
     'xbmc_master'           => 'int(1) DEFAULT 0',
     'xbmc_host'             => 'varchar(30) DEFAULT ""',
     'xbmc_port'             => 'varchar(5) DEFAULT ""',
@@ -258,12 +260,30 @@ $mysql_tables['hash'] = array(
     'movies'                => 'varchar(32) DEFAULT ""',
     'tvshows'               => 'varchar(32) DEFAULT ""',
     'episodes'              => 'varchar(32) DEFAULT ""',
-    'actor'                 => 'varchar(32) DEFAULT ""',
-    'genre'                 => 'varchar(32) DEFAULT ""',
-    'country'               => 'varchar(32) DEFAULT ""',
-    'studio'                => 'varchar(32) DEFAULT ""',
-    'director'              => 'varchar(32) DEFAULT ""'
+    'images'                => 'varchar(32) DEFAULT ""'
 );
+
+// indexes
+$mysql_indexes['actor'] = array('ix_actor');
+$mysql_indexes['country'] = array('ix_country');
+$mysql_indexes['director'] = array('ix_director');
+$mysql_indexes['genre'] = array('ix_genre');
+$mysql_indexes['studio'] = array('ix_studio');
+
+$mysql_indexes['movies'] = array('ix_title', 'ix_rating', 'ix_runtime', 'ix_originaltitle', 'ix_year', 'ix_set', 'ix_play_count', 'ix_last_played', 'ix_date_added', 'ix_hide');
+$mysql_indexes['movies_actor'] = array('ix_id', 'ix_actorid', 'ix_order');
+$mysql_indexes['movies_country'] = array('ix_id', 'ix_countryid');
+$mysql_indexes['movies_director'] = array('ix_id', 'ix_directorid');
+$mysql_indexes['movies_genre'] = array('ix_id', 'ix_genreid');
+$mysql_indexes['movies_studio'] = array('ix_id', 'ix_studioid');
+$mysql_indexes['movies_stream'] = array('ix_id');
+
+$mysql_indexes['tvshows'] = array('ix_title', 'ix_rating', 'ix_originaltitle', 'ix_premiered', 'ix_play_count', 'ix_last_played', 'ix_date_added', 'ix_hide');
+$mysql_indexes['tvshows_actor'] = array('ix_id', 'ix_actorid', 'ix_order');
+$mysql_indexes['tvshows_genre'] = array('ix_id', 'ix_genreid');
+
+$mysql_indexes['episodes'] = array('ix_season', 'ix_tvshow');
+$mysql_indexes['episodes_stream'] = array('ix_id');
 
 // views
 $views = array('view_default', 'view_list', 'view_sposter', 'view_bposter');
@@ -318,6 +338,7 @@ $item_desc = array(
     'xbmc',
     'xbmc_episode',
     'watched_img',
+    'playcount_img',
     'genre',
     'rating',
     'rating_star',

@@ -34,10 +34,7 @@ if ($option == 'search') {
         
     function search($table, $search_sql, $search_array, $a_href, $setting) {
         $output = '';
-        $search_res = mysql_query($search_sql);
-        if (!$search_res) {
-            echo mysql_error();
-        }
+        $search_res = mysql_q($search_sql);
         if (mysql_num_rows($search_res) > 0) {
             while($searched = mysql_fetch_assoc($search_res)) {
                 // thumb
@@ -59,7 +56,7 @@ if ($option == 'search') {
                 // panels
                 foreach ($search_array as $val) {
                     $sel_sql = 'SELECT ' . $val . '.' . $val . ' FROM ' . $val . ', ' . $table . '_' . $val . ' WHERE ' . $val . '.id = ' . $table . '_' . $val . '.' . $val . 'id AND ' . $table . '_' . $val . '.id = "' . $searched['id'] . '"';
-                    $sel_res = mysql_query($sel_sql);
+                    $sel_res = mysql_q($sel_sql);
                     $out = array();
                     while ($s = mysql_fetch_row($sel_res)) {
                         $out[] = $s[0];
@@ -229,17 +226,17 @@ if ($option  == 'remote') {
                 if ($item['type'] == 'episode') {
                     // get episode
                     $episode_sql = 'SELECT tvshow, season, episode, title, plot FROM episodes WHERE id = "' . $item['id'] . '"';
-                    $episode_result = mysql_query($episode_sql);
+                    $episode_result = mysql_q($episode_sql);
                     $episode = mysql_fetch_assoc($episode_result);
                     // get tvshow
                     $tvshow_sql = 'SELECT title, rating FROM tvshows WHERE id = "' . $episode['tvshow'] . '"';
-                    $tvshow_result = mysql_query($tvshow_sql);
+                    $tvshow_result = mysql_q($tvshow_sql);
                     $tvshow = mysql_fetch_assoc($tvshow_result);
                     // get panels
                     $search_array = array('genre');
                     foreach ($search_array as $val) {
                         $sel_sql = 'SELECT ' . $val . '.' . $val . ' FROM ' . $val . ', tvshows_' . $val . ' WHERE ' . $val . '.id = tvshows_' . $val . '.' . $val . 'id AND tvshows_' . $val . '.id = "' . $item['id'] . '"';
-                        $sel_res = mysql_query($sel_sql);
+                        $sel_res = mysql_q($sel_sql);
                         $out = array();
                         while ($s = mysql_fetch_row($sel_res)) {
                             $out[] = $s[0];
@@ -264,13 +261,13 @@ if ($option  == 'remote') {
                 } else if($item['type'] == 'movie') {
                     // get movie
                     $movie_sql = 'SELECT `title`, `originaltitle`, `rating`, `runtime`, `plot`, `set`, `year` FROM movies WHERE id = "' . $item['id'] . '"';
-                    $movie_result = mysql_query($movie_sql);
+                    $movie_result = mysql_q($movie_sql);
                     $movie = mysql_fetch_assoc($movie_result);
                     // get panels
                     $search_array = array('genre', 'country', 'director', 'studio');
                     foreach ($search_array as $val) {
                         $sel_sql = 'SELECT ' . $val . '.' . $val . ' FROM ' . $val . ', movies_' . $val . ' WHERE ' . $val . '.id = movies_' . $val . '.' . $val . 'id AND movies_' . $val . '.id = "' . $item['id'] . '"';
-                        $sel_res = mysql_query($sel_sql);
+                        $sel_res = mysql_q($sel_sql);
                         $out = array();
                         while ($s = mysql_fetch_row($sel_res)) {
                             $out[] = $s[0];
@@ -343,7 +340,7 @@ if ($option  == 'deletemovie' or $option  == 'deletetvshow') {
         sync_delete(array($_GET['id']), 'movies');
     } else {
         $episodes_sql = 'SELECT id FROM episodes WHERE tvshow = "' . $_GET['id'] . '"';
-        $episodes_res = mysql_query($episodes_sql);
+        $episodes_res = mysql_q($episodes_sql);
         $episodes_id = array();
         while ($epi = mysql_fetch_assoc($episodes_res)) {
             $episodes_id[] = $epi['id'];
@@ -351,6 +348,18 @@ if ($option  == 'deletemovie' or $option  == 'deletetvshow') {
         sync_delete(array($_GET['id']), 'tvshows');
         sync_delete($episodes_id, 'episodes');
     }
+}
+
+// delete img
+if ($option == 'deleteposter' or $option == 'deletefanart') {
+    // admin permission
+    if (!isset($_SESSION['logged_admin']) or $_SESSION['logged_admin'] !== true) {
+        die('no permission');
+    }
+    include('function.php');
+    connect($mysql_ml);
+    $filename = $_GET['video'] . '_' . $_GET['id'] . ($option == 'deletefanart' ? '_f' : '') . '.jpg';
+    remove_images(array($filename));
 }
 
 // hide movie or tvshow
@@ -373,7 +382,7 @@ if ($option  == 'hidemovie' or $option  == 'hidetvshow' or $option  == 'visiblem
     }
     connect($mysql_ml);
     $hide_sql = 'UPDATE `' . $table . '` SET hide = ' . $hide . ' WHERE id = "' . $id . '"';
-    mysql_query($hide_sql);
+    mysql_q($hide_sql);
 }
 
 // banner

@@ -16,6 +16,8 @@
 .title_org { font-size:11px; font-weight:bold; color:#aaa; }
 .imdb_img { position: absolute; margin-left:5px; margin-top:-1px; }
 .watched_img { display:block; position:absolute; margin-left:102px; margin-top:-44px; }
+.playcount_block { display:block; position:absolute; margin-left:140px; margin-top:-20px; }
+.playcount_img { margin-left: -6px; }
 .trailer_img { position:absolute; margin-left:94px; margin-top:8px; display:block; }
 .table_flags { margin:auto; }
 .table_flags td { padding-left:10px; padding-right:10px; vertical-align:top; }
