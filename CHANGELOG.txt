@@ -1,3 +1,6 @@
+v. 2.8.1
+- fixed creating database indexes
+
 v. 2.8.0
 - fixed filter delete button
 - fixed database tables

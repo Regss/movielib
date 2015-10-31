@@ -1,6 +1,6 @@
 <?PHP
 
-$version = '2.8.0';
+$version = '2.8.1';
 
 if (file_exists('db.php')) {
     include('db.php');

@@ -195,7 +195,7 @@ function create_table($mysql_tables, $mysql_indexes, $lang, $version, $drop) {
         }
         foreach($index_val as $index_name) {
             $alter_sql = 'CREATE INDEX `' . $index_name . '` ON `' . $table . '` (`' . substr($index_name, 3) . '`)';
-            #mysql_q($alter_sql);
+            mysql_q($alter_sql);
         }
     }
     // update version
