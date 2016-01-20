@@ -575,20 +575,34 @@ function auto_conf_remote($s) {
 /* #################
  * # CREATE BANNER #
  */#################
-function create_banner($lang, $file, $data) {
+function create_banner($lang, $file, $data, $m_id = '', $m_type = '') {
     
-    $movie_sql = 'SELECT `id`, `title`, `originaltitle`, `rating`, `runtime`, `year`, `last_played` FROM `movies` ORDER BY `last_played` DESC LIMIT 0, 1';
+    if ($m_type == 'movie') {
+        $movie_sql = 'SELECT `id`, `title`, `originaltitle`, `rating`, `runtime`, `year`, `last_played` FROM `movies` WHERE `id` = "' . $m_id . '"';
+    } else {
+        $movie_sql = 'SELECT `id`, `title`, `originaltitle`, `rating`, `runtime`, `year`, `last_played` FROM `movies` ORDER BY `last_played` DESC LIMIT 0, 1';
+    }
     $movie_result = mysql_q($movie_sql);
     $movie = mysql_fetch_assoc($movie_result);
     
-    $episode_sql = 'SELECT `episode`, `season`, `tvshow`, `title`, `last_played` FROM `episodes` ORDER BY `last_played` DESC LIMIT 0, 1';
+    if ($m_type == 'episode') {
+        $episode_sql = 'SELECT `episode`, `season`, `tvshow`, `title`, `last_played` FROM `episodes` WHERE `id` = "' . $m_id . '"';
+    } else {
+        $episode_sql = 'SELECT `episode`, `season`, `tvshow`, `title`, `last_played` FROM `episodes` ORDER BY `last_played` DESC LIMIT 0, 1';
+    }
     $episode_result = mysql_q($episode_sql);
     $episode = mysql_fetch_assoc($episode_result);
     $episode['e_title'] = $episode['title'];
     unset($episode['title']);
     
-    if (isset($episode['last_played']) && $episode['last_played'] > $movie['last_played']) {
-        $tvshow_sql = 'SELECT `id`, `title`, `originaltitle`, `rating`, `last_played` FROM `tvshows` WHERE `id` = ' . $episode['tvshow'];
+    if ($m_type == '') {
+        $mode = (isset($episode['last_played']) && $episode['last_played'] > $movie['last_played'] ? 'episode' : 'movie');
+    } else {
+        $mode = $m_type;
+    }
+    
+    if ($mode == 'episode') {
+        $tvshow_sql = 'SELECT `id`, `title`, `originaltitle`, `rating`, `last_played` FROM `tvshows` WHERE `id` = "' . $episode['tvshow'] . '"';
         $tvshow_result = mysql_q($tvshow_sql);
         $tvshow = mysql_fetch_assoc($tvshow_result);
         $ban = array_merge($tvshow, $episode);
@@ -685,14 +699,15 @@ function create_banner($lang, $file, $data) {
         imageline($gradient, $x, 0, $x, $b['h'], $gradient_color);
     }
     imagecopyresampled($banner, $gradient, $new_width-$width, 0, 0, 0, $width, $b['h'], $width, $b['h']);
-
+    
     // add text
+    $action = ($m_id == '' ? $lang['i_last_played'] : $lang['i_now_playing']);
     $last_watched_color = imagecolorallocate($banner, $lw_c['r'], $lw_c['g'], $lw_c['b']);
     $title_color = imagecolorallocate($banner, $t_c['r'], $t_c['g'], $t_c['b']);
     $o_title_color = imagecolorallocate($banner, $o_c['r'], $o_c['g'], $o_c['b']);
     $info_color = imagecolorallocate($banner, $i_c['r'], $i_c['g'], $i_c['b']);
     $stroke_color = imagecolorallocate($banner, $st_c['r'], $st_c['g'], $st_c['b']);
-    imagettfstroketext($banner, $b['lw_s'], 0, $b['lw_x'], $b['lw_y'], $last_watched_color, $stroke_color, $font, $lang['i_last_played'], 1);
+    imagettfstroketext($banner, $b['lw_s'], 0, $b['lw_x'], $b['lw_y'], $last_watched_color, $stroke_color, $font, $action, 1);
     imagettfstroketext($banner, $b['t_s'], 0, $b['t_x'], $b['t_y'], $title_color, $stroke_color, $font, 
         (isset($ban['title']) ? $ban['title'] : '') . 
         (isset($ban['season']) ? ' - ' . $ban['season'] . 'x' : '') . 

@@ -596,6 +596,7 @@ if ($option == 'banner') {
     $output_panel.= '<input type="submit" name="reset" value="' . $lang['a_reset'] . '"></form></p>';
     $url = 'http://' . $_SERVER['SERVER_NAME'] . implode('/', array_slice(explode('/', $_SERVER['REQUEST_URI']), 0, -1)) . '/';
     $output_panel.= '<textarea readonly="readonly">' . $url . 'cache/banner.jpg</textarea>';
+    $output_panel.= '<img id="banner_now" src="cache/banner.jpg">';
 }
 
 /* ########

@@ -41,7 +41,11 @@ if ($token == $setting['token']) {
         
         // generate banner
         case 'generatebanner':
-            create_banner($lang, 'banner.jpg', $setting['banner']);
+            if (isset($_POST['id']) && isset($_POST['type'])) {
+                create_banner($lang, 'banner.jpg', $setting['banner'], $_POST['id'], $_POST['type']);
+            } else {
+                create_banner($lang, 'banner.jpg', $setting['banner']);
+            }
             break;
         
         // get hash

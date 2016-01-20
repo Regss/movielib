@@ -1,5 +1,5 @@
 .movie { border:1px solid #fff; margin:10px; display:inline-block; }
-.poster { width:100px; display:block; }
+.poster { width:100px; height:147px; display:block; }
 .xbmc_hide { width:22px; position:absolute; opacity:.0; margin-top:10px; margin-left:5px; }
 .xbmc_hide img { cursor:pointer; }
 .ribbon_new { position: absolute; margin-left:-14px; margin-top:-151px; width:68px; height:70px; }
