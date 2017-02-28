@@ -136,6 +136,12 @@ $(document).ready(function() {
         });
     }
     
+    // plot fade
+    $('.plot_ex').click(function() {
+        $(this).parent().children('.plot').css({ 'height': '100%' });
+        $(this).remove();
+    });
+    
     // toggle panel_box
     $('.panel_box').each(function(){
         var opt = $(this).attr('class').replace('panel_box ', '');

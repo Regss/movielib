@@ -52,7 +52,7 @@ if ($token == $setting['token']) {
         case 'showhash':
             $hash_sql = 'SELECT * FROM hash';
             $hash_res = mysql_q($hash_sql);
-            $hash = mysql_fetch_assoc($hash_res);
+            $hash = mysqli_fetch_assoc($hash_res);
             echo json_encode($hash);
             break;
         

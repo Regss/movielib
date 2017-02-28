@@ -2,8 +2,12 @@
 session_start();
 header('Content-type: text/html; charset=utf-8');
 
+$page_load_time = microtime(true);
+
 include('config.php');
 include('function.php');
+
+debugPHP("Start");
 
 if (!file_exists('db.php')) {
     if (file_exists('install.php')) {
@@ -15,6 +19,8 @@ if (!file_exists('db.php')) {
 
 // connect to database
 connect($mysql_ml);
+
+debugPHP("Connect Mysql");
 
 // get settings from db
 $setting = get_settings();
@@ -39,6 +45,8 @@ if ($setting['protect_site'] == 1) {
     $video = $_GET['video'];
 }
 
+debugPHP("Define Arrays");
+
 /* ############
  * # FACEBOOK #
  */############
@@ -49,9 +57,11 @@ if ($fb_link !== '') {
         $face_sql = 'SELECT id FROM movies WHERE title="' . urldecode(substr($fb_link, 0, -4)) . '" AND year="' . substr($fb_link, -4, 4) . '" LIMIT 0, 1';
     }
     $face_res = mysql_q($face_sql);
-    $face_id = mysql_fetch_assoc($face_res);
+    $face_id = mysqli_fetch_assoc($face_res);
     $id = $face_id['id'];
 }
+
+debugPHP("Prepare Facebook links");
 
 // views
 $view = $setting['view'];
@@ -111,12 +121,14 @@ if ($video == 'tvshows') {
 }
 $output['select_media'] = '<a class="' . ($video == 'movies' ? "selected" : "") . '" href="' . create_url($setting, array('video' => 'movies', 'view' => $view)) . '">' . mb_strtoupper($lang['i_movies']) . '</a><a class="' . ($video == 'tvshows' ? "selected" : "") . '" href="' . create_url($setting, array('video' => 'tvshows', 'view' => $view)) . '">' . mb_strtoupper($lang['i_tvshows']) . '</a>';
 if ($setting['select_media_header'] == 1) {
-    $count_movies = mysql_result(mysql_q('SELECT COUNT( * ) FROM movies'), 0);
-    $count_tvshows = mysql_result(mysql_q('SELECT COUNT( * ) FROM tvshows'), 0);
+    $count_movies = mysqli_result(mysql_q('SELECT COUNT( * ) FROM movies'), 0);
+    $count_tvshows = mysqli_result(mysql_q('SELECT COUNT( * ) FROM tvshows'), 0);
     if ($count_movies == 0 or $count_tvshows == 0) {
         $output['select_media'] = '';
     }
 }
+
+debugPHP("Prepare Select media links");
 
 /* #############
  * # TOP PANEL #
@@ -132,13 +144,15 @@ if ($setting['panel_top'] == 1) {
     foreach ($top_panel_sql as $name => $item_top_sql) {
         $output[$name] = '';
         $item_top_result = mysql_q($item_top_sql);
-        while ($item_top = mysql_fetch_array($item_top_result)) {
+        while ($item_top = mysqli_fetch_array($item_top_result)) {
             if (file_exists('cache/' . $mysql_table . '_' . $item_top['id'] . '.jpg')) {
                 $output[$name].= '<a href="' . create_url($setting, array('video' => $video, 'view' => $view, 'id' => $item_top['id'])) . '"><img src="cache/' . $mysql_table . '_' . $item_top['id'] . '.jpg" title="' . $item_top['title'] . '" alt=""></a>';
             }
         }
     }
 }
+
+debugPHP("Prepare Top Panel");
 
 /* ####################
  * # ARRAYS FOR PANEL #
@@ -162,6 +176,8 @@ if ($filter == '') {
     $filter_mysql = $mysql_table . '.' . $filter . ' LIKE "%' . $panels_array[$filter][$filterid] . '%" AND';
 }
 
+debugPHP("Prepare Arrays for Panles");
+
 /* ##############
  * # LEFT PANEL #
  */##############
@@ -171,9 +187,9 @@ $show['panel_overall'] = $setting['panel_overall'];
 if ($setting['panel_overall'] > 0) {
     $overall_sql = 'SELECT play_count, hide FROM ' . $mysql_table . ' WHERE hide=0';
     $overall_result = mysql_q($overall_sql);
-    $overall_all = mysql_num_rows($overall_result);
+    $overall_all = mysqli_num_rows($overall_result);
     $overall_watched = 0;
-    while($overall = mysql_fetch_array($overall_result)) {
+    while($overall = mysqli_fetch_array($overall_result)) {
         if ($overall['play_count'] > 0) {
             $overall_watched++;
         }
@@ -198,6 +214,8 @@ foreach ($menu_array as $menu_name) {
         }
     }
 }
+
+debugPHP("Prepare left panel");
 
 /* ########
  * # SORT #
@@ -229,6 +247,8 @@ foreach ($sort_array as $key => $val) {
     '" title="' . $lang['i_sort'] . '">' . $val[0] . '</a>');
 }
 
+debugPHP("Prepare Sort panel");
+
 /* #########
  * # WATCH #
  */#########
@@ -251,6 +271,8 @@ if ($watch == 1) {
 }
 $output['panel_watch'].= '</div></div>';
 
+debugPHP("Prepare Watch panel");
+
 /* ########
  * # VIEW #
  */########
@@ -266,6 +288,8 @@ if ($setting['panel_view'] > 0) {
     }
     $output['panel_view'].= '</div></div>';
 }
+
+debugPHP("Prepare View panel");
 
 /* ##########
  * # SEARCH #
@@ -289,7 +313,7 @@ $nav_sql = 'SELECT ' . $mysql_table . '.id FROM ' . $mysql_table . $mysql_table2
     ORDER BY ' . $sort_array[$sort][1];
     
 $nav_result = mysql_q($nav_sql);
-$row = mysql_num_rows($nav_result);
+$row = mysqli_num_rows($nav_result);
 if ($setting['per_page'] == 0) {
     $i_pages = 1;
     $output['panel_nav'] = '';
@@ -302,6 +326,8 @@ if ($setting['per_page'] == 0) {
         $output['panel_nav'] = '';
     }
 }
+
+debugPHP("Prepare search and nav panels");
 
 /* ################
  * # PANEL FILTER #
@@ -318,6 +344,8 @@ if ($id > 0) {
     $output['panel_filter'] = '<span>' . $lang['i_filter'] . ': </span>' . $lang['i_title'];
     $show['panel_filter'] = 1;
 }
+
+debugPHP("Prepare Filters panel");
 
 /* ##################
  * # CONTROL REMOTE #
@@ -348,11 +376,13 @@ $list_result = mysql_q($list_sql);
 // get date for last added
 $new_sql = 'SELECT ' . $mysql_table . '.date_added FROM ' . $mysql_table . ' ORDER BY ' . $mysql_table . '.date_added DESC LIMIT 0, 1';
 $new_result = mysql_q($new_sql);
-$new_date = mysql_fetch_assoc($new_result);
+$new_date = mysqli_fetch_assoc($new_result);
 $new_date = substr($new_date['date_added'], 0, 10);
 
+debugPHP("Get items list");
+
 $output_panel_list = '';
-while ($list = mysql_fetch_assoc($list_result)) {
+while ($list = mysqli_fetch_assoc($list_result)) {
 
     // output and show desc arrays
     $output_desc = array();
@@ -389,7 +419,7 @@ while ($list = mysql_fetch_assoc($list_result)) {
     
     // file
     if ($video == 'movies') {
-        $output_desc['file'] = 'http://' . $setting['xbmc_login'] . ':' . $setting['xbmc_pass'] . '@' . $setting['xbmc_host'] . ':' . $setting['xbmc_port'] . '/vfs/' . urlencode($list['file']);
+        $output_desc['file'] = 'http://' . $setting['xbmc_login'] . ':' . $setting['xbmc_pass'] . '@' . $setting['xbmc_host'] . ':' . $setting['xbmc_port'] . '/vfs/' . rawurlencode($list['file']);
     }
     
     // poster
@@ -420,7 +450,7 @@ while ($list = mysql_fetch_assoc($list_result)) {
     $genre_sql = 'SELECT genre.id, genre.genre FROM genre, ' . $video . '_genre WHERE ' . $video . '_genre.id = "' . $list['id'] . '" AND genre.id = ' . $video . '_genre.genreid';
     $genre_res = mysql_q($genre_sql);
         
-    while ($val =  mysql_fetch_assoc($genre_res)) {
+    while ($val =  mysqli_fetch_assoc($genre_res)) {
         $output_genre_array[] = '<a href="'. create_url($setting, array('video' => $video, 'view' => $view, 'watch' => $watch, 'sort' => $sort, 'filter' => 'genre', 'filterid' => $val['id'])) . '">' . $val['genre'] . '</a>';
     }
     if (count($output_genre_array) > 0) {
@@ -450,10 +480,10 @@ while ($list = mysql_fetch_assoc($list_result)) {
     
     // actors
     $output_actor_array = array();
-    $actor_sql = 'SELECT actor.id, actor.actor FROM actor, ' . $video . '_actor WHERE ' . $video . '_actor.id = "' . $list['id'] . '" AND actor.id = ' . $video . '_actor.actorid ORDER BY ' . $video . '_actor.order';
+    $actor_sql = 'SELECT actor.id, actor.actor FROM actor, ' . $video . '_actor WHERE ' . $video . '_actor.id = "' . $list['id'] . '" AND actor.id = ' . $video . '_actor.actorid ORDER BY ' . $video . '_actor.order LIMIT ' . $setting['limit_actors'];
     $actor_res = mysql_q($actor_sql);
     
-    while ($val = mysql_fetch_assoc($actor_res)) {
+    while ($val = mysqli_fetch_assoc($actor_res)) {
         if ($val['actor'] !== '') {
             if (file_exists('cache/actors/' . substr(md5($val['actor']), 0, 10) . '.jpg')) {
                 $actor_thumb = '<img class="actor_thumb" src="cache/actors/' . substr(md5($val['actor']), 0, 10) . '.jpg">';
@@ -488,7 +518,7 @@ while ($list = mysql_fetch_assoc($list_result)) {
         $country_sql = 'SELECT country.id, country.country FROM country, ' . $video . '_country WHERE ' . $video . '_country.id = "' . $list['id'] . '" AND country.id = ' . $video . '_country.countryid';
         $country_res = mysql_q($country_sql);
         
-        while ($val =  mysql_fetch_assoc($country_res)) {
+        while ($val =  mysqli_fetch_assoc($country_res)) {
             $output_country_array[] = '<a href="' . create_url($setting, array('video' => $video, 'view' => $view, 'watch' => $watch, 'sort' => $sort, 'filter' => 'country', 'filterid' => $val['id'])) . '">' . $val['country'] . '</a>';
         }
         if (count($output_country_array) > 0) {
@@ -505,7 +535,7 @@ while ($list = mysql_fetch_assoc($list_result)) {
         // director
         $director_sql = 'SELECT director.id, director.director FROM director, ' . $video . '_director WHERE ' . $video . '_director.id = "' . $list['id'] . '" AND director.id = ' . $video . '_director.directorid';
         $director_res = mysql_q($director_sql);
-        $val =  mysql_fetch_assoc($director_res);
+        $val =  mysqli_fetch_assoc($director_res);
         if (isset($val['director'])) {
             $show_desc['director'] = 1;
             $output_desc['director'] = '<a href="' . create_url($setting, array('video' => $video, 'view' => $view, 'watch' => $watch, 'sort' => $sort, 'filter' => 'director', 'filterid' => $val['id'])) . '">' . $val['director'] . '</a>';
@@ -525,7 +555,7 @@ while ($list = mysql_fetch_assoc($list_result)) {
         // studio
         $studio_sql = 'SELECT studio.id, studio.studio FROM studio, ' . $video . '_studio WHERE ' . $video . '_studio.id = "' . $list['id'] . '" AND studio.id = ' . $video . '_studio.studioid';
         $studio_res = mysql_q($studio_sql);
-        $val =  mysql_fetch_assoc($studio_res);
+        $val =  mysqli_fetch_assoc($studio_res);
         if (isset($val['studio'])) {
             $show_desc['studio'] = 1;
             $output_desc['studio'] = '<a href="' . create_url($setting, array('video' => $video, 'view' => $view, 'watch' => $watch, 'sort' => $sort, 'filter' => 'studio', 'filterid' => $val['id'])) . '">' . $val['studio'] . '</a>';
@@ -538,16 +568,16 @@ while ($list = mysql_fetch_assoc($list_result)) {
         // ribbon new
         if (substr($list['date_added'], 0, 10) == $new_date) {
             $show_desc['ribbon_new'] = 1;
-            $output_desc['ribbon_new'] = '<div class="ribbon_new_text">' . mb_strtoupper($lang['i_ribbon_new']) . '</div><img class="ribbon_new" src="templates/' . $setting['theme'] . '/img/ribbon_new.png">';
+            $output_desc['ribbon_new'] = '<img class="ribbon_new" src="templates/' . $setting['theme'] . '/img/ribbon_new.png">';
         }
         
         // streams
         $stream_sql = 'SELECT * FROM `movies_stream` WHERE id = "' . $list['id'] . '"';
         $stream_res = mysql_q($stream_sql);
         
-        if (mysql_num_rows($stream_res) > 0) {
+        if (mysqli_num_rows($stream_res) > 0) {
             $str = array('v' => array(), 'a' => array(), 's' => array());
-            while ($stream = mysql_fetch_assoc($stream_res)) {
+            while ($stream = mysqli_fetch_assoc($stream_res)) {
                 $str[$stream['type']][] = $stream;
             }
         }
@@ -680,14 +710,17 @@ while ($list = mysql_fetch_assoc($list_result)) {
         $season_array = array();
         $seasons_sql = 'SELECT season FROM episodes WHERE tvshow = "' . $list['id'] . '" ORDER BY season';
         $seasons_result = mysql_q($seasons_sql);
-        while ($seasons = mysql_fetch_array($seasons_result)) {
+        while ($seasons = mysqli_fetch_array($seasons_result)) {
             if (!array_key_exists($seasons['season'], $season_array)) {
-                $season_array[$seasons['season']] = '<a href="' . create_url($setting, array('video' => 'tvshows', 'view' => $view, 'id' => $list['id'])) . '#season_' . $seasons['season'] . '">' . $lang['i_season'] . ' ' . $seasons['season'] . '</a>';
+                $season_array[$seasons['season']] = '<a href="' . create_url($setting, array('video' => 'tvshows', 'view' => $view, 'id' => $list['id'], 'season' => $seasons['season'])) . '">' . $lang['i_season'] . ' ' . $seasons['season'] . '</a>';
             }
         }
-        if (count($season_array) <> 0) {
+        if (count($season_array) > 0) {
             $show_desc['seasons'] = 1;
-            $output_desc['seasons'] = implode(' / ', $season_array);
+            if (count($season_array) > 1) {
+                $output_desc['seasons'] = '<a href="' . create_url($setting, array('video' => 'tvshows', 'view' => $view, 'id' => $list['id'])) . '">' . $lang['i_all'] . '</a> / ';
+            }
+            $output_desc['seasons'].= implode(' / ', $season_array);
         }
         
         // episodes
@@ -695,16 +728,17 @@ while ($list = mysql_fetch_assoc($list_result)) {
             // get date for last added episode
             $new_episode_sql = 'SELECT date_added FROM episodes ORDER BY date_added DESC LIMIT 0, 1';
             $new_episode_result = mysql_q($new_episode_sql);
-            $new_episode_date = mysql_fetch_assoc($new_episode_result);
+            $new_episode_date = mysqli_fetch_assoc($new_episode_result);
             $new_episode_date = substr($new_episode_date['date_added'], 0, 10);
-        
+            
             $show_desc['episodes'] = 1;
-            $episodes_sql = 'SELECT id, title, episode, season, plot, firstaired, file, play_count, date_added, last_played FROM episodes WHERE tvshow = "' . $list['id'] . '" ORDER BY season, episode ASC';
+            
+            $episodes_sql = 'SELECT id, title, episode, season, plot, firstaired, file, play_count, date_added, last_played FROM episodes WHERE tvshow = "' . $list['id'] . '" AND season LIKE "' . ($season == '' ? '%' : $season) . '" ORDER BY season, episode ASC';
             $episodes_result = mysql_q($episodes_sql);
             $i = -1;
             
             $output_epiosde_list = '';
-            while ($episodes = mysql_fetch_assoc($episodes_result)) {
+            while ($episodes = mysqli_fetch_assoc($episodes_result)) {
             
                 // output and show episodes arrays
                 $output_episode = array();
@@ -720,14 +754,24 @@ while ($list = mysql_fetch_assoc($list_result)) {
                 
                 $output_episode['episode'] = $episodes['id'];
                 $output_episode['season'] = $episodes['season'];
-                $output_episode['plot'] = $episodes['plot'];
-                $output_episode['aired'] = $episodes['firstaired'];
-                                
+                
+                // aired
+                if ($episodes['firstaired'] != '') {
+                    $show_episode['aired'] = 1;
+                    $output_episode['aired'] = $episodes['firstaired'];
+                }
+                
                 // title
                 $output_episode['title'] = $episodes['episode'] . '. ' . ($episodes['title'] == '' ? $lang['i_episode'] . ' ' . $episodes['episode'] : $episodes['title']);
                 
+                // plot
+                if ($episodes['plot'] != '') {
+                    $show_episode['plot'] = 1;
+                    $output_episode['plot'] = $episodes['plot'];
+                }
+                
                 // file
-                $output_episode['file'] = 'http://' . $setting['xbmc_login'] . ':' . $setting['xbmc_pass'] . '@' . $setting['xbmc_host'] . ':' . $setting['xbmc_port'] . '/vfs/' . urlencode($episodes['file']);
+                $output_episode['file'] = 'http://' . $setting['xbmc_login'] . ':' . $setting['xbmc_pass'] . '@' . $setting['xbmc_host'] . ':' . $setting['xbmc_port'] . '/vfs/' . rawurlencode($episodes['file']);
                 
                 // thumbnail
                 if (file_exists('cache/episodes_' . $episodes['id'] . '.jpg')) {
@@ -743,16 +787,16 @@ while ($list = mysql_fetch_assoc($list_result)) {
                 
                 // episode ribbon new
                 if (substr($episodes['date_added'], 0, 10) == $new_episode_date) {
-                    $output_episode['ribbon_new'] = '<div class="episode_ribbon_new_text">' . mb_strtoupper($lang['i_ribbon_new']) . '</div><img class="episode_ribbon_new" src="templates/' . $setting['theme'] . '/img/ribbon_new.png">';
+                    $output_episode['ribbon_new'] = '<img class="episode_ribbon_new" src="templates/' . $setting['theme'] . '/img/ribbon_new.png">';
                 }
         
                 // episode streams
                 $stream_sql = 'SELECT * FROM `episodes_stream` WHERE id = "' . $episodes['id'] . '"';
                 $stream_res = mysql_q($stream_sql);
                 
-                if (mysql_num_rows($stream_res) > 0) {
+                if (mysqli_num_rows($stream_res) > 0) {
                     $str = array('v' => array(), 'a' => array(), 's' => array());
-                    while ($stream = mysql_fetch_assoc($stream_res)) {
+                    while ($stream = mysqli_fetch_assoc($stream_res)) {
                         $str[$stream['type']][] = $stream;
                     }
                 }
@@ -864,6 +908,8 @@ while ($list = mysql_fetch_assoc($list_result)) {
 $output['panel_list'] = $output_panel_list;
 $output['sort'] = $sort;
 
+debugPHP("Prepare items list");
+
 // faccebok meta data
 if ($id == 0) {
     $url = 'http://' . $_SERVER['SERVER_NAME'] . implode('/', array_slice(explode('/', $_SERVER['REQUEST_URI']), 0, -1)) . '/';
@@ -895,6 +941,14 @@ if ($setting['show_facebook'] == 1) {
                             }(document, \'script\', \'facebook-jssdk\'));</script>';
 }
 
+// page load time
+if ($setting['page_load_time'] == 1) {
+    $show['page_load_time'] = 1;
+    $output['page_load_time'] = round((microtime(true) - $page_load_time), 2);
+}
+
+debugPHP("Prepare Facebook data");
+
 // create page
 $index = new Teamplate('index.tpl', $setting, $lang);
 foreach ($output as $key => $val) {
@@ -906,5 +960,11 @@ foreach ($show as $key => $val) {
 
 $site = $index->init();
 print $site;
+
+if (isset($_GET["debug"])) {
+    foreach (debugPHP("Print page") as $key => $val) {
+        echo $key . ': ' . $val . '<br>';
+    }
+}
 
 ?>

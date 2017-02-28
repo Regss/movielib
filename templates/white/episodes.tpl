@@ -15,14 +15,18 @@
     <div class="episode_desc">
         <div class="episode_title">{title}</div>
         <table>
+            {SHOW.aired}
             <tr>
                 <td class="left">{LANG.i_aired}</td>
                 <td class="right">{aired}</td>
             </tr>
+            {/SHOW.aired}
+            {SHOW.plot}
             <tr>
-                <td class="left">{LANG.i_plot}</td>
-                <td class="right">{plot}</td>
+                <td class="left">{LANG.i_plot}:</td>
+                <td class="right"><div id="plot_{id}" class="plot">{plot}</div><div class="plot_ex text_center">...</div></td>
             </tr>
+            {/SHOW.plot}
         </table>
         <img class="img_space" src="templates/{SET.theme}/img/space.png" alt="">
         <table class="table_flags">

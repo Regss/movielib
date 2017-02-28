@@ -42,19 +42,41 @@ class Teamplate {
  * # FUNCTIONS #
  */#############
 
+ function debugPHP($name) {
+    static $times;
+    static $microtime;
+    
+    if (!isset($times) or !isset($microtime)) {
+        $times = array('start' => 0);
+        $microtime = microtime(true);
+        return;
+    }
+    
+    $times[$name] = microtime(true) - $microtime;
+    $microtime = microtime(true);
+    
+    return $times;
+ }
+ 
 /* ###############
  * # MYSQL query #
  */###############
 
 function mysql_q($query) {
+    static $totaltime;
     $time = microtime(true);
-    $result = mysql_query($query);
+    
+    $conn = connect();
+    $result = mysqli_query($conn, $query);
     if (!$result) {
         echo $query . '<br>';
-        die ('ERROR: MySQL - ' . mysql_error());
+        die ('ERROR: MySQL - ' . mysqli_error());
     } else {
         if (isset($_GET['debug'])) {
-             echo $query . ' - ' . (microtime(true) - $time) . '<br>';
+            $querytime = microtime(true) - $time;
+            if (!isset($totaltime)) $totaltime = $querytime;
+            else $totaltime = $totaltime + $querytime;
+            echo $query . ' - ' . $querytime . ' / ' . $totaltime . '<br>';
         }
         return $result;
     }
@@ -63,19 +85,25 @@ function mysql_q($query) {
 /* ########################
  * # Connect to databaase #
  */########################
-function connect($mysql_ml) {
-    $conn_ml = @mysql_connect($mysql_ml[0] . ':' . $mysql_ml[1], $mysql_ml[2], $mysql_ml[3]);
-    if (!$conn_ml) {
-        die(mysql_error());
+function connect($mysql_data = null) {
+    static $link;
+    static $mysql_ml;
+    
+    if ($mysql_data == null) return $link;
+    if ($mysql_ml == $mysql_data) return $link;
+    $mysql_ml = $mysql_data;
+    
+    $link = @mysqli_connect($mysql_ml[0], $mysql_ml[2], $mysql_ml[3], $mysql_ml[4], $mysql_ml[1]);
+    
+    if (mysqli_connect_errno()) {
+        die(mysqli_connect_error());
     }
-    $sel_ml = @mysql_select_db($mysql_ml[4]);
-    if (!$sel_ml) {
-        die(mysql_error());
-    }
-
+    
     // Sets utf8 connections
-    mysql_q('SET CHARACTER SET utf8');
-    mysql_q('SET NAMES utf8');
+    mysqli_query($link, 'SET CHARACTER SET utf8');
+    mysqli_query($link, 'SET NAMES utf8');
+    
+    return $link; // returns the link
 }
 
 /* ##############################
@@ -87,7 +115,7 @@ function get_settings() {
     if (!isset($_SESSION) or count($_SESSION) < 10) {
         $set_sql = 'SELECT * FROM `config`';
         $set_res = mysql_q($set_sql);
-        $get_set = mysql_fetch_assoc($set_res);
+        $get_set = mysqli_fetch_assoc($set_res);
         foreach($get_set as $key => $val) {
             $_SESSION[$key] = $val;
         }
@@ -111,7 +139,7 @@ function create_table($mysql_tables, $mysql_indexes, $lang, $version, $drop) {
     $tables_array = array();
     $tables_sql = 'SHOW TABLES';
     $tables_result = mysql_q($tables_sql);
-    while ($tables_db = mysql_fetch_array($tables_result)) {
+    while ($tables_db = mysqli_fetch_array($tables_result)) {
         $tables_array[] = $tables_db[0];
     }
     
@@ -129,30 +157,30 @@ function create_table($mysql_tables, $mysql_indexes, $lang, $version, $drop) {
     // insert config
     $sel = 'SELECT * FROM config';
     $res = mysql_q($sel);
-    if (mysql_num_rows($res) == 0) {
+    if (mysqli_num_rows($res) == 0) {
         $insert_config_sql = 'INSERT INTO `config` () VALUES ()';
         $insert_config_res = mysql_q($insert_config_sql);
     }
     // insert users
     $sel = 'SELECT * FROM users';
     $res = mysql_q($sel);
-    if (mysql_num_rows($res) == 0) {
+    if (mysqli_num_rows($res) == 0) {
             $insert_users_sql = 'INSERT INTO `users` (`id`, `login`, `password`) VALUES (1, "admin", "21232f297a57a5a743894a0e4a801fc3"), (2, "user", "ee11cbb19052e40b07aac0ca060c23ee")';
             $insert_users_res = mysql_q($insert_users_sql);
         }
     // insert hash
     $sel = 'SELECT * FROM hash';
     $res = mysql_q($sel);
-    if (mysql_num_rows($res) == 0) {
+    if (mysqli_num_rows($res) == 0) {
         $insert_hash_sql = 'INSERT INTO `hash` () VALUES ()';
-        $insert_hash_res = mysql_q ($insert_hash_sql);
+        $insert_hash_res = mysql_q($insert_hash_sql);
     }
     // check columns
     $columns_db_array = array();
     foreach ($mysql_tables as $table => $table_val) {
         $columns_sql = 'SHOW COLUMNS FROM `' . $table . '`';
         $columns_result = mysql_q($columns_sql);
-        while($columns = mysql_fetch_assoc($columns_result)) {
+        while($columns = mysqli_fetch_assoc($columns_result)) {
             $columns_db_array[$table][] = $columns['Field'];
         }
     }
@@ -180,7 +208,7 @@ function create_table($mysql_tables, $mysql_indexes, $lang, $version, $drop) {
     foreach ($mysql_indexes as $table => $index_val) {
         $index_sql = 'SHOW INDEX FROM `' . $table . '`';
         $index_res = mysql_q($index_sql);
-        while($index = mysql_fetch_assoc($index_res)) {
+        while($index = mysqli_fetch_assoc($index_res)) {
             if ($index['Key_name'] !== 'PRIMARY') {
                 $index_db_array[$table][] = $index['Key_name'];
             }
@@ -213,7 +241,7 @@ function show($cols, $table) {
     $show_result = mysql_q($show_sql);
     
     $output = array();
-    while ($d = mysql_fetch_row($show_result)) {
+    while ($d = mysqli_fetch_row($show_result)) {
         $output[$d[0]] = $d[1];
     }
     if (count($output) > 0) {
@@ -341,13 +369,13 @@ function sync_add($mysql_tables) {
                     // check if panel exist
                     $sql_id = 'SELECT `id` FROM `' . $panel . '` WHERE `' . $panel . '` = "' . add_slash($val) . '"';
                     $res_id = mysql_q($sql_id);
-                    if (!mysql_num_rows($res_id)) {
+                    if (!mysqli_num_rows($res_id)) {
                         $sql_ins = 'INSERT INTO `' . $panel . '` (`' . $panel . '`) VALUES ("' . add_slash($val) . '")';
                         mysql_q($sql_ins);
-                        $id = mysql_insert_id();
+                        $id = mysqli_insert_id(connect());
                     }
                     else {
-                        $row = mysql_fetch_assoc($res_id);
+                        $row = mysqli_fetch_assoc($res_id);
                         $id = $row['id'];
                     }
                     // add panels info
@@ -508,20 +536,26 @@ function add_slash($string){
  */####################
 function panels_array($columns, $table) {
     
-    $sep_tab = array('actor', 'genre', 'country', 'studio', 'director');
+    $sep_tab = array('genre', 'country', 'studio', 'director');
     $panels_array = array();
     foreach ($columns as $val) {
         if (in_array($val, $sep_tab)) {
             $sel = 'SELECT DISTINCT ' . $val . '.id, ' . $val . '.' . $val . ' FROM `' . $val . '`, `' . $table . '_' . $val . '` WHERE ' . $val . '.id=' . $table . '_' . $val . '.' . $val . 'id ORDER BY ' . $val . '.' . $val;
             $res = mysql_q($sel);
-            while ($r = mysql_fetch_assoc($res)) {
+            while ($r = mysqli_fetch_assoc($res)) {
+                $panels_array[$val][$r['id']] = $r[$val];
+            }
+        } else if ($val == "actor") {
+            $sel = 'SELECT ' . $val . '.id, ' . $val . '.' . $val . ' FROM `' . $val . '` ORDER BY ' . $val . '.' . $val;
+            $res = mysql_q($sel);
+            while ($r = mysqli_fetch_assoc($res)) {
                 $panels_array[$val][$r['id']] = $r[$val];
             }
         } else {
             $sel = 'SELECT DISTINCT `' . $val . '` FROM `' . $table . '` WHERE `hide` = 0 ORDER BY `' . $val . '`';
             $res = mysql_q($sel);
-            if (mysql_num_rows($res) > 0) {
-                while ($r = mysql_fetch_assoc($res)) {
+            if (mysqli_num_rows($res) > 0) {
+                while ($r = mysqli_fetch_assoc($res)) {
                     if ($r[$val] != '') {
                         $panels_array[$val][] = $r[$val];
                     }
@@ -583,7 +617,7 @@ function create_banner($lang, $file, $data, $m_id = '', $m_type = '') {
         $movie_sql = 'SELECT `id`, `title`, `originaltitle`, `rating`, `runtime`, `year`, `last_played` FROM `movies` ORDER BY `last_played` DESC LIMIT 0, 1';
     }
     $movie_result = mysql_q($movie_sql);
-    $movie = mysql_fetch_assoc($movie_result);
+    $movie = mysqli_fetch_assoc($movie_result);
     
     if ($m_type == 'episode') {
         $episode_sql = 'SELECT `episode`, `season`, `tvshow`, `title`, `last_played` FROM `episodes` WHERE `id` = "' . $m_id . '"';
@@ -591,7 +625,7 @@ function create_banner($lang, $file, $data, $m_id = '', $m_type = '') {
         $episode_sql = 'SELECT `episode`, `season`, `tvshow`, `title`, `last_played` FROM `episodes` ORDER BY `last_played` DESC LIMIT 0, 1';
     }
     $episode_result = mysql_q($episode_sql);
-    $episode = mysql_fetch_assoc($episode_result);
+    $episode = mysqli_fetch_assoc($episode_result);
     $episode['e_title'] = $episode['title'];
     unset($episode['title']);
     
@@ -604,7 +638,7 @@ function create_banner($lang, $file, $data, $m_id = '', $m_type = '') {
     if ($mode == 'episode') {
         $tvshow_sql = 'SELECT `id`, `title`, `originaltitle`, `rating`, `last_played` FROM `tvshows` WHERE `id` = "' . $episode['tvshow'] . '"';
         $tvshow_result = mysql_q($tvshow_sql);
-        $tvshow = mysql_fetch_assoc($tvshow_result);
+        $tvshow = mysqli_fetch_assoc($tvshow_result);
         $ban = array_merge($tvshow, $episode);
         $table = 'tvshows';
         $panels_array = array('genre');
@@ -619,7 +653,7 @@ function create_banner($lang, $file, $data, $m_id = '', $m_type = '') {
             $sel_sql = 'SELECT ' . $val . '.' . $val . ' FROM ' . $val . ', ' . $table . '_' . $val . ' WHERE ' . $val . '.id = ' . $table . '_' . $val . '.' . $val . 'id AND ' . $table . '_' . $val . '.id = "' . $ban['id'] . '"';
             $sel_res = mysql_q($sel_sql);
             $out = array();
-            while ($s = mysql_fetch_row($sel_res)) {
+            while ($s = mysqli_fetch_row($sel_res)) {
                 $out[] = $s[0];
             }
             $ban[$val] = implode(' / ', $out);

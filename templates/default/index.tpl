@@ -158,6 +158,9 @@
             </div>
             <div id="panel_bottom">
                 <div id="bottom_info">
+                    {SHOW.page_load_time}
+                    {LANG.i_page_load_time}: {page_load_time} {LANG.i_sec}. | 
+                    {/SHOW.page_load_time}
                     <a href="http://github.com/Regss/movielib">MovieLib</a> {version} - Created by <a href="mailto:regss84@gmail.com">Regss</a>
                 </div>
             </div>

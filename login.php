@@ -30,7 +30,7 @@ $output = '';
 if ($_GET['login'] === 'admin') {
     $admin_check_sql = 'SELECT * FROM users WHERE login = "admin"';
     $admin_check_result = mysql_q($admin_check_sql);
-    while ($admin_check = mysql_fetch_array($admin_check_result)) {
+    while ($admin_check = mysqli_fetch_array($admin_check_result)) {
         if (isset($_POST['movielib_admin_pass']) && md5($_POST['movielib_admin_pass']) == $admin_check['password']) {
             $_SESSION['logged_admin'] = true;
             header('Location:admin.php');
@@ -50,7 +50,7 @@ if ($_GET['login'] === 'admin') {
 if ($_GET['login'] === 'user') {
     $user_check_sql = 'SELECT * FROM users WHERE login = "user"';
     $user_check_result = mysql_q($user_check_sql);
-    while ($user_check = mysql_fetch_array($user_check_result)) {
+    while ($user_check = mysqli_fetch_array($user_check_result)) {
         if (isset($_POST['movielib_pass']) && md5($_POST['movielib_pass']) == $user_check['password']) {
             $_SESSION['logged'] = true;
             header('Location:index.php');

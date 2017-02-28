@@ -1,6 +1,6 @@
 <?PHP
 
-$version = '2.8.2';
+$version = '2.9.0';
 
 if (file_exists('db.php')) {
     include('db.php');
@@ -36,7 +36,7 @@ $vtype_assoc['mpeg4']   =   array('mpeg4', 'dm4v', 'dx50', 'geox', 'm4s2', 'mpeg
 $vtype_assoc['qt']      =   array('qt', '8bps', 'advj', 'avrn', 'rle', 'rpza', 'smc', 'sv10', 'svq', 'zygo');
 $vtype_assoc['wmv']     =   array('wmv', 'wma');
 $vtype_assoc['xvid']    =   array('xvid', 'xvix');
-$vtype_assoc['hevc']    =   array('h265', 'x265');
+$vtype_assoc['hevc']    =   array('h265', 'x265', 'hevc');
 
 // Audio codec
 $atype_assoc['aac']     =   array('aac');
@@ -67,14 +67,10 @@ $langs = array(
     'en' => 'English',
     'es' => 'Spanish',
     'fr' => 'French',
-    'hu' => 'Hungarian',
+    'hr' => 'Croatian',
     'it' => 'Italian',
     'nl' => 'Dutch',
-    'no' => 'Norwegian',
     'pl' => 'Polish',
-    'pt' => 'Portuguese',
-    'ru' => 'Russian',
-    'hr' => 'Croatian',
     'sk' => 'Slovak',
     'sr' => 'Serbian'
 );
@@ -214,6 +210,7 @@ $mysql_tables['config'] = array(
     'select_media_header'   => 'int(1) DEFAULT 0',
     'view'                  => 'int(1) DEFAULT 0',
     'per_page'              => 'int(5) DEFAULT 50',
+    'page_load_time'        => 'int(1) DEFAULT 1',
     'default_sort'          => 'int(1) DEFAULT 1',
     'default_watch'         => 'int(1) DEFAULT 0',
     'panel_top_limit'       => 'int(5) DEFAULT 10',
@@ -222,6 +219,7 @@ $mysql_tables['config'] = array(
     'panel_view'            => 'int(1) DEFAULT 1',
     'watched_status'        => 'int(1) DEFAULT 1',
     'show_playcount'        => 'int(1) DEFAULT 1',
+    'limit_actors'          => 'int(5) DEFAULT 100',
     'live_search'           => 'int(1) DEFAULT 1',
     'live_search_max_res'   => 'int(4) DEFAULT 10',
     'panel_overall'         => 'int(1) DEFAULT 1',
@@ -233,7 +231,7 @@ $mysql_tables['config'] = array(
     'show_fanart'           => 'int(1) DEFAULT 1',
     'fadeout_fanart'        => 'int(1) DEFAULT 0',
     'show_trailer'          => 'int(1) DEFAULT 1',
-    'show_facebook'         => 'int(1) DEFAULT 1',
+    'show_facebook'         => 'int(1) DEFAULT 0',
     'banner'                => 'varchar(200) DEFAULT 0',
     'protect_site'          => 'int(1) DEFAULT 0',
     'mod_rewrite'           => 'int(1) DEFAULT 0',
@@ -303,6 +301,7 @@ $item = array(
     'meta_type',
     'facebook',
     'version',
+    'page_load_time',
     'panel_top',
     'panel_top_last_added',
     'panel_top_most_watched',
@@ -469,6 +468,7 @@ $var = array(
     'option'    =>  '',
     'filter'    =>  '',
     'filterid'  =>  '',
+    'season'    =>  '',
     'fb_link'   =>  ''
     );
 foreach ($var as $key => $val) {

@@ -94,7 +94,7 @@
             {SHOW.plot}
             <tr>
                 <td class="left">{LANG.i_plot}:</td>
-                <td class="right">{plot}</td>
+                <td class="right"><div id="plot_{id}" class="plot">{plot}</div><div class="plot_ex text_center">...</div></td>
             </tr>
             {/SHOW.plot}
         </table>

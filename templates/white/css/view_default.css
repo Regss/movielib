@@ -1,8 +1,7 @@
 .movie { text-align:left; border:1px solid #fff; background-color:#ddd; min-height:280px; margin-top:10px; margin-bottom:10px; padding:5px 10px 5px 10px; }
 .poster_container { float:left; margin-top:5px; margin-right:5px; }
 .studio { float:right; margin-top:-30px; width:140px; }
-.ribbon_new { position: absolute; margin-left:338px; margin-top:-51px; }
-.ribbon_new_text { width:140px; z-index:10; position: absolute; margin-left:500px; margin-top:-8px; text-align:center; font-size:16px; 	text-shadow: 1px 1px #000000; font-family:Verdana, Tahoma; font-weight:bold; -webkit-transform: rotate(45deg); -moz-transform: rotate(45deg); -o-transform: rotate(45deg); writing-mode: lr-tb; }
+.ribbon_new { position: absolute; margin-left:381px; margin-top:-49px; }
 .poster { width:142px; height:209px; border:1px solid #000; }
 .fb { position: absolute; display:block; width:142px; text-align:center; margin-top:230px; }
 .title { font-size:20px; font-weight:bold; color:#414141; }
@@ -36,14 +35,15 @@
 .left { font-weight:bold; color:#414141; text-align:right; width:60px; vertical-align:top; }
 .right { text-align:left; }
 .right img { vertical-align:middle; }
+.plot { height:30px; overflow:hidden; }
+.plot_ex { height: 10px; line-height:5px; cursor: pointer; }
 .actor_thumb { position: absolute; display:none; border:1px solid #111; width:75px; height:100px; }
 .trailer { border: 1px solid #000; margin:auto; margin-top:10px; margin-bottom:10px; width:560px; }
 .img_space { width:300px; height:1px; display:block; margin:auto; margin-top:5px; margin-bottom:5px; }
-.episode { min-height:130px; background-color: #eee; border: 1px solid #fff; margin-bottom:5px; }
-.episode_desc { text-align:center; margin:5px 5px 5px 213px; min-height:260px; }
+.episode { min-height:130px; background-color: #eee; border: 1px solid #fff; margin-bottom:10px; }
+.episode_desc { text-align:center; margin:5px 5px 5px 213px; }
 .thumbnail { width:200px; height:113px; border:1px solid #000; margin-left:5px; display:block; }
 .season { font-size:16px; font-weight:bold; color:#414141; margin-left:10px; margin-bottom:5px; }
 .episode_title { font-size:14px; font-weight:bold; color:#414141; margin:2px 0px 2px 2px; text-align:left; }
 .episode_watched { display:block; position:absolute; margin-left:166px; margin-top:78px; }
-.episode_ribbon_new { position: absolute; margin-left:263px; margin-top:-7px; }
-.episode_ribbon_new_text { width:140px; z-index:10; position: absolute; margin-left:490px; margin-top:38px; text-align:center; font-size:16px; text-shadow: 1px 1px #ffffff; font-family:Verdana, Tahoma; font-weight:bold; -webkit-transform: rotate(45deg); -moz-transform: rotate(45deg); -o-transform: rotate(45deg); writing-mode: lr-tb; }
+.episode_ribbon_new { position: absolute; margin-left:305px; margin-top:-5px; }

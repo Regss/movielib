@@ -57,7 +57,7 @@ if ($option == '') {
     // get version from db
     $db_vers_sql = 'SELECT version FROM config';
     $db_vers_result = mysql_q($db_vers_sql);
-    $db_version_assoc = mysql_fetch_assoc($db_vers_result);
+    $db_version_assoc = mysqli_fetch_assoc($db_vers_result);
     $db_version = $db_version_assoc['version'];
     
     // check tables if versions not match
@@ -72,10 +72,10 @@ if ($option == '') {
     // Watched
     $overall_movies_sql = 'SELECT play_count, hide FROM movies';
     $overall_movies_result = mysql_q($overall_movies_sql);
-    $overall_movies_all = mysql_num_rows($overall_movies_result);
+    $overall_movies_all = mysqli_num_rows($overall_movies_result);
     $overall_movies_watched = 0;
     $overall_movies_hidden = 0;
-    while ($overall_movies = mysql_fetch_array($overall_movies_result)) {
+    while ($overall_movies = mysqli_fetch_array($overall_movies_result)) {
         if ($overall_movies['hide'] == 1) {
             $overall_movies_hidden++;
         } else {
@@ -88,10 +88,10 @@ if ($option == '') {
     
     $overall_tvshows_sql = 'SELECT play_count, hide FROM tvshows';
     $overall_tvshows_result = mysql_q($overall_tvshows_sql);
-    $overall_tvshows_all = mysql_num_rows($overall_tvshows_result);
+    $overall_tvshows_all = mysqli_num_rows($overall_tvshows_result);
     $overall_tvshows_watched = 0;
     $overall_tvshows_hidden = 0;
-    while ($overall_tvshows = mysql_fetch_array($overall_tvshows_result)) {
+    while ($overall_tvshows = mysqli_fetch_array($overall_tvshows_result)) {
         if ($overall_tvshows['hide'] == 1) {
             $overall_tvshows_hidden++;
         } else {
@@ -205,7 +205,7 @@ if ($option == 'movieslist' or $option == 'tvshowslist') {
                 <td><img src="admin/img/i_delete.png" title="' . $lang['a_delete'] . '" alt=""></td>
             </tr>';
     $i = 0;
-    while ($list = mysql_fetch_array($list_result)) {
+    while ($list = mysqli_fetch_array($list_result)) {
         if (file_exists('cache/' . $t . '_' . $list['id'] . '.jpg')) {
             $poster_exist = '<img class="p_exist animate" src="admin/img/exist.png" alt="" title="' . $lang['a_delete_poster'] . '">';
         } else {
@@ -290,9 +290,11 @@ if ($option == 'settings') {
     $output_fadeout_fanart = '';
     $output_show_trailer = '';
     $output_show_facebook = '';
+    $output_limit_actors = '';
     $output_protect_site = '';
     $output_mod_rewrite = '';
     $output_per_page = '';
+    $output_page_load_time = '';
     $output_default_sort = '';
     $output_default_watch = '';
     $output_panel_top_limit = '';
@@ -363,6 +365,7 @@ if ($option == 'settings') {
         $output_panel_top.= '<option' . ($setting['panel_top'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         $output_select_media_header.= '<option' . ($setting['select_media_header'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         $output_panel_view.= '<option' . ($setting['panel_view'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
+        $output_page_load_time.= '<option' . ($setting['page_load_time'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         $output_watched_status.= '<option' . ($setting['watched_status'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         $output_show_playcount.= '<option' . ($setting['show_playcount'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
         $output_live_search.= '<option' . ($setting['live_search'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . ($val == 0 ? $lang['a_setting_off'] : $lang['a_setting_on']) . '</option>';
@@ -392,12 +395,10 @@ if ($option == 'settings') {
     
     $quantity = array(5, 10, 20, 50, 100);
     foreach ($quantity as $val) {
-        // set per page input
         $output_per_page.= '<option' . ($setting['per_page'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . $val . '</option>';
-        // set panel top limit
         $output_panel_top_limit.= '<option' . ($setting['panel_top_limit'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . $val . '</option>';
-        // set live search max res
         $output_live_search_max_res.= '<option' . ($setting['live_search_max_res'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . $val . '</option>';
+        $output_limit_actors.= '<option' . ($setting['limit_actors'] == $val ? ' selected="selected"' : '') . ' value="' . $val . '">' . $val . '</option>';
     }
 
     // output form
@@ -419,20 +420,23 @@ if ($option == 'settings') {
                 <tr><td>' . $lang['a_select_media_header'] . ':</td><td><select name="select_media_header">' . $output_select_media_header . '</select></td></tr>
                 <tr><td>' . $lang['a_view'] . ':</td><td><select name="view">' . $output_view . '</select></td></tr>
                 <tr><td>' . $lang['a_per_page'] . ':</td><td><select name="per_page">' . $output_per_page . '</select></td></tr>
+                <tr><td>' . $lang['a_page_load_time'] . ':</td><td><select name="page_load_time">' . $output_page_load_time . '</select></td></tr>
                 <tr><td>' . $lang['a_default_sort'] . ':</td><td><select name="default_sort">' . $output_default_sort . '</select></td></tr>
                 <tr><td>' . $lang['a_default_watch'] . ':</td><td><select name="default_watch">' . $output_default_watch . '</select></td></tr>
                 <tr><td>' . $lang['a_panel_top'] . ':</td><td><select name="panel_top">' . $output_panel_top . '</select></td></tr>
                 <tr><td>' . $lang['a_panel_view'] . ':</td><td><select name="panel_view">' . $output_panel_view . '</select></td></tr>
-                <tr><td>' . $lang['a_watched_status'] . ':</td><td><select name="watched_status">' . $output_watched_status . '</select></td></tr>
-                <tr><td>' . $lang['a_show_playcount'] . ':</td><td><select name="show_playcount">' . $output_show_playcount . '</select></td></tr>
                 <tr><td>' . $lang['a_live_search'] . ':</td><td><select name="live_search">' . $output_live_search . '</select></td></tr>
                 <tr><td>' . $lang['a_live_search_max_res'] . ':</td><td><select name="live_search_max_res">' . $output_live_search_max_res . '</select></td></tr>
+                <tr><td>' . $lang['a_protect_site']  . ':</td><td><select name="protect_site">' . $output_protect_site . '</select></td></tr>
+                <tr><td>' . $lang['a_mod_rewrite']  . ':</td><td><select name="mod_rewrite">' . $output_mod_rewrite . '</select></td></tr>
+                <tr><td class="bold orange">' . $lang['a_set_each_item'] . '</td><td></td></tr>
+                <tr><td>' . $lang['a_watched_status'] . ':</td><td><select name="watched_status">' . $output_watched_status . '</select></td></tr>
+                <tr><td>' . $lang['a_show_playcount'] . ':</td><td><select name="show_playcount">' . $output_show_playcount . '</select></td></tr>
+                <tr><td>' . $lang['a_limit_actors'] . ':</td><td><select name="limit_actors">' . $output_limit_actors . '</select></td></tr>
                 <tr><td>' . $lang['a_show_fanart'] . ':</td><td><select name="show_fanart">' . $output_show_fanart . '</select></td></tr>
                 <tr><td>' . $lang['a_fadeout_fanart'] . ':</td><td><select name="fadeout_fanart">' . $output_fadeout_fanart . '</select></td></tr>
                 <tr><td>' . $lang['a_show_trailer'] . ':</td><td><select name="show_trailer">' . $output_show_trailer . '</select></td></tr>
                 <tr><td>' . $lang['a_show_facebook'] . ':</td><td><select name="show_facebook">' . $output_show_facebook . '</select></td></tr>
-                <tr><td>' . $lang['a_protect_site']  . ':</td><td><select name="protect_site">' . $output_protect_site . '</select></td></tr>
-                <tr><td>' . $lang['a_mod_rewrite']  . ':</td><td><select name="mod_rewrite">' . $output_mod_rewrite . '</select></td></tr>
                 <tr><td class="bold orange">' . $lang['a_set_panel_left'] . '</td><td></td></tr>
                 <tr><td>' . $lang['a_panel_overall'] . ':</td><td><select name="panel_overall">' . $output_panel_overall . '</select></td></tr>
                 <tr><td>' . $lang['a_panel_genre'] . ':</td><td><select name="panel_genre">' . $output_panel_genre . '</select></td></tr>
@@ -525,7 +529,7 @@ if ($option == 'password_save') {
 // check admin pass is not default
 $pass_check_sql = 'SELECT * FROM users WHERE login = "admin"';
 $pass_check_result = mysql_q($pass_check_sql);
-$pass_check = mysql_fetch_array($pass_check_result);
+$pass_check = mysqli_fetch_array($pass_check_result);
 if ($pass_check['password'] == '21232f297a57a5a743894a0e4a801fc3') {
     $output_panel_info.= $lang['a_pass_default'] . '<br />';
 }

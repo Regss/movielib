@@ -87,17 +87,18 @@ switch ($option) {
         /* ##################
          * # CHECK DATABASE #
          */##################
-        $conn_install = mysql_connect($_POST['host'] . ':' . $_POST['port'], $_POST['login'], $_POST['pass']);
-        if (!$conn_install) {
-            die($lang['ins_could_connect'] . ' - ' . mysql_error());
-        }
-        $create_sql = 'CREATE DATABASE IF NOT EXISTS ' . $_POST['database'];
-        mysql_q($create_sql);
+        $mysql_ml = array ($_POST['host'], $_POST['port'], $_POST['login'], $_POST['pass'], null);
         
-        $sel_install = mysql_select_db($_POST['database']);
+        $conn_install = connect($mysql_ml);
+        
+        $create_sql = 'CREATE DATABASE IF NOT EXISTS ' . $_POST['database'] . ' CHARACTER SET utf8 COLLATE utf8_general_ci';
+        mysqli_query($conn_install, $create_sql);
+        
+        $sel_install = mysqli_select_db($conn_install, $_POST['database']);
         if (!$sel_install) {
-            die($lang['ins_could_connect'] . ' - ' . mysql_error());
+            die($lang['ins_could_connect'] . ' - ' . mysqli_error());
         }
+        
         create_table($mysql_tables, $mysql_indexes, $lang, $version, 1);
         
         // create db.php

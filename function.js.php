@@ -35,8 +35,8 @@ if ($option == 'search') {
     function search($table, $search_sql, $search_array, $a_href, $setting) {
         $output = '';
         $search_res = mysql_q($search_sql);
-        if (mysql_num_rows($search_res) > 0) {
-            while($searched = mysql_fetch_assoc($search_res)) {
+        if (mysqli_num_rows($search_res) > 0) {
+            while($searched = mysqli_fetch_assoc($search_res)) {
                 // thumb
                 if ($table == 'movies' or $table == 'tvshows') {
                     if (file_exists('cache/' . $table . '_' . $searched['id'] . '.jpg')) {
@@ -58,7 +58,7 @@ if ($option == 'search') {
                     $sel_sql = 'SELECT ' . $val . '.' . $val . ' FROM ' . $val . ', ' . $table . '_' . $val . ' WHERE ' . $val . '.id = ' . $table . '_' . $val . '.' . $val . 'id AND ' . $table . '_' . $val . '.id = "' . $searched['id'] . '"';
                     $sel_res = mysql_q($sel_sql);
                     $out = array();
-                    while ($s = mysql_fetch_row($sel_res)) {
+                    while ($s = mysqli_fetch_row($sel_res)) {
                         $out[] = $s[0];
                     }
                     $searched[$val] = implode(' / ', $out);
@@ -227,18 +227,18 @@ if ($option  == 'remote') {
                     // get episode
                     $episode_sql = 'SELECT tvshow, season, episode, title, plot FROM episodes WHERE id = "' . $item['id'] . '"';
                     $episode_result = mysql_q($episode_sql);
-                    $episode = mysql_fetch_assoc($episode_result);
+                    $episode = mysqli_fetch_assoc($episode_result);
                     // get tvshow
                     $tvshow_sql = 'SELECT title, rating FROM tvshows WHERE id = "' . $episode['tvshow'] . '"';
                     $tvshow_result = mysql_q($tvshow_sql);
-                    $tvshow = mysql_fetch_assoc($tvshow_result);
+                    $tvshow = mysqli_fetch_assoc($tvshow_result);
                     // get panels
                     $search_array = array('genre');
                     foreach ($search_array as $val) {
                         $sel_sql = 'SELECT ' . $val . '.' . $val . ' FROM ' . $val . ', tvshows_' . $val . ' WHERE ' . $val . '.id = tvshows_' . $val . '.' . $val . 'id AND tvshows_' . $val . '.id = "' . $item['id'] . '"';
                         $sel_res = mysql_q($sel_sql);
                         $out = array();
-                        while ($s = mysql_fetch_row($sel_res)) {
+                        while ($s = mysqli_fetch_row($sel_res)) {
                             $out[] = $s[0];
                         }
                         $tvshow[$val] = implode(' / ', $out);
@@ -262,14 +262,14 @@ if ($option  == 'remote') {
                     // get movie
                     $movie_sql = 'SELECT `title`, `originaltitle`, `rating`, `runtime`, `plot`, `set`, `year` FROM movies WHERE id = "' . $item['id'] . '"';
                     $movie_result = mysql_q($movie_sql);
-                    $movie = mysql_fetch_assoc($movie_result);
+                    $movie = mysqli_fetch_assoc($movie_result);
                     // get panels
                     $search_array = array('genre', 'country', 'director', 'studio');
                     foreach ($search_array as $val) {
                         $sel_sql = 'SELECT ' . $val . '.' . $val . ' FROM ' . $val . ', movies_' . $val . ' WHERE ' . $val . '.id = movies_' . $val . '.' . $val . 'id AND movies_' . $val . '.id = "' . $item['id'] . '"';
                         $sel_res = mysql_q($sel_sql);
                         $out = array();
-                        while ($s = mysql_fetch_row($sel_res)) {
+                        while ($s = mysqli_fetch_row($sel_res)) {
                             $out[] = $s[0];
                         }
                         $movie[$val] = implode(' / ', $out);
@@ -342,7 +342,7 @@ if ($option  == 'deletemovie' or $option  == 'deletetvshow') {
         $episodes_sql = 'SELECT id FROM episodes WHERE tvshow = "' . $_GET['id'] . '"';
         $episodes_res = mysql_q($episodes_sql);
         $episodes_id = array();
-        while ($epi = mysql_fetch_assoc($episodes_res)) {
+        while ($epi = mysqli_fetch_assoc($episodes_res)) {
             $episodes_id[] = $epi['id'];
         }
         sync_delete(array($_GET['id']), 'tvshows');

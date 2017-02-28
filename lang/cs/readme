@@ -1,0 +1,11 @@
+Skript automaticky synchronizuje a zobrazuje knihovnu XBMC/KODI.
+
+Požadavky:
+- Server s Apache serverem, PHP 5, MySql 5
+- Doplněk "Movielib" pro XBMC/Kodi https://raw.github.com/Regss/xbmc-regss-repository/master/repo/repository.regss/repository.regss-1.2.1.zip 
+
+Výchozí hesla:
+Přístup na stránky: user
+Přístup do panelu administrátora: admin
+
+V Panelu administrátora musíte vytvořit token a vložit jej společně s URL cestou ke skriptu v nastavení doplňku.

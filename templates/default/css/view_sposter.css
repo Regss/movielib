@@ -2,6 +2,5 @@
 .poster { width:100px; height:147px; display:block; }
 .xbmc_hide { width:22px; position:absolute; opacity:.0; margin-top:10px; margin-left:5px; }
 .xbmc_hide img { cursor:pointer; }
-.ribbon_new { position: absolute; margin-left:-14px; margin-top:-151px; width:68px; height:70px; }
-.ribbon_new_text { font-smooth:always; width:140px; z-index:10; position: absolute; margin-left:8px; margin-top:-129px; text-align:center; font-size:7px; color:#fff;	text-shadow: 1px 1px #000000; font-family:Verdana, Tahoma; font-weight:bold; -webkit-transform: rotate(45deg); -moz-transform: rotate(45deg); -o-transform: rotate(45deg); writing-mode: lr-tb; }
+.ribbon_new { position: absolute; margin-left:-15px; margin-top:-151px; width:69px; height:70px; }
 .watched_img { width:30px; position:absolute; margin-left:76px; margin-top:-24px; display:block; }

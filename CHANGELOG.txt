@@ -1,3 +1,11 @@
+v. 2.9.0
+- fixed code for PHP 7 (mysqli)
+- added hevc codec
+- collapse too long story
+- view episodes for single season
+- setting for limit displaying actors
+- improved performance
+
 v. 2.8.2
 - added now playing option to banner
 
