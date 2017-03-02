@@ -1,3 +1,6 @@
+v. 2.9.1
+- improved performance
+
 v. 2.9.0
 - fixed code for PHP 7 (mysqli)
 - added hevc codec

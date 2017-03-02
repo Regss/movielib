@@ -52,7 +52,7 @@ class Teamplate {
         return;
     }
     
-    $times[$name] = microtime(true) - $microtime;
+    $times[$name] = round(microtime(true) - $microtime, 4);
     $microtime = microtime(true);
     
     return $times;
@@ -70,7 +70,7 @@ function mysql_q($query) {
     $result = mysqli_query($conn, $query);
     if (!$result) {
         echo $query . '<br>';
-        die ('ERROR: MySQL - ' . mysqli_error());
+        die ('ERROR: MySQL - ' . mysqli_error($conn));
     } else {
         if (isset($_GET['debug'])) {
             $querytime = microtime(true) - $time;
@@ -154,6 +154,40 @@ function create_table($mysql_tables, $mysql_indexes, $lang, $version, $drop) {
             $create_res = mysql_q($create_sql);
         }
     }
+    
+    // convert set column to tables (from 2.9.0 to 2.9.1)
+    $sql_u = 'SHOW COLUMNS FROM `movies`';
+    $res = mysql_q($sql_u);
+    while($columns = mysqli_fetch_assoc($res)) {
+        if ($columns['Field'] == 'set') {
+            $sel = 'SELECT `id`, `set` FROM movies';
+            $res = mysql_q($sel);
+            while($index = mysqli_fetch_assoc($res)) {
+                if ($index['set'] != '') {
+                    $sql_id = 'SELECT `id` FROM `set` WHERE `set` = "' . $index['set'] . '"';
+                    $res_id = mysql_q($sql_id);
+                    if (!mysqli_num_rows($res_id)) {
+                        $sql_ins = 'INSERT INTO `set` (`set`) VALUES ("' . $index['set'] . '")';
+                        mysql_q($sql_ins);
+                        $id = mysqli_insert_id(connect());
+                    }
+                    else {
+                        $row = mysqli_fetch_assoc($res_id);
+                        $id = $row['id'];
+                    }
+                    $sql_insert_check = 'SELECT `id`, `setid` FROM `movies_set` WHERE `id` = "' . $index['id'] . '" AND `setid` = "' . $id . '"';
+                    $res_insert_check = mysql_q($sql_insert_check);
+                    if (mysqli_num_rows($res_insert_check) == 0) {
+                        $insert_sql = 'INSERT INTO `movies_set` (`id`, `setid`) VALUES ("' . $index['id'] . '", "' . $id . '")';
+                        $result = mysql_q($insert_sql);
+                    }
+                }
+            }
+            break;
+        }
+    }
+    // convert set column to tables (from 2.9.0 to 2.9.1)
+    
     // insert config
     $sel = 'SELECT * FROM config';
     $res = mysql_q($sel);
@@ -165,9 +199,9 @@ function create_table($mysql_tables, $mysql_indexes, $lang, $version, $drop) {
     $sel = 'SELECT * FROM users';
     $res = mysql_q($sel);
     if (mysqli_num_rows($res) == 0) {
-            $insert_users_sql = 'INSERT INTO `users` (`id`, `login`, `password`) VALUES (1, "admin", "21232f297a57a5a743894a0e4a801fc3"), (2, "user", "ee11cbb19052e40b07aac0ca060c23ee")';
-            $insert_users_res = mysql_q($insert_users_sql);
-        }
+        $insert_users_sql = 'INSERT INTO `users` (`id`, `login`, `password`) VALUES (1, "admin", "21232f297a57a5a743894a0e4a801fc3"), (2, "user", "ee11cbb19052e40b07aac0ca060c23ee")';
+        $insert_users_res = mysql_q($insert_users_sql);
+    }
     // insert hash
     $sel = 'SELECT * FROM hash';
     $res = mysql_q($sel);
@@ -208,24 +242,37 @@ function create_table($mysql_tables, $mysql_indexes, $lang, $version, $drop) {
     foreach ($mysql_indexes as $table => $index_val) {
         $index_sql = 'SHOW INDEX FROM `' . $table . '`';
         $index_res = mysql_q($index_sql);
+        $index_db_array[$table] = array();
         while($index = mysqli_fetch_assoc($index_res)) {
             if ($index['Key_name'] !== 'PRIMARY') {
-                $index_db_array[$table][] = $index['Key_name'];
+                if (substr($index['Key_name'], 3) == $index['Column_name']) {
+                    $index_db_array[$table][] = $index['Key_name'];
+                } else {
+                    $del_sql = 'DROP INDEX `' . $index['Key_name'] . '` ON `' . $table . '`';
+                    mysql_q($del_sql);
+                }
             }
         }
     }
-    foreach ($mysql_indexes as $table => $index_val) {
-        if (in_array($table, array_keys($index_db_array))) {
-            foreach (array_unique($index_db_array[$table]) as $index) {
-                $alter_sql = 'DROP INDEX `' . $index . '` ON `' . $table . '`';
+    
+    foreach ($index_db_array as $table => $indexes) {
+        foreach ($indexes as $index) {
+            if (!in_array($index, $mysql_indexes[$table])) {
+                $del_sql = 'DROP INDEX `' . $index . '` ON `' . $table . '`';
+                mysql_q($del_sql);
+            }
+        }
+    }
+    
+    foreach ($mysql_indexes as $table => $indexes) {
+        foreach ($indexes as $index) {
+            if (!in_array($index, $index_db_array[$table])) {
+                $alter_sql = 'CREATE INDEX `' . $index . '` ON `' . $table . '` (`' . substr($index, 3) . '`)';
                 mysql_q($alter_sql);
             }
         }
-        foreach($index_val as $index_name) {
-            $alter_sql = 'CREATE INDEX `' . $index_name . '` ON `' . $table . '` (`' . substr($index_name, 3) . '`)';
-            mysql_q($alter_sql);
-        }
     }
+    
     // update version
     $update_v_sql = 'UPDATE `config` SET `version` = "' . $version . '" WHERE `version` LIKE "%"';
     mysql_q($update_v_sql);
@@ -347,11 +394,13 @@ function remove_images($data) {
 function sync_add($mysql_tables) {
     $insert_array = array();
     // add actors, genres, countries
-    $panels = array('actor', 'genre', 'country', 'studio', 'director', 'stream');
+    $panels = array('actor', 'genre', 'country', 'studio', 'director', 'set', 'stream');
     foreach ($panels as $panel) {
         if (isset($_POST[$panel])) {
             $values = array();
-            foreach ($_POST[$panel] as $key => $val) {
+            if(is_array($_POST[$panel])) $arr = $_POST[$panel];
+            else $arr = array($_POST[$panel]);
+            foreach ($arr as $key => $val) {
                 // add stream
                 if ($panel == 'stream') {
                     $cols = array_keys($mysql_tables['movies_stream']);
@@ -405,6 +454,7 @@ function sync_add($mysql_tables) {
         }
     }
     $insert_sql = 'INSERT INTO `' . $_POST['table'] . '` (' . implode(', ', array_keys($insert_array)) . ') VALUES (' . implode(', ', $insert_array) . ')';
+    echo 'BLE: ' . $insert_sql;
     $insert = mysql_q($insert_sql);
 }
 
@@ -414,7 +464,7 @@ function sync_add($mysql_tables) {
 function sync_delete($id, $table) {
     $del_array = array($table);
     if ($table == 'movies') {
-        array_push($del_array, $table . '_actor', $table . '_genre', $table . '_country', $table . '_studio', $table . '_director', $table . '_stream');
+        array_push($del_array, $table . '_actor', $table . '_genre', $table . '_country', $table . '_studio', $table . '_director', $table . '_set', $table . '_stream');
     }
     if ($table == 'tvshows') {
         array_push($del_array, $table . '_actor', $table . '_genre');
@@ -445,7 +495,7 @@ function sync_delete($id, $table) {
  * # Clean database #
  */##################
 function clean_db() {
-    $clean_array = array('movies_actor', 'movies_country', 'movies_director', 'movies_genre', 'movies_studio', 'movies_stream', 'tvshows_actor', 'tvshows_genre', 'episodes_stream');
+    $clean_array = array('movies_actor', 'movies_country', 'movies_director', 'movies_set', 'movies_genre', 'movies_studio', 'movies_stream', 'tvshows_actor', 'tvshows_genre', 'episodes_stream');
     foreach ($clean_array as $table) {
         $split = explode('_', $table);
         $video = $split[0];
@@ -536,23 +586,17 @@ function add_slash($string){
  */####################
 function panels_array($columns, $table) {
     
-    $sep_tab = array('genre', 'country', 'studio', 'director');
+    $sep_tab = array('genre', 'country', 'studio', 'set');
     $panels_array = array();
     foreach ($columns as $val) {
         if (in_array($val, $sep_tab)) {
-            $sel = 'SELECT DISTINCT ' . $val . '.id, ' . $val . '.' . $val . ' FROM `' . $val . '`, `' . $table . '_' . $val . '` WHERE ' . $val . '.id=' . $table . '_' . $val . '.' . $val . 'id ORDER BY ' . $val . '.' . $val;
-            $res = mysql_q($sel);
-            while ($r = mysqli_fetch_assoc($res)) {
-                $panels_array[$val][$r['id']] = $r[$val];
-            }
-        } else if ($val == "actor") {
-            $sel = 'SELECT ' . $val . '.id, ' . $val . '.' . $val . ' FROM `' . $val . '` ORDER BY ' . $val . '.' . $val;
+            $sel = 'SELECT DISTINCT `' . $val . '`.`id`, `' . $val . '`.`' . $val . '` FROM `' . $val . '`, `' . $table . '_' . $val . '` WHERE `' . $val . '`.`id` = `' . $table . '_' . $val . '`.`' . $val . 'id` ORDER BY `' . $val . '`.`' . $val . '`';
             $res = mysql_q($sel);
             while ($r = mysqli_fetch_assoc($res)) {
                 $panels_array[$val][$r['id']] = $r[$val];
             }
         } else {
-            $sel = 'SELECT DISTINCT `' . $val . '` FROM `' . $table . '` WHERE `hide` = 0 ORDER BY `' . $val . '`';
+            $sel = 'SELECT DISTINCT `' . $val . '` FROM `' . $table . '` WHERE `hide` = "0" ORDER BY `' . $val . '`';
             $res = mysql_q($sel);
             if (mysqli_num_rows($res) > 0) {
                 while ($r = mysqli_fetch_assoc($res)) {

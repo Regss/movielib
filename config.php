@@ -1,6 +1,6 @@
 <?PHP
 
-$version = '2.9.0';
+$version = '2.9.1';
 
 if (file_exists('db.php')) {
     include('db.php');
@@ -91,7 +91,6 @@ $mysql_tables['movies'] = array(
     'runtime'               => 'int(4) DEFAULT NULL',
     'originaltitle'         => 'varchar(255) DEFAULT ""',
     'year'                  => 'int(4) DEFAULT NULL',
-    'set'                   => 'varchar(255) DEFAULT ""',
     'file'                  => 'varchar(255) DEFAULT ""',
     'imdbid'                => 'varchar(12) DEFAULT ""',
     'play_count'            => 'int(10) DEFAULT 0',
@@ -176,6 +175,14 @@ $mysql_tables['director'] = array(
 $mysql_tables['movies_director'] = array(
     'id'                    => 'int(6) NOT NULL',
     'directorid'            => 'int(6) NOT NULL'
+);
+$mysql_tables['set'] = array(
+    'id'                    => 'int(6) NOT NULL AUTO_INCREMENT PRIMARY KEY',
+    'set'                   => 'varchar(255) NOT NULL'
+);
+$mysql_tables['movies_set'] = array(
+    'id'                    => 'int(6) NOT NULL',
+    'setid'                 => 'int(6) NOT NULL'
 );
 $mysql_tables['movies_stream'] = array(
     'id'                    => 'int(6) NOT NULL',
@@ -265,13 +272,15 @@ $mysql_tables['hash'] = array(
 $mysql_indexes['actor'] = array('ix_actor');
 $mysql_indexes['country'] = array('ix_country');
 $mysql_indexes['director'] = array('ix_director');
+$mysql_indexes['set'] = array('ix_set');
 $mysql_indexes['genre'] = array('ix_genre');
 $mysql_indexes['studio'] = array('ix_studio');
 
-$mysql_indexes['movies'] = array('ix_title', 'ix_rating', 'ix_runtime', 'ix_originaltitle', 'ix_year', 'ix_set', 'ix_play_count', 'ix_last_played', 'ix_date_added', 'ix_hide');
+$mysql_indexes['movies'] = array('ix_title', 'ix_rating', 'ix_runtime', 'ix_originaltitle', 'ix_year', 'ix_play_count', 'ix_last_played', 'ix_date_added', 'ix_hide');
 $mysql_indexes['movies_actor'] = array('ix_id', 'ix_actorid', 'ix_order');
 $mysql_indexes['movies_country'] = array('ix_id', 'ix_countryid');
 $mysql_indexes['movies_director'] = array('ix_id', 'ix_directorid');
+$mysql_indexes['movies_set'] = array('ix_id', 'ix_setid');
 $mysql_indexes['movies_genre'] = array('ix_id', 'ix_genreid');
 $mysql_indexes['movies_studio'] = array('ix_id', 'ix_studioid');
 $mysql_indexes['movies_stream'] = array('ix_id');

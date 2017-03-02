@@ -2,6 +2,10 @@
 session_start();
 header('Content-type: text/html; charset=utf-8');
 
+ini_set('display_errors',1);
+ini_set('display_startup_errors',1);
+error_reporting(-1);
+
 include('config.php');
 include('function.php');
 
@@ -55,7 +59,7 @@ $output_panel = '';
 if ($option == '') {
     
     // get version from db
-    $db_vers_sql = 'SELECT version FROM config';
+    $db_vers_sql = 'SELECT `version` FROM `config`';
     $db_vers_result = mysql_q($db_vers_sql);
     $db_version_assoc = mysqli_fetch_assoc($db_vers_result);
     $db_version = $db_version_assoc['version'];
@@ -70,7 +74,7 @@ if ($option == '') {
     }
 
     // Watched
-    $overall_movies_sql = 'SELECT play_count, hide FROM movies';
+    $overall_movies_sql = 'SELECT `play_count`, `hide` FROM `movies`';
     $overall_movies_result = mysql_q($overall_movies_sql);
     $overall_movies_all = mysqli_num_rows($overall_movies_result);
     $overall_movies_watched = 0;
@@ -86,7 +90,7 @@ if ($option == '') {
     }
     $overall_movies_unwatched = $overall_movies_all - $overall_movies_watched;
     
-    $overall_tvshows_sql = 'SELECT play_count, hide FROM tvshows';
+    $overall_tvshows_sql = 'SELECT `play_count`, `hide` FROM `tvshows`';
     $overall_tvshows_result = mysql_q($overall_tvshows_sql);
     $overall_tvshows_all = mysqli_num_rows($overall_tvshows_result);
     $overall_tvshows_watched = 0;
@@ -185,10 +189,10 @@ if ($option == '') {
 if ($option == 'movieslist' or $option == 'tvshowslist') {
     if ($option == 'movieslist') {
         $t = 'movies';
-        $list_sql = 'SELECT id, title, trailer, play_count, hide FROM movies ORDER BY title';
+        $list_sql = 'SELECT `id`, `title`, `trailer`, `play_count`, `hide` FROM `movies` ORDER BY `title`';
     } else {
         $t = 'tvshows';
-        $list_sql = 'SELECT id, title, play_count, hide FROM tvshows ORDER BY title';
+        $list_sql = 'SELECT `id`, `title`, `play_count`, `hide` FROM `tvshows` ORDER BY `title`';
     }
     
     $list_result = mysql_q($list_sql);
@@ -244,7 +248,7 @@ if ($option == 'movieslist' or $option == 'tvshowslist') {
 // DELETE ALL
 if ($option == 'delete_all_movies' or $option == 'delete_all_tvshows') {
     if ($option == 'delete_all_movies') {
-        $truncate = array('movies', 'movies_country', 'movies_actor', 'movies_director', 'movies_genre', 'movies_stream', 'movies_studio');
+        $truncate = array('movies', 'movies_country', 'movies_actor', 'movies_director', 'movies_set', 'movies_genre', 'movies_stream', 'movies_studio');
         $reg_exp = '#^(movies)#';
     } else {
         $truncate = array('tvshows', 'tvshows_actor', 'tvshows_genre', 'episodes', 'episodes_stream');
@@ -457,13 +461,13 @@ if ($option == 'settings_save' && isset($_POST) && count($_POST) > 10) {
     $settings_array = array();
     $test = true;
     foreach ($_POST as $key => $val) {
-        $settings_array[] = $key . ' = "' . $val . '"';
+        $settings_array[] = '`' . $key . '` = "' . $val . '"';
         if (strlen($val) == 0) {
             $test = false;
             break;
         }
     }
-    $settings_update_sql = 'UPDATE config SET ' . implode(', ', $settings_array);
+    $settings_update_sql = 'UPDATE `config` SET ' . implode(', ', $settings_array);
     
     // delete session var
     $_SESSION = array();
@@ -501,7 +505,7 @@ if ($option == 'password_save') {
     if (strlen($_POST['password']) > 0) {
         if ($_POST['password'] == $_POST['password_re']) {
             if (strlen($_POST['password']) > 3) {
-                $password_update_sql = 'UPDATE users SET password = "' . md5($_POST['password']) . '" WHERE login ="user"';
+                $password_update_sql = 'UPDATE `users` SET `password` = "' . md5($_POST['password']) . '" WHERE `login` = "user"';
                 mysql_q($password_update_sql);
                 $output_panel_info.= $lang['a_user_pass_changed'] . '<br />';
             } else {
@@ -515,7 +519,7 @@ if ($option == 'password_save') {
     if (strlen($_POST['password_admin']) > 0) {
         if ($_POST['password_admin'] == $_POST['password_admin_re']) {
             if (strlen($_POST['password_admin']) > 3) {
-                $password_update_sql = 'UPDATE users SET password = "' . md5($_POST['password_admin']) . '" WHERE login ="admin"';
+                $password_update_sql = 'UPDATE `users` SET `password` = "' . md5($_POST['password_admin']) . '" WHERE `login` = "admin"';
                 mysql_q($password_update_sql);
                 $output_panel_info.= $lang['a_admin_pass_changed'] . '<br />';
             } else {
@@ -527,7 +531,7 @@ if ($option == 'password_save') {
     }
 }
 // check admin pass is not default
-$pass_check_sql = 'SELECT * FROM users WHERE login = "admin"';
+$pass_check_sql = 'SELECT * FROM `users` WHERE `login` = "admin"';
 $pass_check_result = mysql_q($pass_check_sql);
 $pass_check = mysqli_fetch_array($pass_check_result);
 if ($pass_check['password'] == '21232f297a57a5a743894a0e4a801fc3') {
@@ -569,7 +573,7 @@ if ($option == 'banner') {
             }
         }
         if (!isset($false)) {
-            $update_sql = 'UPDATE config SET `banner` = "' . banner2str($_POST['banner']) . '"';
+            $update_sql = 'UPDATE `config` SET `banner` = "' . banner2str($_POST['banner']) . '"';
             mysql_q($update_sql);
             $_SESSION['banner'] = $setting['banner'] = banner2str($_POST['banner']);
             $b = create_banner($lang, 'banner.jpg', banner2str($_POST['banner']));
@@ -632,11 +636,11 @@ if ($option == 'xbmc') {
 
 // Save connection
 if ($option == 'xbmc_save') {
-    $xbmc_update_sql = 'UPDATE config SET 
-        xbmc_host = "' . $_POST['xbmc_host'] . '", 
-        xbmc_port = "' . $_POST['xbmc_port'] . '",
-        xbmc_login = "' . $_POST['xbmc_login'] . '", 
-        xbmc_pass = "' . $_POST['xbmc_pass'] . '"';
+    $xbmc_update_sql = 'UPDATE `config` SET 
+        `xbmc_host` = "' . $_POST['xbmc_host'] . '", 
+        `xbmc_port` = "' . $_POST['xbmc_port'] . '",
+        `xbmc_login` = "' . $_POST['xbmc_login'] . '", 
+        `xbmc_pass` = "' . $_POST['xbmc_pass'] . '"';
     mysql_q($xbmc_update_sql);
     $output_panel_info.= $lang['a_xbmc_saved'] . '<br />';
     $_SESSION = array();
