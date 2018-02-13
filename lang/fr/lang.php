@@ -162,6 +162,7 @@ $lang['a_panel_year']                   =   'Panneau année';
 $lang['a_panel_country']                =   'Panneau pays';
 $lang['a_panel_set']                    =   'Set panel';
 $lang['a_panel_studio']                 =   'Studio panel';
+$lang['a_panel_director']               =   'Panel Réalisateurs';
 $lang['a_show_fanart']                  =   'Voir le fanart d\'arrière-plan';
 $lang['a_fadeout_fanart']               =   'Fadeout fanart when mouse leave movie window';
 $lang['a_show_trailer']                 =   'Voir les bandes-annonces';

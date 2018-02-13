@@ -162,6 +162,7 @@ $lang['a_panel_year']                   =   'Årstal panel';
 $lang['a_panel_country']                =   'Land panel';
 $lang['a_panel_set']                    =   'Set panel';
 $lang['a_panel_studio']                 =   'Studio panel';
+$lang['a_panel_director']               =   'Direktørpanel';
 $lang['a_show_fanart']                  =   'Vis fanskabte billeder i baggrunden';
 $lang['a_fadeout_fanart']               =   'Utydeliggør fanskabte billeder når musen fjernes fra film vinduet';
 $lang['a_show_trailer']                 =   'Vis trailer';

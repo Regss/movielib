@@ -162,6 +162,7 @@ $lang['a_panel_year']                   =   'Rok';
 $lang['a_panel_country']                =   'Krajina panel';
 $lang['a_panel_set']                    =   'Nastavenie panel';
 $lang['a_panel_studio']                 =   'Štúdio panel';
+$lang['a_panel_director']               =   'Panel riaditeľov';
 $lang['a_show_fanart']                  =   'Ukáž fanart v pozadí';
 $lang['a_fadeout_fanart']               =   'Urob prechod ked myšou prejdeš okno filmu';
 $lang['a_show_trailer']                 =   'Ukáž trailer';

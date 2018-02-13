@@ -162,6 +162,7 @@ $lang['a_panel_year']                   =   'Jaar paneel';
 $lang['a_panel_country']                =   'Land paneel';
 $lang['a_panel_set']                    =   'Set paneel';
 $lang['a_panel_studio']                 =   'Studio paneel';
+$lang['a_panel_director']               =   'Regisseur paneel';
 $lang['a_show_fanart']                  =   'Toon fanart in achtergrond';
 $lang['a_fadeout_fanart']               =   'Fade-out fanart wanneer de muis het filmscherm verlaat';
 $lang['a_show_trailer']                 =   'Toon trailer';

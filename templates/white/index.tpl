@@ -118,6 +118,12 @@
                             <ul>{panel_studio}</ul>
                         </div>
                         {/SHOW.panel_studio}
+                        {SHOW.panel_director}
+                        <div id="director" class="panel_box_title">{LANG.i_director}</div>
+                        <div id="panel_director" class="panel_box {SET.panel_director}">
+                            <ul>{panel_director}</ul>
+                        </div>
+                        {/SHOW.panel_director}
                     </div>
                     <div id="panel_right">
                         <div id="panel_sort">{panel_sort}</div>

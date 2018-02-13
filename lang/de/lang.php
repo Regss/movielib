@@ -162,6 +162,7 @@ $lang['a_panel_year']                   =   'Jahr-Bereich';
 $lang['a_panel_country']                =   'Land-Bereich';
 $lang['a_panel_set']                    =   'Panel festlegen';
 $lang['a_panel_studio']                 =   'Studiotafel';
+$lang['a_panel_director']               =   'Regisseurtafel';
 $lang['a_show_fanart']                  =   'Fankunst im Hintergrund anzeigen';
 $lang['a_fadeout_fanart']               =   'Fankunst ausblenden, wenn die Maus das Filmfenster verlässt';
 $lang['a_show_trailer']                 =   'Filmvorschau anzeigen';

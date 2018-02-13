@@ -154,6 +154,7 @@ if ($video == 'tvshows') {
     if ($setting['panel_genre'] <> 0) $columns[] = 'genre';
     if ($setting['panel_country'] <> 0) $columns[] = 'country';
     if ($setting['panel_studio'] <> 0) $columns[] = 'studio';
+    if ($setting['panel_director'] <> 0) $columns[] = 'director';
 }
 
 $panels_array = panels_array($columns, $mysql_table);
@@ -194,7 +195,7 @@ if ($setting['panel_overall'] > 0) {
 }
 
 // menu panel
-$menu_array = array('genre', 'year', 'country', 'set', 'studio');
+$menu_array = array('genre', 'year', 'country', 'set', 'studio', 'director');
 foreach ($menu_array as $menu_name) {
     $output['panel_' . $menu_name] = '';
     if ($setting['panel_' . $menu_name] <> 0 && isset($panels_array[$menu_name]) && count($panels_array[$menu_name]) > 0) {
