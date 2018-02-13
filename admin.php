@@ -290,6 +290,7 @@ if ($option == 'settings') {
     $output_panel_country = '';
     $output_panel_set = '';
     $output_panel_studio = '';
+    $output_panel_director = '';
     $output_show_fanart = '';
     $output_fadeout_fanart = '';
     $output_show_trailer = '';
@@ -395,6 +396,7 @@ if ($option == 'settings') {
         $output_panel_country.= '<option' . ($setting['panel_country'] == $key ? ' selected="selected"' : '') . ' value="' . $key . '">' . $val . '</option>';
         $output_panel_set.= '<option' . ($setting['panel_set'] == $key ? ' selected="selected"' : '') . ' value="' . $key . '">' . $val . '</option>';
         $output_panel_studio.= '<option' . ($setting['panel_studio'] == $key ? ' selected="selected"' : '') . ' value="' . $key . '">' . $val . '</option>';
+        $output_panel_director.= '<option' . ($setting['panel_director'] == $key ? ' selected="selected"' : '') . ' value="' . $key . '">' . $val . '</option>';
     }
     
     $quantity = array(5, 10, 20, 50, 100);
@@ -448,6 +450,7 @@ if ($option == 'settings') {
                 <tr><td>' . $lang['a_panel_country'] . ':</td><td><select name="panel_country">' . $output_panel_country . '</select></td></tr>
                 <tr><td>' . $lang['a_panel_set'] . ':</td><td><select name="panel_set">' . $output_panel_set . '</select></td></tr>
                 <tr><td>' . $lang['a_panel_studio'] . ':</td><td><select name="panel_studio">' . $output_panel_studio . '</select></td></tr>
+                <tr><td>' . $lang['a_panel_director'] . ':</td><td><select name="panel_director">' . $output_panel_director . '</select></td></tr>
                 <tr><td class="bold orange">' . $lang['a_set_panel_top'] . '</td><td></td></tr>
                 <tr><td>' . $lang['a_panel_top_time'] . ':</td><td><input type="text" name="panel_top_time" value="' . $setting['panel_top_time'] . '" /></td></tr>
                 <tr><td>' . $lang['a_panel_top_limit'] . ':</td><td><select name="panel_top_limit">' . $output_panel_top_limit . '</select></td></tr>

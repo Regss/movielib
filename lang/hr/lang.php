@@ -162,6 +162,7 @@ $lang['a_panel_year']                   =   'Panel godina';
 $lang['a_panel_country']                =   'Panel zemlja';
 $lang['a_panel_set']                    =   'Panel kolekcija';
 $lang['a_panel_studio']                 =   'Panel studia';
+$lang['a_panel_director']               =   'Panel rendezők';
 $lang['a_show_fanart']                  =   'Prikaži fanart u pozadini';
 $lang['a_fadeout_fanart']               =   'Sakrij fanart kada miš napusti područje filma';
 $lang['a_show_trailer']                 =   'Pogledaj najavu';

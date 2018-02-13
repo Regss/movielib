@@ -586,7 +586,7 @@ function add_slash($string){
  */####################
 function panels_array($columns, $table) {
     
-    $sep_tab = array('genre', 'country', 'studio', 'set');
+    $sep_tab = array('genre', 'country', 'studio', 'set', 'director');
     $panels_array = array();
     foreach ($columns as $val) {
         if (in_array($val, $sep_tab)) {
